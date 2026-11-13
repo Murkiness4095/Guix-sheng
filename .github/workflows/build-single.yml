@@ -2,9 +2,9 @@ name: build-single
 on:
   push:
     branches: [main]
-    paths-ignore: ["**/*.md", "docs/**", "TODO.md"]
+    paths: ["images/**", "scripts/**", "channels.scm", ".github/workflows/build-single.yml"]
   pull_request:
-    paths-ignore: ["**/*.md", "docs/**", "TODO.md"]
+    paths: ["images/**", "scripts/**", "channels.scm", ".github/workflows/build-single.yml"]
   workflow_dispatch:
     inputs:
       desktop_username:

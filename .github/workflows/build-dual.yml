@@ -2,9 +2,9 @@ name: build-dual
 on:
   push:
     branches: [main]
-    paths-ignore: ["**/*.md", "docs/**", "TODO.md"]
+    paths: ["images/**", "scripts/**", "channels.scm", ".github/workflows/build-dual.yml"]
   pull_request:
-    paths-ignore: ["**/*.md", "docs/**", "TODO.md"]
+    paths: ["images/**", "scripts/**", "channels.scm", ".github/workflows/build-dual.yml"]
   workflow_dispatch:
     inputs:
       desktop_username:
