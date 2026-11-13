@@ -1,0 +1,51 @@
+name: build
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["**/*.md", "collab/**", "docs/**"]
+  pull_request:
+    paths-ignore: ["**/*.md", "collab/**", "docs/**"]
+  workflow_dispatch:
+jobs:
+  image:
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - single-tty
+          - single-kde
+          - single-gnome
+          - single-niri
+          - single-noctalia
+          - dual-tty
+          - dual-kde
+          - dual-gnome
+          - dual-niri
+          - dual-noctalia
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Guix and image tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget parted dosfstools mtools e2fsprogs android-sdk-libsparse-utils
+          wget https://guix.gnu.org/install.sh -O /tmp/guix-install.sh
+          yes | sudo bash /tmp/guix-install.sh
+      - name: Pull channels (guix master + midnight)
+        run: sudo -H guix pull -C channels.scm
+      - name: Build and extract rootfs
+        run: |
+          sudo -H env PATH=/var/guix/profiles/per-user/root/current-guix/bin:/usr/local/bin:/usr/bin:/bin \
+            bash scripts/build-image.sh images/${{ matrix.image }}.scm
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sheng-${{ matrix.image }}
+          path: |
+            *.ext4
+            *.sparse.img
+      - name: Dump image builder logs on failure
+        if: failure()
+        run: |
+          for f in $(find /var/log/guix/drvs -name '*partition.img*' -o -name '*disk-image*' 2>/dev/null); do
+            echo "===== $f ====="; zcat "$f" 2>/dev/null | tail -40 || true
+          done

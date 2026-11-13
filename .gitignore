@@ -1,0 +1,9 @@
+result
+result-*
+.DS_Store
+.devenv
+.devenv-build
+artifacts/sheng-debug/
+.sheng-ip
+*.nar
+*.nar.zst

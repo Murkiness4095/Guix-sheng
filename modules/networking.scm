@@ -1,0 +1,5 @@
+(define-module (sheng networking)
+  #:use-module (gnu services networking)
+  #:export (sheng-networking-services))
+(define (sheng-networking-services)
+  (list (service network-manager-service-type)))

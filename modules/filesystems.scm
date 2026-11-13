@@ -1,0 +1,5 @@
+(define-module (sheng filesystems)
+  #:use-module (gnu)
+  #:export (sheng-file-systems))
+(define (sheng-file-systems)
+  (list (file-system (mount-point "/") (device (file-system-label "linux")) (type "ext4"))))

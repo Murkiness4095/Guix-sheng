@@ -1,0 +1,5 @@
+(define-module (sheng desktop)
+  #:use-module (gnu)
+  #:export (sheng-desktop-services))
+(define (sheng-desktop-services)
+  (list))
