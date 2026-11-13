@@ -5,7 +5,12 @@ set -euo pipefail
 GUIX=${GUIX:-guix}
 src=$1
 prefix=${2:-$(basename "$src" .scm)}
-disk=$("$GUIX" system image "$src" 2>/dev/null | tail -1)
+if ! out=$("$GUIX" system image "$src" 2>"$prefix.err"); then
+  echo "guix system image failed: $src" >&2
+  tail -60 "$prefix.err" >&2
+  exit 1
+fi
+disk=$(printf '%s\n' "$out" | tail -1)
 test -f "$disk" || { echo "no disk image from guix: $disk" >&2; exit 1; }
 echo "disk image: $disk"
 # root partition starts at root-offset = 512 * 2048 = 1 MiB (gnu/system/image.scm)
