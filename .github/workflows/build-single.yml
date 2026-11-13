@@ -37,12 +37,17 @@ jobs:
           hash=$(openssl passwd -6 "$pass")
           printf '(define desktop-username "%s")\n(define desktop-password-hash "%s")\n' "$uname" "$hash" > images/settings.scm
           cat images/settings.scm
-      - name: Pull channels (guix master + midnight)
-        run: sudo -H guix pull -C channels.scm
+      - name: Cache Guix checkouts
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/guix/checkouts
+          key: guix-checkouts-${{ hashFiles('channels.scm') }}
+      - name: Pull pinned channels
+        run: guix pull -C channels.scm
       - name: Build and extract rootfs
-        run: |
-          sudo -H env PATH=/var/guix/profiles/per-user/root/current-guix/bin:/usr/local/bin:/usr/bin:/bin \
-            bash scripts/build-image.sh images/${{ matrix.image }}.scm
+        env:
+          GUIX: $HOME/.config/guix/current/bin/guix
+        run: scripts/build-image.sh images/${{ matrix.image }}.scm
       - uses: actions/upload-artifact@v4
         with:
           name: sheng-${{ matrix.image }}
