@@ -31,7 +31,7 @@ jobs:
         run: |
           uname=${UNAME:-sheng}; pass=${UPASS:-sheng}
           hash=$(openssl passwd -6 "$pass")
-          printf '(define desktop-username "%s")\n(define desktop-password-hash "%s")\n' "$uname" "$hash" > images/settings.scm
+          printf '(define sheng-desktop-username "%s")\n(define sheng-desktop-password-hash "%s")\n' "$uname" "$hash" > images/settings.scm
           cat images/settings.scm
       - name: Cache Guix checkouts
         uses: actions/cache@v4

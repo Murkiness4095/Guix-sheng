@@ -21,9 +21,9 @@
   (string-append (dirname (current-filename)) "/settings.scm"))
 (if (file-exists? settings-file) (load settings-file))
 (define desktop-username
-  (if (defined? 'desktop-username) desktop-username "sheng"))
+  (if (defined? 'sheng-desktop-username) sheng-desktop-username "sheng"))
 (define desktop-password-hash
-  (if (defined? (quote desktop-password-hash)) desktop-password-hash #f))
+  (if (defined? 'sheng-desktop-password-hash) sheng-desktop-password-hash #f))
 
 (define (sheng-niri-desktop desktop-name exec-line)
   "Package providing a wayland-session desktop entry."
