@@ -1,5 +1,5 @@
 ;; images/dual-niri.scm — sheng dual system, niri desktop, noctalia greeter, librewolf.
-(load (string-append (dirname (current-filename)) "/base.scm"))
+(load "images/base.scm")
 (use-modules (gnu) (gnu image) (gnu system image) (guix gexp))
 
 (define the-os

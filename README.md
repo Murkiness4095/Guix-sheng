@@ -14,6 +14,7 @@ Xiaomi Pad 6S Pro（sheng）的 GNU Guix（aarch64）移植。设备支持参考
 | `packages/` | 内核、U-Boot、固件、用户态包 |
 | `modules/` `services/` | Guix 模块与 shepherd 服务 |
 | `scripts/build-image.sh` | 构建并提取 ext4 根分区 |
+| `examples/` | 最小/桌面/双系统/多机/tmpfs 样板 |
 | `docs/` `tests/` | 文档与测试 |
 
 ## 镜像
