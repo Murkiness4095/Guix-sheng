@@ -52,7 +52,8 @@
     (license #f)))
 
 (define (sheng-desktop-services)
-  (list (service elogind-service-type)
+  (list (service dbus-root-service-type)
+        (service elogind-service-type)
         (service polkit-service-type)
         (service accountsservice-service-type)
         (service upower-service-type)
