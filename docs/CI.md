@@ -29,3 +29,17 @@
 
 `scripts/build-image.sh` 调用 `guix system image`，从 1 MiB 偏移提取 root
 分区为 ext4，并尽可能转换为 Android sparse。artifact 名 `sheng-<variant>`。
+
+## 缓存
+
+Guix 没有 `cache-nix-action` 的等价物，使用原生替代机制：
+
+- 上游包：默认 substitute（`ci.guix.gnu.org` / `bordeaux`）。
+- `guix pull` 的 Guix profile：`guix archive --export -r` 导出 nar，
+  由 `actions/cache` 以 `channels.scm` 哈希为 key 跨运行复用；命中后先
+  `guix archive --import`，`guix pull` 无需重新编译 Guix。
+- `~/.cache/guix`（Git checkout 与包缓存）一并缓存。
+- 镜像本身（ext4/sparse）体积大，不放入 actions/cache（仓库 10 GB 上限）；
+  它们的昂贵部分是系统闭包，仍由官方 substitute 覆盖大部分上游包。
+
+`guix publish --cache` 也可以做远程二进制缓存，但需要持久存储；本仓库未配置。

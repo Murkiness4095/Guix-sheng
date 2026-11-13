@@ -33,13 +33,22 @@ jobs:
           hash=$(openssl passwd -6 "$pass")
           printf '(define sheng-desktop-username "%s")\n(define sheng-desktop-password-hash "%s")\n' "$uname" "$hash" > images/settings.scm
           cat images/settings.scm
-      - name: Cache Guix checkouts
+      - name: Cache Guix state
         uses: actions/cache@v4
         with:
-          path: ~/.cache/guix/checkouts
-          key: guix-checkouts-${{ hashFiles('channels.scm') }}
+          path: |
+            ~/.cache/guix
+            ~/.config/guix
+          key: guix-state-${{ hashFiles('channels.scm') }}
+      - name: Import cached Guix profile
+        run: |
+          if [ -f ~/.config/guix/cache-profile.nar ]; then
+            guix archive --import < ~/.config/guix/cache-profile.nar || true
+          fi
       - name: Pull pinned channels
-        run: guix pull -C channels.scm
+        run: |
+          guix pull -C channels.scm
+          guix archive --export -r "$(readlink -f ~/.config/guix/current)" > ~/.config/guix/cache-profile.nar || true
       - name: Build all single-system images
         env:
           GUIX: $HOME/.config/guix/current/bin/guix
