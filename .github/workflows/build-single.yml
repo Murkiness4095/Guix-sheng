@@ -14,12 +14,8 @@ on:
         description: Desktop user password
         default: sheng
 jobs:
-  image:
+  images:
     runs-on: ubuntu-24.04-arm
-    strategy:
-      fail-fast: false
-      matrix:
-        image: [single-tty, single-kde, single-gnome, single-niri, single-noctalia]
     steps:
       - uses: actions/checkout@v4
       - name: Install Guix and image tools
@@ -44,13 +40,21 @@ jobs:
           key: guix-checkouts-${{ hashFiles('channels.scm') }}
       - name: Pull pinned channels
         run: guix pull -C channels.scm
-      - name: Build and extract rootfs
+      - name: Build all single-system images
         env:
           GUIX: $HOME/.config/guix/current/bin/guix
-        run: scripts/build-image.sh images/${{ matrix.image }}.scm
+        run: |
+          set -e
+          for img in single-tty single-kde single-gnome single-niri single-noctalia; do
+            echo "=== $img ==="
+            scripts/build-image.sh "images/$img.scm" || echo "FAILED: $img" | tee -a failures.txt
+          done
+          test ! -s failures.txt
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: sheng-${{ matrix.image }}
+          name: sheng-single-images
           path: |
             *.ext4
             *.sparse.img
+            failures.txt
