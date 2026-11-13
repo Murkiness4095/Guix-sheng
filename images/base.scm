@@ -10,7 +10,7 @@
              (gnu packages linux)
              (gnu packages librewolf)
              (gnu packages window-management)
-             (gnu build-system trivial)
+             (guix build-system trivial)
              (guix gexp)
              (midnight packages noctalia)
              (midnight services noctalia-greeter))

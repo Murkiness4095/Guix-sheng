@@ -3,7 +3,7 @@
 (use-modules (gnu) (gnu image) (gnu system image) (guix gexp))
 
 (define the-os
-  (sheng-os #:desktop 'niri #:hostname "sheng" #:root-label "linux"))
+  (sheng-os #:desktop 'niri #:hostname "sheng" #:root-label "userdata"))
 
 (image
  (inherit mbr-disk-image)
@@ -11,7 +11,7 @@
  (partitions
   (list (partition
          (inherit root-partition)
-         (label "linux")
+         (label "userdata")
          (initializer
           #~(lambda (root . args)
               (apply (@ (gnu build image) initialize-root-partition)
