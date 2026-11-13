@@ -15,6 +15,7 @@
              (guix build-system trivial)
              (guix gexp)
              (midnight packages noctalia)
+             (midnight packages noctalia-greeter)
              (midnight services noctalia-greeter))
 
 ;; Build-time identity settings.  CI writes images/settings.scm from the
