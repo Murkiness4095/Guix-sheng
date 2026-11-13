@@ -6,6 +6,7 @@
              (gnu services base)
              (gnu services desktop)
              (gnu services dbus)
+             (gnu services ssh)
              (gnu services networking)
              (gnu services sound)
              (gnu packages linux)
