@@ -42,3 +42,11 @@ Guix 没有 `cache-nix-action` 的等价物：
 `scripts/build-image.sh` 调用 `guix system image`，失败时打印 stderr；成功后从
 1 MiB 偏移提取 root 分区为 ext4，并尽可能转换为 Android sparse。artifact 名
 `sheng-<variant>`。
+
+## 求值先行
+
+构建前有 `Evaluate all images` 步骤，用
+`guix system image --dry-run images/<variant>.scm` 逐个求值。任何未绑定变量或
+服务类型错误会在实际构建前失败，避免把时间花在错误的镜像上。
+
+注意：镜像文件返回 `<image>` 记录，不能用 `guix system build` 求值。
