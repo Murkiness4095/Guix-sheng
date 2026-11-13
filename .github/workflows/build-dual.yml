@@ -43,6 +43,16 @@ jobs:
       - name: Pull pinned channels
         run: |
           guix pull -C channels.scm
+      - name: Evaluate all images
+        run: |
+          set -o pipefail
+          export GUIX="$HOME/.config/guix/current/bin/guix"
+          for img in $(echo "$IMAGES"); do
+            echo "=== eval $img ==="
+            "$GUIX" system build --dry-run "images/$img.scm" 2>&1 | tail -20 || exit 1
+          done
+        env:
+          IMAGES: dual-tty dual-kde dual-gnome dual-niri dual-noctalia
       - name: Build all dual-system images
         run: |
           export GUIX="$HOME/.config/guix/current/bin/guix"
