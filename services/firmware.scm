@@ -1,5 +1,5 @@
 ;; services/firmware.scm — vendor firmware/userspace stack (Guix port of nixos-sheng modules/firmware.nix)
-(define-module (sheng services firmware)
+(define-module (services firmware)
   #:use-module (gnu services)
   #:export (sheng-firmware-service-type))
 

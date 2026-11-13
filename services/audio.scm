@@ -1,5 +1,5 @@
 ;; services/audio.scm — port of nixos-sheng modules/audio.nix
-(define-module (sheng services audio)
+(define-module (services audio)
   #:use-module (gnu services)
   #:export (sheng-audio-service-type))
 (define sheng-audio-service-type

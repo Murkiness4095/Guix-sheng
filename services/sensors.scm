@@ -1,4 +1,4 @@
-(define-module (sheng services sensors)
+(define-module (services sensors)
   #:use-module (gnu services)
   #:export (sheng-sensors-service))
 (define (sheng-sensors-service)

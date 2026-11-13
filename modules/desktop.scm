@@ -1,4 +1,4 @@
-(define-module (sheng desktop)
+(define-module (modules desktop)
   #:use-module (gnu)
   #:export (sheng-desktop-services))
 (define (sheng-desktop-services)

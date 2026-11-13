@@ -1,4 +1,4 @@
-(define-module (sheng camera)
+(define-module (modules camera)
   #:use-module (gnu)
   #:export (sheng-camera))
 (define (sheng-camera)

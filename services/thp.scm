@@ -1,4 +1,4 @@
-(define-module (sheng services thp)
+(define-module (services thp)
   #:use-module (gnu services)
   #:export (sheng-thp-service))
 (define (sheng-thp-service)

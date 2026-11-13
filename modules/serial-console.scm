@@ -1,4 +1,4 @@
-(define-module (sheng serial-console)
+(define-module (modules serial-console)
   #:use-module (gnu)
   #:export (sheng-serial-console))
 (define (sheng-serial-console)

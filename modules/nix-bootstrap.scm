@@ -1,4 +1,4 @@
-(define-module (sheng nix-bootstrap)
+(define-module (modules nix-bootstrap)
   #:use-module (gnu)
   #:export (sheng-nix-bootstrap))
 (define (sheng-nix-bootstrap)

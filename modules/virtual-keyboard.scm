@@ -1,4 +1,4 @@
-(define-module (sheng virtual-keyboard)
+(define-module (modules virtual-keyboard)
   #:use-module (gnu)
   #:export (sheng-virtual-keyboard))
 (define (sheng-virtual-keyboard)

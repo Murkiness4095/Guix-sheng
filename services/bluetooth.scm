@@ -1,4 +1,4 @@
-(define-module (sheng services bluetooth)
+(define-module (services bluetooth)
   #:use-module (gnu services)
   #:export (sheng-bluetooth-service))
 (define (sheng-bluetooth-service)

@@ -1,4 +1,4 @@
-(define-module (sheng networking)
+(define-module (modules networking)
   #:use-module (gnu services networking)
   #:export (sheng-networking-services))
 (define (sheng-networking-services)

@@ -1,8 +1,8 @@
 ;; system.scm — top-level Guix System declaration for sheng.
 (use-modules (gnu)
-             (sheng boot)
-             (sheng filesystems)
-             (sheng networking))
+             (modules boot)
+             (modules filesystems)
+             (modules networking))
 
 (operating-system
   (host-name "sheng")

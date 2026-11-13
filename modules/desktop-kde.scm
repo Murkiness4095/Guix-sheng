@@ -1,4 +1,4 @@
-(define-module (sheng desktop-kde)
+(define-module (modules desktop-kde)
   #:use-module (gnu)
   #:export (sheng-desktop-kde))
 (define (sheng-desktop-kde)

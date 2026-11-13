@@ -1,4 +1,4 @@
-(define-module (sheng desktop-gnome)
+(define-module (modules desktop-gnome)
   #:use-module (gnu)
   #:export (sheng-desktop-gnome))
 (define (sheng-desktop-gnome)

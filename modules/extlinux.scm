@@ -1,4 +1,4 @@
-(define-module (sheng extlinux)
+(define-module (modules extlinux)
   #:use-module (gnu)
   #:export (sheng-extlinux))
 (define (sheng-extlinux)

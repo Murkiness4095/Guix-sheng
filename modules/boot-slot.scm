@@ -1,4 +1,4 @@
-(define-module (sheng boot-slot)
+(define-module (modules boot-slot)
   #:use-module (gnu)
   #:export (sheng-boot-slot))
 (define (sheng-boot-slot)

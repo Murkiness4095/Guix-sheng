@@ -1,4 +1,4 @@
-(define-module (sheng services fingerprint)
+(define-module (services fingerprint)
   #:use-module (gnu services)
   #:export (sheng-fingerprint-service))
 (define (sheng-fingerprint-service)

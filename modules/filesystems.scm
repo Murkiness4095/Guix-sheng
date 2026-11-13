@@ -1,4 +1,4 @@
-(define-module (sheng filesystems)
+(define-module (modules filesystems)
   #:use-module (gnu)
   #:export (sheng-file-systems))
 (define (sheng-file-systems)

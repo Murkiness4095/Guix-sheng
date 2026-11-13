@@ -1,4 +1,4 @@
-(define-module (sheng hardware)
+(define-module (modules hardware)
   #:use-module (gnu)
   #:export (sheng-hardware-services))
 (define (sheng-hardware-services)

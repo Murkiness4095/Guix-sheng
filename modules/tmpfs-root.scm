@@ -1,4 +1,4 @@
-(define-module (sheng tmpfs-root)
+(define-module (modules tmpfs-root)
   #:use-module (gnu)
   #:export (sheng-tmpfs-root))
 (define (sheng-tmpfs-root)

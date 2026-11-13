@@ -1,7 +1,7 @@
 ;; packages/u-boot/default.scm — U-Boot for sheng (SM8550).
 ;; Source: SushyDev/u-boot branch xiaomi-sheng.  Defconfig: sm8550_defconfig.
 ;; Cross-compiled for aarch64; the board boot uses this to produce boot.img.
-(define-module (sheng packages u-boot)
+(define-module (packages u-boot)
   #:use-module (gnu packages bootloaders)
   #:use-module (gnu packages android)
   #:use-module (gnu packages vim)
@@ -24,8 +24,8 @@
                (base32
                 "0rzcvchj9npzpdvrw8xz3jff426aqwdhjsjfkzk2nhikfyfx0m33"))
               (patches
-               (list (local-file "patches/prefer-abl-memory-layout.patch")
-                     (local-file "patches/fix-fastboot-menu-reboot-mode.patch")))))))
+               (list (local-file "u-boot/patches/prefer-abl-memory-layout.patch")
+                     (local-file "u-boot/patches/fix-fastboot-menu-reboot-mode.patch")))))))
 
 (define u-boot-sheng
   (let ((base (make-u-boot-package "sm8550" "aarch64-linux-gnu"

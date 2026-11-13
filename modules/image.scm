@@ -1,4 +1,4 @@
-(define-module (sheng image)
+(define-module (modules image)
   #:use-module (gnu)
   #:export (sheng-image))
 (define (sheng-image)
