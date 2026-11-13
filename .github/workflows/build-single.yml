@@ -40,15 +40,9 @@ jobs:
             ~/.cache/guix
             ~/.config/guix
           key: guix-state-${{ hashFiles('channels.scm') }}
-      - name: Import cached Guix profile
-        run: |
-          if [ -f ~/.config/guix/cache-profile.nar ]; then
-            guix archive --import < ~/.config/guix/cache-profile.nar || true
-          fi
       - name: Pull pinned channels
         run: |
           guix pull -C channels.scm
-          guix archive --export --recursive "$(readlink -f ~/.config/guix/current)" > ~/.config/guix/cache-profile.nar 2>/dev/null || true
       - name: Build all single-system images
         run: |
           export GUIX="$HOME/.config/guix/current/bin/guix"
