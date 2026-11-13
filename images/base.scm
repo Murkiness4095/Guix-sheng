@@ -15,6 +15,16 @@
              (midnight packages noctalia)
              (midnight services noctalia-greeter))
 
+;; Build-time identity settings.  CI writes images/settings.scm from the
+;; workflow inputs; local builds fall back to these defaults.
+(define settings-file
+  (string-append (dirname (current-filename)) "/settings.scm"))
+(if (file-exists? settings-file) (load settings-file))
+(define desktop-username
+  (if (defined? 'desktop-username) desktop-username "sheng"))
+(define desktop-password-hash
+  (if (defined? (quote desktop-password-hash)) desktop-password-hash #f))
+
 (define (sheng-niri-desktop desktop-name exec-line)
   "Package providing a wayland-session desktop entry."
   (package
@@ -98,10 +108,11 @@
                              (type "ext4"))
                            %base-file-systems))
       (users (cons* (user-account
-                      (name "sheng")
+                      (name desktop-username)
+                      (password desktop-password-hash)
                       (group "users")
                       (supplementary-groups '("wheel" "netdev" "audio" "video" "input"))
-                      (home-directory "/home/sheng"))
+                      (home-directory (string-append "/home/" desktop-username)))
                     (user-account
                       (name "greeter")
                       (group "greeter")

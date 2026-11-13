@@ -1,22 +1,21 @@
-# 待办与验收标准（sheng 的 Guix 移植）
+# 待办
 
-## 已完成
+## 已验证
 
-- [x] 项目骨架按目的创建
-- [x] 职能聊天室 rooms/*（16 个）
-- [x] 共享机制 shared/*
-- [x] 实时工作台 scripts/workbench
-- [x] Guix 包/模块/服务骨架
-- [x] 内核/U-Boot/固件/音频/触摸/笔/指纹/电源/传感器/键盘等包骨架
-- [x] 架构与参考文档
+- [x] 单系统 tty 镜像构建成功（CI）
+- [x] SQLite 锁绕过（`#:register-closures? #f`）
+- [x] 仓库历史压缩、CI 历史清理
 
-## 剩余待办
+## 进行中
 
-- [ ] channels.scm 锁定 Guix 提交并验证求值
-- [ ] system.scm 可求值（guix system build）在 aarch64 CI
-- [ ] 将包骨架替换为真实源码与构建
-- [ ] 服务从骨架转为 shepherd 实现
-- [ ] 单/双系统 6 种镜像（tty/kde/gnome）构建与刷写验证
-- [ ] 双系统布局与切换
-- [ ] 触摸/笔/音频/Wi-Fi/蓝牙验收
-- [ ] 文档与交接更新
+- [ ] 单/双系统 × tty/kde/gnome/niri/noctalia 十个镜像全部构建
+- [ ] `base.scm` 在 CI 求值通过（niri + midnight + greetd）
+- [ ] 构建时用户名/密码写入镜像并生效
+
+## 待办
+
+- [ ] 内核包替换为 `sm8550-mainline` 实际构建
+- [ ] U-Boot 包与补丁实际构建
+- [ ] 固件包实际构建
+- [ ] 镜像内 store DB 注册（首启或改 Guix 镜像构建器）
+- [ ] 实机刷入、启动、触摸/笔/音频/Wi-Fi/蓝牙验收

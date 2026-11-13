@@ -1,28 +1,25 @@
-name: build
+name: build-dual
 on:
   push:
     branches: [main]
-    paths-ignore: ["**/*.md", "collab/**", "docs/**"]
+    paths-ignore: ["**/*.md", "docs/**", "TODO.md"]
   pull_request:
-    paths-ignore: ["**/*.md", "collab/**", "docs/**"]
+    paths-ignore: ["**/*.md", "docs/**", "TODO.md"]
   workflow_dispatch:
+    inputs:
+      desktop_username:
+        description: Desktop user name
+        default: sheng
+      desktop_password:
+        description: Desktop user password
+        default: sheng
 jobs:
   image:
     runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
       matrix:
-        image:
-          - single-tty
-          - single-kde
-          - single-gnome
-          - single-niri
-          - single-noctalia
-          - dual-tty
-          - dual-kde
-          - dual-gnome
-          - dual-niri
-          - dual-noctalia
+        image: [dual-tty, dual-kde, dual-gnome, dual-niri, dual-noctalia]
     steps:
       - uses: actions/checkout@v4
       - name: Install Guix and image tools
@@ -31,6 +28,15 @@ jobs:
           sudo apt-get install -y wget parted dosfstools mtools e2fsprogs android-sdk-libsparse-utils
           wget https://guix.gnu.org/install.sh -O /tmp/guix-install.sh
           yes | sudo bash /tmp/guix-install.sh
+      - name: Write build-time identity settings
+        env:
+          UNAME: ${{ inputs.desktop_username }}
+          UPASS: ${{ inputs.desktop_password }}
+        run: |
+          uname=${UNAME:-sheng}; pass=${UPASS:-sheng}
+          hash=$(openssl passwd -6 "$pass")
+          printf '(define desktop-username "%s")\n(define desktop-password-hash "%s")\n' "$uname" "$hash" > images/settings.scm
+          cat images/settings.scm
       - name: Pull channels (guix master + midnight)
         run: sudo -H guix pull -C channels.scm
       - name: Build and extract rootfs
@@ -43,9 +49,3 @@ jobs:
           path: |
             *.ext4
             *.sparse.img
-      - name: Dump image builder logs on failure
-        if: failure()
-        run: |
-          for f in $(find /var/log/guix/drvs -name '*partition.img*' -o -name '*disk-image*' 2>/dev/null); do
-            echo "===== $f ====="; zcat "$f" 2>/dev/null | tail -40 || true
-          done
