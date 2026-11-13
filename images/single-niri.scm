@@ -1,5 +1,6 @@
 ;; images/single-niri.scm — sheng single system, niri desktop, noctalia greeter, librewolf.
-(load "images/base.scm")
+(use-modules (guix build utils))
+(load (string-append (dirname (current-filename)) "/base.scm"))
 (use-modules (gnu) (gnu image) (gnu system image) (guix gexp))
 
 (define the-os

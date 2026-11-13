@@ -17,7 +17,8 @@
 
 ;; Build-time identity settings.  CI writes images/settings.scm from the
 ;; workflow inputs; local builds fall back to these defaults.
-(define settings-file "images/settings.scm")
+(define settings-file
+  (string-append (dirname (current-filename)) "/settings.scm"))
 (if (file-exists? settings-file) (load settings-file))
 (define desktop-username
   (if (defined? 'desktop-username) desktop-username "sheng"))
