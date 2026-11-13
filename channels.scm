@@ -2,8 +2,8 @@
 ;; Pinned commits, GitHub mirror for guix (Savannah git is unreliable in CI).
 (list (channel
         (name 'guix)
-        (url "https://github.com/guix-mirror/guix.git")
-        (commit "2cd049ff5f3f9f1dd194a25d0d0f3ecaa234b8f8")
+        (url "https://codeberg.org/guix/guix.git")
+        (commit "e130d23d6c716273beca5c97649e8b14cf50440f")
         (introduction
          (make-channel-introduction
           "9edb3f66fd807b096b48283debdcddccfea34bad"
