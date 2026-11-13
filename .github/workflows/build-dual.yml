@@ -50,9 +50,8 @@ jobs:
           guix pull -C channels.scm
           guix archive --export --recursive "$(readlink -f ~/.config/guix/current)" > ~/.config/guix/cache-profile.nar 2>/dev/null || true
       - name: Build all dual-system images
-        env:
-          GUIX: $HOME/.config/guix/current/bin/guix
         run: |
+          export GUIX="$HOME/.config/guix/current/bin/guix"
           set -e
           for img in dual-tty dual-kde dual-gnome dual-niri dual-noctalia; do
             echo "=== $img ==="
