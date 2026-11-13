@@ -11,6 +11,7 @@
              (gnu packages linux)
              (gnu packages librewolf)
              (gnu packages window-management)
+             (guix packages)
              (guix build-system trivial)
              (guix gexp)
              (midnight packages noctalia)
@@ -54,8 +55,7 @@
         (service accountsservice-service-type)
         (service upower-service-type)
         (service network-manager-service-type)
-        (service bluetooth-service-type)
-        (service pipewire-service-type)))
+        (service bluetooth-service-type)))
 
 (define (sheng-greetd-config)
   (greetd-configuration
