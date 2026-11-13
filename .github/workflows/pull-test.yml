@@ -1,0 +1,18 @@
+name: pull-test
+on:
+  workflow_dispatch:
+jobs:
+  pull:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Guix
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://guix.gnu.org/install.sh -O /tmp/guix-install.sh
+          yes | sudo bash /tmp/guix-install.sh
+      - name: Pull pinned channels
+        run: |
+          time sudo -H guix pull -C channels.scm
+          sudo -H /var/guix/profiles/per-user/root/current-guix/bin/guix describe
