@@ -38,16 +38,26 @@ jobs:
           hash=$(openssl passwd -6 "$pass")
           printf '(define sheng-desktop-username "%s")\n(define sheng-desktop-password-hash "%s")\n' "$uname" "$hash" > images/settings.scm
           cat images/settings.scm
-      - name: Cache Guix state
-        uses: actions/cache@v4
+      - name: Restore Guix state
+        uses: actions/cache/restore@v4
         with:
           path: |
             ~/.cache/guix
             ~/.config/guix
           key: guix-state-${{ hashFiles('channels.scm') }}
       - name: Pull pinned channels
+        id: pull
         run: |
           guix pull -C channels.scm
+      - name: Save Guix state
+        if: always() && steps.pull.outcome == 'success'
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.cache/guix
+            ~/.config/guix
+          key: guix-state-${{ hashFiles('channels.scm') }}
       - name: Evaluate all images
         run: |
           set -o pipefail
