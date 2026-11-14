@@ -7,6 +7,9 @@ on:
     paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/workflows/build-dual.yml"]
   workflow_dispatch:
     inputs:
+      variants:
+        description: Space-separated image names
+        default: dual-tty dual-kde dual-gnome dual-niri dual-noctalia
       desktop_username:
         description: Desktop user name
         default: sheng
@@ -54,7 +57,7 @@ jobs:
             "$GUIX" system image -L . --dry-run "images/$img.scm" 2>&1 | tail -20 || exit 1
           done
         env:
-          IMAGES: dual-tty dual-kde dual-gnome dual-niri dual-noctalia
+          IMAGES: ${{ inputs.variants || 'dual-tty dual-kde dual-gnome dual-niri dual-noctalia' }}
       - name: Build U-Boot boot.img
         run: |
           export GUIX="$HOME/.config/guix/current/bin/guix"
@@ -63,11 +66,13 @@ jobs:
         run: |
           export GUIX="$HOME/.config/guix/current/bin/guix"
           set -e
-          for img in dual-tty dual-kde dual-gnome dual-niri dual-noctalia; do
+          for img in $IMAGES; do
             echo "=== $img ==="
             scripts/build-image.sh "images/$img.scm" || echo "FAILED: $img" | tee -a failures.txt
           done
           test ! -s failures.txt
+        env:
+          IMAGES: ${{ inputs.variants || 'dual-tty dual-kde dual-gnome dual-niri dual-noctalia' }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
