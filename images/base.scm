@@ -60,6 +60,9 @@
         (service polkit-service-type)
         (service accountsservice-service-type)
         (service upower-service-type)
+        ;; NetworkManager's default shepherd requirement is 'wireless-daemon,
+        ;; which wpa-supplicant provides.
+        (service wpa-supplicant-service-type)
         (service network-manager-service-type)
         (service bluetooth-service-type)))
 
