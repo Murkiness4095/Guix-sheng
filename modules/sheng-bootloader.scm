@@ -26,7 +26,8 @@
     (source #f)
     (build-system trivial-build-system)
     (arguments
-     (list #:builder
+     (list #:modules '((guix build utils))
+           #:builder
            #~(begin
                (use-modules (guix build utils))
                (mkdir-p #$output))))

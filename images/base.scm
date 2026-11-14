@@ -39,7 +39,8 @@
     (source #f)
     (build-system trivial-build-system)
     (arguments
-     (list #:builder
+     (list #:modules '((guix build utils))
+           #:builder
            #~(begin
                (use-modules (guix build utils) (ice-9 format))
                (let ((dir (string-append #$output "/share/wayland-sessions")))
