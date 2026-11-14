@@ -135,11 +135,17 @@
       (packages (append browser session-pkgs %base-packages))
       (services
        (append
-        (modify-services %base-services
-          (delete mingetty-service-type))
+        ;; A tty image must stay usable without a working graphical greeter;
+        ;; desktop variants replace getty with the noctalia greeter.
+        (if (eq? desktop 'tty)
+            %base-services
+            (modify-services %base-services
+              (delete mingetty-service-type)))
         (sheng-desktop-services)
         desktop-service
         noctalia-config
-        (list (service noctalia-greeter-service-type)
-              (service greetd-service-type (sheng-greetd-config))
-              (service openssh-service-type)))))))
+        (if (eq? desktop 'tty)
+            (list (service openssh-service-type))
+            (list (service noctalia-greeter-service-type)
+                  (service greetd-service-type (sheng-greetd-config))
+                  (service openssh-service-type))))))))
