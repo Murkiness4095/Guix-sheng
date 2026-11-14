@@ -3,9 +3,11 @@
 # Usage: scripts/build-image.sh images/single-tty.scm [out-prefix]
 set -euo pipefail
 GUIX=${GUIX:-guix}
+repo=$(cd "$(dirname "$0")/.." && pwd)
 src=$1
 prefix=${2:-$(basename "$src" .scm)}
-if ! out=$("$GUIX" system image "$src" 2>"$prefix.err"); then
+# -L lets the image files use the repo's (packages ...) and (modules ...).
+if ! out=$("$GUIX" system image -L "$repo" "$src" 2>"$prefix.err"); then
   echo "guix system image failed: $src" >&2
   tail -60 "$prefix.err" >&2
   exit 1

@@ -2,22 +2,29 @@
 
 ## 当前状态
 
-- 单系统 tty 镜像构建已通过 CI。
-- 单/双系统各五种桌面变体已加入矩阵，正在验证。
-- 仓库历史已压缩为单条提交；CI 历史仅保留成功运行。
-- 硬件（内核/U-Boot/固件）包仍是骨架，引用上游源码，未实机验证。
+- 启动链已实现：`packages/u-boot.scm`（fork + 补丁 + mkbootimg）、
+  `modules/sheng-bootloader.scm`（extlinux.conf）、`images/base.scm` 接入
+  `linux-sheng`、`sheng-firmware`。
+- 十种镜像已用本地 `guix repl` 求值通过；CI 实际构建尚未跑。
+- 硬件包源哈希已核对：内核/固件原值正确，U-Boot 已修正。
+- 实机刷入、首启、外设：未开始。
 
 ## 关键结论
 
-- `guix system image` 在镜像内注册 store DB 时会在 CI 沙箱触发 SQLite
-  `database is locked`；用 `#:register-closures? #f` 跳过，闭包仍复制。
-- niri 在 Guix 官方 `(gnu packages window-management)`；noctalia 与
-  noctalia-greeter 在 midnight 频道。
-- 镜像 root 分区从 1 MiB 偏移提取；双系统根标签 `linux`，单系统 `userdata`
-  （当前镜像统一用 `linux`，见 TODO）。
+- U-Boot fork 的两个远端（SushyDev、Murkiness4095）`xiaomi-sheng` 指向同一提交
+  `7025b79`；本仓库固定该提交。
+- U-Boot 的 `boot.img` 必须用 `--header_version 2`，并带 `u-boot.dtb`；
+  cmdline 含 `root=PARTLABEL=userdata`（双系统为 `linux`）。
+- 双系统 U-Boot 必须同时改 `board/qualcomm/sheng.env` 的 sysboot 分区名和
+  rescue 的 `root=PARTLABEL=`，只改 boot.img cmdline 不够。
+- Guix 默认 `root-partition` 已关闭 `metadata_csum`/`64bit`，U-Boot 可读。
+- 镜像 root 分区从 1 MiB 偏移提取；ext4 卷标与分区标签同为 `userdata`。
+- `guix system image --dry-run` 之前必须加 `-L <仓库根>`，否则
+  `(packages ...)`/`(modules ...)` 无法解析。
 
 ## 下一步
 
-1. 十种镜像全部构建通过。
-2. 内核/U-Boot/固件包替换为真实构建。
-3. 实机刷入与启动、外设验收。
+1. 触发 `build-single`，确认 U-Boot、内核、固件、tty 镜像构建。
+2. 按 `docs/boot-chain.md` 刷入并完成首启验收。
+3. 建立 store DB 注册，恢复 `bootrescue` 路径。
+4. 双系统与桌面变体。

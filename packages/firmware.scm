@@ -1,22 +1,24 @@
-;; packages/firmware/default.scm — sheng vendor firmware blobs.
+;; packages/firmware.scm — sheng vendor firmware blobs.
 ;; Installed under /lib/firmware; source: ianchb/sheng-firmware.
 (define-module (packages firmware)
-  #:use-module (guix packages)
-  #:use-module (guix git-download)
   #:use-module (guix build-system copy)
-  #:use-module (guix licenses)
+  #:use-module (guix git-download)
+  #:use-module (guix packages)
   #:export (sheng-firmware))
 
 (define sheng-firmware
   (package
     (name "sheng-firmware")
     (version "1.0")
-    (source (git-fetch
-              (url "https://github.com/ianchb/sheng-firmware")
-              (commit "053da477a5c338ac28d7c1c869e8c3ff7ca24d11")
-              (sha256
-               (base32
-                "0hgz4s6gspdld0yncxpbs4qish13n2qa686k5a875xr8dcq15api"))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/ianchb/sheng-firmware")
+             (commit "053da477a5c338ac28d7c1c869e8c3ff7ca24d11")))
+       (sha256
+        (base32
+         "0hgz4s6gspdld0yncxpbs4qish13n2qa686k5a875xr8dcq15api"))))
     (build-system copy-build-system)
     (arguments
      (list #:install-plan #~'(("." "lib/firmware"))))

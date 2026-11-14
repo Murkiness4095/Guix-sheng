@@ -1,7 +1,6 @@
 ;; images/base.scm — shared sheng operating-system generator.
 ;; Load with (load (string-append (dirname (current-filename)) "/base.scm")).
 (use-modules (gnu)
-             (gnu bootloader u-boot)
              (gnu services)
              (gnu services base)
              (gnu services desktop)
@@ -17,7 +16,10 @@
              (guix gexp)
              (midnight packages noctalia)
              (midnight packages noctalia-greeter)
-             (midnight services noctalia-greeter))
+             (midnight services noctalia-greeter)
+             (modules sheng-bootloader)
+             (packages kernel)
+             (packages firmware))
 
 ;; Build-time identity settings.  CI writes images/settings.scm from the
 ;; workflow inputs; local builds fall back to these defaults.
@@ -103,8 +105,13 @@
       (host-name hostname)
       (timezone "Asia/Shanghai")
       (locale "en_US.utf8")
+      (kernel linux-sheng)
+      (kernel-arguments
+       (list "console=ttyMSM0,115200n8" "console=ttyGS0,115200n8"
+             "console=tty0" "fbcon=map:0" "loglevel=4" "rootwait"))
+      (firmware (cons* sheng-firmware %base-firmware))
       (bootloader (bootloader-configuration
-                    (bootloader u-boot-bootloader)
+                    (bootloader sheng-extlinux-bootloader)
                     (targets '("/dev/mmcblk0"))))
       (file-systems (cons* (file-system
                              (mount-point "/")

@@ -52,9 +52,11 @@ guix pull -C channels.scm
 
 | 项目 | 状态 |
 | --- | --- |
-| `single-tty` 镜像构建 | ✅ CI 通过 |
-| 桌面/双系统变体 | 构建中，见 Actions |
-| 内核/U-Boot/固件包 | 骨架，引用上游源码 |
+| 十种镜像求值 | ✅ 本地 `guix repl` 全部通过 |
+| `single-tty` 镜像构建 | ✅ CI 通过（旧骨架，未含 sheng 内核） |
+| 启动链（U-Boot → extlinux → tty） | 已实现，待 CI 构建与实机首启，见 `docs/boot-chain.md` |
+| 内核/U-Boot/固件包 | 真实包已接入；源哈希已核对；未构建 |
+| 桌面/双系统变体 | 求值通过；实机未验证 |
 | 实机刷入与启动 | 未验证 |
 
 `guix system image` 在镜像内注册 store DB 时会遇到 SQLite `database is locked`；
@@ -68,7 +70,9 @@ guix pull -C channels.scm
 | 内核配置 | debian-sheng `sm8550.config` | debian-sheng 提交 `da1d2761dbc1ccaea0122f8b0c2dce2d52edaeb2` |
 | U-Boot | https://github.com/SushyDev/u-boot | `xiaomi-sheng`，提交 `7025b792e2884c5fb4747d891e30002ea029048a` |
 | U-Boot 补丁 | nixos-sheng `packages/u-boot/patches/` | 见目录 |
-| 固件 | https://github.com/ianchb/sheng-firmware | `master` |
+| 固件 | https://github.com/ianchb/sheng-firmware | 提交 `053da477a5c338ac28d7c1c869e8c3ff7ca24d11` |
+| 启动配置 | `modules/sheng-bootloader.scm`（extlinux.conf 生成器） | 本仓库 |
+| boot.img 打包 | `packages/mkbootimg-v2.py`（header v2；与 AOSP 输出逐字节一致） | 本仓库 |
 | niri | Guix 官方 `(gnu packages window-management)` | 随频道提交 |
 | noctalia / greeter | https://codeberg.org/stampede/midnight | `main` |
 

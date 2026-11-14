@@ -2,9 +2,9 @@ name: build-dual
 on:
   push:
     branches: [main]
-    paths: ["images/**", "scripts/**", "channels.scm", ".github/workflows/build-dual.yml"]
+    paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/workflows/build-dual.yml"]
   pull_request:
-    paths: ["images/**", "scripts/**", "channels.scm", ".github/workflows/build-dual.yml"]
+    paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/workflows/build-dual.yml"]
   workflow_dispatch:
     inputs:
       desktop_username:
@@ -49,10 +49,14 @@ jobs:
           export GUIX="$HOME/.config/guix/current/bin/guix"
           for img in $(echo "$IMAGES"); do
             echo "=== eval $img ==="
-            "$GUIX" system image --dry-run "images/$img.scm" 2>&1 | tail -20 || exit 1
+            "$GUIX" system image -L . --dry-run "images/$img.scm" 2>&1 | tail -20 || exit 1
           done
         env:
           IMAGES: dual-tty dual-kde dual-gnome dual-niri dual-noctalia
+      - name: Build U-Boot boot.img
+        run: |
+          export GUIX="$HOME/.config/guix/current/bin/guix"
+          scripts/build-uboot.sh dual
       - name: Build all dual-system images
         run: |
           export GUIX="$HOME/.config/guix/current/bin/guix"
@@ -67,6 +71,7 @@ jobs:
         with:
           name: sheng-dual-images
           path: |
+            sheng-boot-dual.img
             *.ext4
             *.sparse.img
             failures.txt
