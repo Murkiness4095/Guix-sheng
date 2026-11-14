@@ -39,8 +39,10 @@ CI 将输入写入 `images/settings.scm`（不提交）后构建。
 已通过 CI 的路径（单系统 tty，镜像本体）：
 
 ```sh
-guix system image images/single-tty.scm
+guix system image -L . images/single-tty.scm
 ```
+
+`-L .` 让镜像文件能加载本仓库的 `(packages ...)` 与 `(modules ...)`。
 
 本地只有官方 guix 频道时，niri/noctalia 变体需要先：
 
