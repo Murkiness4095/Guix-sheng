@@ -15,6 +15,10 @@ sheng 的 GNU Guix（aarch64）移植。仓库按职责分层：
 | `tests/` | 配置/系统测试 |
 | `docs/` | 交接、架构、验证文档 |
 
-镜像产物：单系统与双系统各五种桌面（tty/kde/gnome/niri/noctalia），
-统一 noctalia greeter 登录、librewolf 浏览器。构建入口见
-`.github/workflows/build-single.yml` 与 `build-dual.yml`。
+镜像产物：单系统与双系统各五种（tty/kde/gnome/niri/noctalia）。桌面变体
+统一用 noctalia greeter 登录，tty 变体保留文本 getty。构建入口见
+`.github/workflows/build-single.yml` 与 `build-dual.yml`，本地构建需要
+`guix system image -L . images/<variant>.scm`。
+
+启动链（U-Boot → extlinux → tty）与刷机步骤见
+[boot-chain.md](boot-chain.md)。
