@@ -23,13 +23,16 @@
 Guix 没有 `cache-nix-action` 的等价物：
 
 - 上游包：默认 substitute（`ci.guix.gnu.org` / `bordeaux`）。
-- `~/.cache/guix`（Git checkout 与包缓存）由 `actions/cache` 复用，省去重复克隆。
-- 不缓存 Guix profile 的 store 闭包：`guix archive --export` 默认签名，密钥默认
-  在 `/etc/guix`，非 root 无法使用，且跨运行无法稳定复用签名。镜像本身体积也
-  超过仓库 10 GB 缓存上限。
+- `~/.cache/guix` 与 `~/.config/guix` 由 `actions/cache/restore`/`save` 复用：
+  pull 成功后就保存，即使后面的求值或构建失败也不丢。
+- 但这些目录只有 Git checkout、profile 链接和元数据，**不含 `/gnu/store` 闭包**。
+  runner 每次是干净机器，因此 `guix pull` 仍会重新编译 pinned Guix（约 30 分钟）；
+  缓存只能省掉重复下载 channel 和部分元数据。
+- 不缓存 store 闭包：`guix archive --export` 默认签名，密钥在 `/etc/guix`，
+  非 root 不可用；镜像体积也超过仓库 10 GB 缓存上限。
 - `guix publish --cache` 可做远程二进制缓存，但需要持久存储；本仓库未配置。
 
-因此首次运行的 `guix pull` 约 30 分钟，这是当前主要固定成本。
+因此每次冷运行仍需一次完整 `guix pull`，这是当前主要固定成本。
 
 ## 构建时身份
 
