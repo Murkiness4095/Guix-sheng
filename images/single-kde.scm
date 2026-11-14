@@ -1,5 +1,4 @@
 ;; images/single-kde.scm — sheng single system, kde desktop, noctalia greeter, librewolf.
-(use-modules (guix build utils))
 (load (string-append (dirname (current-filename)) "/base.scm"))
 (use-modules (gnu) (gnu image) (gnu system image) (guix gexp))
 

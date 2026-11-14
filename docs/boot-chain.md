@@ -53,7 +53,7 @@ fastboot reboot
 
 1. 屏幕出现 U-Boot 菜单（5 秒倒计时）。
 2. 串口/屏幕看到 `sysboot` 后内核启动日志。
-3. `uname -r` 为 `7.3.0-sm8550-sheng`。
+3. `uname -r` 以 `7.3.0` 开头（带 extra version，具体后缀以构建为准）。
 4. 根文件系统以 `userdata` 挂载，`/gnu/store` 可读。
 5. 失败时 U-Boot 静态菜单仍能进入 fastboot（`Reboot to fastboot`）。
 
