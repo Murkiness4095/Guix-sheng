@@ -31,7 +31,8 @@
 
 | 差异 | 原因 | 处理 |
 | --- | --- | --- |
-| 启动方式：debian 用其预编译 boot.img + extlinux/内核参数 | Guix 用 extlinux.conf 指向 store | 保持 extlinux；内核参数与 debian 对齐 |
+| 启动方式 | 内核 `Image.gz` + 追加 dtb 的 boot.img，ABL 直接启动，无 initrd；cmdline 仅 `root=PARTLABEL=` | U-Boot → extlinux，内核 `Image` + 独立 `FDT` + Guix initrd | 保留 U-Boot 菜单（明确要求）；若 U-Boot 路线受阻，按 debian 的 `Image.gz-dtb` 直启 boot.img 作为回退 |
+| 根文件系统初始化 | Debian `/sbin/init` | Guix initrd + `gnu.system=` | 暂不取消 initrd；`#:register-closures? #f` 的 store DB 问题首启后处理 |
 | 用户态服务：systemd 单元 | Guix 用 shepherd | 按 `services/` 逐项等价实现 |
 | 内核构建参数：debian 用 clang/LLD（见配置） | Guix 默认 GCC | 先按 GCC + `olddefconfig` 构建；若不行为则加 clang 工具链 |
 | 桌面：debian 可选 GNOME/KDE/server | Guix 提供 tty/kde/gnome/niri/noctalia | 保留现有变体，功能对齐 debian 的 server/GNOME/KDE |
