@@ -1,50 +1,59 @@
 ;; packages/kernel.scm — Linux kernel for sheng (SM8550).
-;; Source: ianchb/sm8550-mainline, branch sheng-7.3.0.
-;; Config: sm8550.config from debian-sheng.
+;; Source: code002-2/sm8550-mainline (default branch sheng-7.2-rc7).
+;; Config: sm8550.config from ianchb/debian-sheng master (its full config),
+;; built the way debian-sheng builds it: clang/LLVM=1, then olddefconfig to
+;; adapt the newer config to this tree.
 ;;
-;; The config is Debian's full .config, not a minimal defconfig.  Passing it
-;; to customize-linux would make its verify-config phase compare GCC-computed
-;; symbols (CC_IS_CLANG, LTO_CLANG, ...) with the clang values in the file and
-;; fail, so load it directly with olddefconfig instead.
+;; This is a proprietary-device port: vendor options and blobs in the config
+;; are intentional.  Guix's free-software defaults are not a constraint.
 (define-module (packages kernel)
   #:use-module (gnu packages linux)
+  #:use-module (gnu packages llvm)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
   #:use-module (guix packages)
   #:use-module (guix utils)
   #:export (linux-sheng))
 
-(define %sm8550-mainline-commit
-  "1fb56e66091e71160d7c7f8e13b065d5b6ab8b8c")
+(define %sheng-kernel-commit
+  "52a5197235edd2a2b6559d69b45557cf83f7d111")
 
 (define %sm8550-config
   (local-file "kernel/sm8550.config"))
 
 (define linux-sheng
   (package
+    ;; linux-libre only supplies the build machinery; the source and config
+    ;; are the sheng kernel tree and debian-sheng's config.
     (inherit linux-libre)
     (name "linux-sheng")
-    ;; The source is 7.3.0, not whatever linux-libre is at.
-    (version "7.3.0")
+    (version "7.2.0-rc7")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/ianchb/sm8550-mainline")
-             (commit %sm8550-mainline-commit)))
+             (url "https://github.com/code002-2/sm8550-mainline")
+             (commit %sheng-kernel-commit)))
        (sha256
         (base32
-         "0476xzvyavi17jl9r3km3qnf5ilf2rcsadhdz5cas2psy9hsrk24"))))
+         "0931m2y5l3qwvrxx1skbcwkkiag3ih72d9ldvisjvw95q9shvqjb"))))
+    (native-inputs
+     (modify-inputs (package-native-inputs linux-libre)
+       (append clang lld llvm)))
     (arguments
      (substitute-keyword-arguments (package-arguments linux-libre)
+       ;; debian-sheng builds with CC=clang and LLVM=1.
+       ((#:make-flags flags ''())
+        #~(cons* "LLVM=1" #$flags))
        ((#:phases phases '%standard-phases)
         #~(modify-phases #$phases
             (replace 'configure
-              (lambda _
-                (setenv "EXTRAVERSION" "-sheng")
+              (lambda* (#:key make-flags #:allow-other-keys)
                 (copy-file #$%sm8550-config ".config")
                 (chmod ".config" #o644)
-                (invoke "make" "olddefconfig")))
+                ;; Kconfig records CC_IS_CLANG and LTO options, so run it
+                ;; with the same LLVM=1 flags as the build.
+                (apply invoke "make" "olddefconfig" make-flags)))
             ;; arm64's 'all' target builds Image only; Guix's install phase
             ;; copies whichever .dtb files exist, so build them first.
             (add-after 'build 'build-dtbs

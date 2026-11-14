@@ -17,7 +17,7 @@
 ## 进行中
 
 - [ ] U-Boot 包真实构建（Zig MDSS + 两个补丁 + mkbootimg）
-- [ ] sheng 内核真实构建（`customize-linux` + `sm8550.config`）
+- [ ] sheng 内核真实构建（`code002-2/sm8550-mainline` + `olddefconfig`）
 - [ ] 固件包真实构建
 - [ ] tty 镜像真实构建并产出 `sheng-boot.img` + `single-tty.sparse.img`
 - [ ] 实机刷入与首启（判定见 `docs/boot-chain.md`）

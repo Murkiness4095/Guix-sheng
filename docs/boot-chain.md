@@ -9,7 +9,7 @@
 | U-Boot | `packages/u-boot.scm`，SushyDev/u-boot `xiaomi-sheng` 提交 `7025b79`，两个 nixos-sheng 补丁 |
 | boot.img | 同包 `build-boot-image` 阶段，调用 `packages/mkbootimg-v2.py` |
 | extlinux.conf | `modules/sheng-bootloader.scm`，写入 `/boot/extlinux/extlinux.conf` |
-| 内核 | `packages/kernel.scm`，`sm8550-mainline` 提交 `1fb56e6` + debian-sheng `sm8550.config` |
+| 内核 | `packages/kernel.scm`，`code002-2/sm8550-mainline` 提交 `52a5197` |
 | 固件 | `packages/firmware.scm`，`ianchb/sheng-firmware` |
 | 根分区 | `images/single-tty.scm`，ext4 卷标/分区名 `userdata` |
 
