@@ -65,3 +65,5 @@ fastboot reboot
   U-Boot 的 `bootrescue` 路径（`/boot/Image`）暂不可用。
 - 内核按 debian-sheng 配置构建；`CONFIG_LTO_CLANG` 等在 GCC 构建下会被
   `oldconfig` 关闭，与 Debian 产物不完全相同。
+- arm64 的 `all` 目标不构建 dtbs，`linux-sheng` 额外执行 `make dtbs`，
+  否则 `lib/dtbs/qcom/sm8550-xiaomi-sheng.dtb` 不存在。
