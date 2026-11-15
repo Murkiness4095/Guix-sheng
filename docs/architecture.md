@@ -3,7 +3,7 @@
 ```
 channels.scm          guix master + midnight
 images/
-  base.scm            共享 OS 生成器（greetd + noctalia greeter + librewolf）
+  base.scm            共享 OS 生成器（SDDM/GDM/noctalia greeter + librewolf）
   single-*.scm        单系统镜像（根 userdata）
   dual-*.scm          双系统镜像（根 linux）
 packages/             内核 / U-Boot / 固件 / 用户态

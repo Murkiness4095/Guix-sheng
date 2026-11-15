@@ -7,7 +7,10 @@
              (gnu services dbus)
              (gnu services ssh)
              (gnu services networking)
+             (gnu services sddm)
              (gnu services sound)
+             (gnu services xorg)
+             (gnu packages display-managers)
              (gnu packages linux)
              (gnu packages librewolf)
              (gnu packages window-management)
@@ -83,6 +86,21 @@
           (greetd-terminal-configuration (terminal-vt "5"))
           (greetd-terminal-configuration (terminal-vt "6"))))))
 
+(define (sheng-login-services desktop)
+  "Return the display manager for DESKTOP.
+KDE and GNOME use their own greeters; niri sessions use the noctalia greeter.
+The tty image keeps a text getty from %base-services."
+  (case desktop
+    ((kde)
+     (list (service sddm-service-type
+                    (sddm-configuration (sddm sddm)))))
+    ((gnome)
+     (list (service gdm-service-type)))
+    ((niri noctalia)
+     (list (service noctalia-greeter-service-type)
+           (service greetd-service-type (sheng-greetd-config))))
+    (else '())))
+
 (define* (sheng-os #:key (desktop 'tty) (hostname "sheng") (root-label "linux"))
   "Return an <operating-system>.  DESKTOP: tty, kde, gnome, niri, noctalia."
   (let* ((desktop-service
@@ -138,8 +156,8 @@
       (packages (append browser session-pkgs %base-packages))
       (services
        (append
-        ;; A tty image must stay usable without a working graphical greeter;
-        ;; desktop variants replace getty with the noctalia greeter.
+        ;; Keep a text getty only for the tty image; graphical variants
+        ;; replace it with their own display manager.
         (if (eq? desktop 'tty)
             %base-services
             (modify-services %base-services
@@ -147,8 +165,5 @@
         (sheng-desktop-services)
         desktop-service
         noctalia-config
-        (if (eq? desktop 'tty)
-            (list (service openssh-service-type))
-            (list (service noctalia-greeter-service-type)
-                  (service greetd-service-type (sheng-greetd-config))
-                  (service openssh-service-type))))))))
+        (append (sheng-login-services desktop)
+                (list (service openssh-service-type))))))))

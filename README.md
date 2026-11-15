@@ -10,7 +10,7 @@ Xiaomi Pad 6S Pro（sheng）的 GNU Guix（aarch64）移植。设备支持参考
 | --- | --- |
 | `channels.scm` | Guix 频道（guix master + midnight） |
 | `images/` | 镜像声明：单/双系统 × tty/kde/gnome/niri/noctalia |
-| `images/base.scm` | 共享 OS 生成器（greetd + noctalia greeter + librewolf） |
+| `images/base.scm` | 共享 OS 生成器（按桌面选择 SDDM/GDM/noctalia greeter） |
 | `packages/` | 内核、U-Boot、固件、用户态包 |
 | `modules/` `services/` | Guix 模块与 shepherd 服务 |
 | `scripts/build-image.sh` | 构建并提取 ext4 根分区 |
@@ -24,7 +24,8 @@ Xiaomi Pad 6S Pro（sheng）的 GNU Guix（aarch64）移植。设备支持参考
 - `build-single`：`single-tty` `single-kde` `single-gnome` `single-niri` `single-noctalia`
 - `build-dual`：`dual-tty` `dual-kde` `dual-gnome` `dual-niri` `dual-noctalia`
 
-所有桌面镜像统一使用 **noctalia greeter** 登录，浏览器统一为 **librewolf**。
+KDE 使用 **SDDM**，GNOME 使用 **GDM**，niri/noctalia 使用 **noctalia greeter**，
+tty 镜像保留文本 getty。浏览器统一为 **librewolf**。
 双系统镜像根分区标签为 `linux`（Android A / Guix B）。
 
 构建时可自定义桌面用户名/密码（`workflow_dispatch` 输入）：

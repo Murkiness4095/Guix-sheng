@@ -16,7 +16,8 @@ sheng 的 GNU Guix（aarch64）移植。仓库按职责分层：
 | `docs/` | 交接、架构、验证文档 |
 
 镜像产物：单系统与双系统各五种（tty/kde/gnome/niri/noctalia）。桌面变体
-统一用 noctalia greeter 登录，tty 变体保留文本 getty。构建入口见
+KDE 用 SDDM，GNOME 用 GDM，niri/noctalia 用 noctalia greeter，tty 变体保留
+文本 getty。构建入口见
 `.github/workflows/build-single.yml` 与 `build-dual.yml`，本地构建需要
 `guix system image -L . images/<variant>.scm`。
 
