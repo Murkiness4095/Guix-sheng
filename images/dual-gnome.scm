@@ -1,4 +1,4 @@
-;; images/dual-gnome.scm — sheng dual system, gnome desktop, noctalia greeter, librewolf.
+;; dual-gnome — sheng image, gnome desktop, GDM, librewolf.
 (load (string-append (dirname (current-filename)) "/base.scm"))
 (use-modules (gnu) (gnu image) (gnu system image) (guix gexp))
 

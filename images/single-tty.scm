@@ -1,4 +1,4 @@
-;; images/single-tty.scm — sheng single system, tty desktop, noctalia greeter, librewolf.
+;; single-tty — sheng image, tty desktop, text getty, librewolf.
 (load (string-append (dirname (current-filename)) "/base.scm"))
 (use-modules (gnu) (gnu image) (gnu system image) (guix gexp))
 

@@ -1,4 +1,4 @@
-;; images/dual-noctalia.scm — sheng dual system, noctalia desktop, noctalia greeter, librewolf.
+;; dual-noctalia — sheng image, noctalia desktop, noctalia greeter, librewolf.
 (load (string-append (dirname (current-filename)) "/base.scm"))
 (use-modules (gnu) (gnu image) (gnu system image) (guix gexp))
 

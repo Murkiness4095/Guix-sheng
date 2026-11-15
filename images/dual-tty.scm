@@ -1,4 +1,4 @@
-;; images/dual-tty.scm — sheng dual system, tty desktop, noctalia greeter, librewolf.
+;; dual-tty — sheng image, tty desktop, text getty, librewolf.
 (load (string-append (dirname (current-filename)) "/base.scm"))
 (use-modules (gnu) (gnu image) (gnu system image) (guix gexp))
 
