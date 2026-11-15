@@ -9,8 +9,8 @@
 (define-module (packages kernel)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages llvm)
+  #:use-module (guix download)
   #:use-module (guix gexp)
-  #:use-module (guix git-download)
   #:use-module (guix packages)
   #:use-module (guix utils)
   #:export (linux-sheng))
@@ -30,13 +30,15 @@
     (version "7.2.0-rc7")
     (source
      (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/code002-2/sm8550-mainline")
-             (commit %sheng-kernel-commit)))
+       ;; url-fetch, not git-fetch: the pinned git builder fails in CI when
+       ;; /etc/gitconfig is unreadable to the build user.
+       (method url-fetch)
+       (uri (string-append
+             "https://github.com/code002-2/sm8550-mainline/archive/"
+             %sheng-kernel-commit ".tar.gz"))
        (sha256
         (base32
-         "0931m2y5l3qwvrxx1skbcwkkiag3ih72d9ldvisjvw95q9shvqjb"))))
+         "15g8vkw7lx0fjb5q6mhc3cj7cf31ff3lywd43hdymimjgwdv7a5i"))))
     (native-inputs
      (modify-inputs (package-native-inputs linux-libre)
        (append clang lld llvm)))

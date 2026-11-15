@@ -2,7 +2,7 @@
 ;; Installed under /lib/firmware; source: ianchb/sheng-firmware.
 (define-module (packages firmware)
   #:use-module (guix build-system copy)
-  #:use-module (guix git-download)
+  #:use-module (guix download)
   #:use-module (guix packages)
   #:export (sheng-firmware))
 
@@ -12,13 +12,15 @@
     (version "1.0")
     (source
      (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/ianchb/sheng-firmware")
-             (commit "053da477a5c338ac28d7c1c869e8c3ff7ca24d11")))
+       ;; url-fetch, not git-fetch: the pinned git builder fails in CI when
+       ;; /etc/gitconfig is unreadable to the build user.
+       (method url-fetch)
+       (uri (string-append
+             "https://github.com/ianchb/sheng-firmware/archive/"
+             "053da477a5c338ac28d7c1c869e8c3ff7ca24d11.tar.gz"))
        (sha256
         (base32
-         "0hgz4s6gspdld0yncxpbs4qish13n2qa686k5a875xr8dcq15api"))))
+         "1glxnlgd57bq3yrd8lv7dkdjrcbmbq7dv4n9sgaprcyc3l29gll9"))))
     (build-system copy-build-system)
     (arguments
      (list #:install-plan #~'(("." "lib/firmware"))))

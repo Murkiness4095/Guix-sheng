@@ -8,8 +8,8 @@
   #:use-module (gnu packages python)
   #:use-module (gnu packages vim)
   #:use-module (gnu packages zig)
+  #:use-module (guix download)
   #:use-module (guix gexp)
-  #:use-module (guix git-download)
   #:use-module (guix packages)
   #:use-module (guix utils)
   #:export (u-boot-sheng
@@ -32,13 +32,15 @@
     (version "xiaomi-sheng")
     (source
      (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/SushyDev/u-boot")
-             (commit %u-boot-sheng-commit)))
+       ;; url-fetch, not git-fetch: the pinned git builder fails in CI when
+       ;; /etc/gitconfig is unreadable to the build user.
+       (method url-fetch)
+       (uri (string-append
+             "https://github.com/SushyDev/u-boot/archive/"
+             %u-boot-sheng-commit ".tar.gz"))
        (sha256
         (base32
-         "1f713a5wzsnqmkj1g091rr4jfgfm15msc7aasyia35ai09g9bafx"))
+         "0bcqzbixr19l4ng1i6728j1hnrhwsqb1j3fgpgh2gzybsqmnish8"))
        (patches
         (list (local-file "u-boot/patches/prefer-abl-memory-layout.patch")
               (local-file "u-boot/patches/fix-fastboot-menu-reboot-mode.patch")))))))
