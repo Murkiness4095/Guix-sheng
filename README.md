@@ -46,7 +46,7 @@ CI 将输入写入 `images/settings.scm`（不提交）后构建。
 
 | 组件 | 来源 | 版本/提交 |
 | --- | --- | --- |
-| 内核 | [ianchb/sm8550-mainline](https://github.com/ianchb/sm8550-mainline/releases/tag/7.3.4) | `7.3.4` 的 `linux-xiaomi-sheng.deb`，资产哈希固定在 `packages/kernel.scm` |
+| 内核 | [ianchb/sm8550-mainline](https://github.com/ianchb/sm8550-mainline) | 按 NixOS-sheng 配方从 `87ac0f2347eb433933841e6854950dd90e96e6b2`（7.3.4）编译 |
 | U-Boot | https://github.com/SushyDev/u-boot | `xiaomi-sheng`，提交 `7025b792e2884c5fb4747d891e30002ea029048a` |
 | U-Boot 补丁 | nixos-sheng `packages/u-boot/patches/` | 见目录 |
 | 固件 | https://github.com/ianchb/sheng-firmware | 提交 `053da477a5c338ac28d7c1c869e8c3ff7ca24d11` |

@@ -9,7 +9,7 @@
 | U-Boot | `packages/u-boot.scm`，SushyDev/u-boot `xiaomi-sheng` 提交 `7025b79`，两个 nixos-sheng 补丁 |
 | boot.img | 同包 `build-boot-image` 阶段，调用 `packages/mkbootimg-v2.py` |
 | extlinux.conf | `modules/sheng-bootloader.scm`，写入 `/boot/extlinux/extlinux.conf` |
-| 内核 | `packages/kernel.scm`，`ianchb/sm8550-mainline` 正式 release `7.3.4` |
+| 内核 | `packages/kernel.scm`，`ianchb/sm8550-mainline` 源码提交 `87ac0f2`（7.3.4） |
 | 固件 | `packages/firmware.scm`，`ianchb/sheng-firmware` |
 | 根分区 | `images/single-tty.scm`，ext4 卷标/分区名 `userdata` |
 
@@ -63,6 +63,6 @@ fastboot reboot
   `guix-daemon` 会自己初始化数据库；GC 根尚未建立，不能依赖 `guix gc`。
 - extlinux.conf 直接引用 store 路径，未复制 `Image`/dtb 到 `/boot`，因此
   U-Boot 的 `bootrescue` 路径（`/boot/Image`）暂不可用。
-- Guix 从上游 release 的同一个内核包提取 Image、DTB 和匹配的模块。
+- Guix 按 NixOS-sheng 配方构建 Image、DTB 和模块。
 - arm64 的 `all` 目标不构建 dtbs，`linux-sheng` 额外执行 `make dtbs`，
   否则 `lib/dtbs/qcom/sm8550-xiaomi-sheng.dtb` 不存在。
