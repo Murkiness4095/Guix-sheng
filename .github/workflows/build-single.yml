@@ -10,6 +10,10 @@ on:
       variants:
         description: Space-separated image names
         default: single-tty single-kde single-gnome single-niri single-noctalia
+      boot_only:
+        description: Build only the ABL boot image
+        type: boolean
+        default: false
       desktop_username:
         description: Desktop user name
         default: sheng
@@ -58,7 +62,12 @@ jobs:
             ~/.cache/guix
             ~/.config/guix
           key: guix-state-${{ hashFiles('channels.scm') }}
+      - name: Build U-Boot boot.img
+        run: |
+          export GUIX="$HOME/.config/guix/current/bin/guix"
+          scripts/build-uboot.sh single
       - name: Evaluate all images
+        if: ${{ !inputs.boot_only }}
         run: |
           set -o pipefail
           export GUIX="$HOME/.config/guix/current/bin/guix"
@@ -68,11 +77,8 @@ jobs:
           done
         env:
           IMAGES: ${{ inputs.variants || 'single-tty single-kde single-gnome single-niri single-noctalia' }}
-      - name: Build U-Boot boot.img
-        run: |
-          export GUIX="$HOME/.config/guix/current/bin/guix"
-          scripts/build-uboot.sh single
       - name: Build all single-system images
+        if: ${{ !inputs.boot_only }}
         run: |
           export GUIX="$HOME/.config/guix/current/bin/guix"
           set -e
