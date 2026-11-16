@@ -1,7 +1,7 @@
 ;; packages/u-boot.scm — U-Boot for sheng (SM8550) plus the Android boot.img
 ;; that ABL loads.  Source: SushyDev/u-boot branch xiaomi-sheng.
 ;;
-;; Mirrors nixos-sheng/packages/u-boot/default.nix: same fork, same two
+;; Mirrors nixos-sheng/packages/u-boot/default.nix: same fork, same board
 ;; patches, same mkbootimg arguments (taken from the stock boot.img header).
 (define-module (packages u-boot)
   #:use-module (gnu packages bootloaders)
@@ -43,7 +43,8 @@
          "0bcqzbixr19l4ng1i6728j1hnrhwsqb1j3fgpgh2gzybsqmnish8"))
        (patches
         (list (local-file "u-boot/patches/prefer-abl-memory-layout.patch")
-              (local-file "u-boot/patches/fix-fastboot-menu-reboot-mode.patch")))))))
+              (local-file "u-boot/patches/fix-fastboot-menu-reboot-mode.patch")
+              (local-file "u-boot/patches/deduplicate-sm8550-clock-config.patch")))))))
 
 (define* (make-u-boot-sheng #:key (root-label "userdata"))
   "Return U-Boot for sheng, with a boot.img whose cmdline roots at ROOT-LABEL.

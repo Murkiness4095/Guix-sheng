@@ -2,29 +2,12 @@
 
 ## 当前状态
 
-- 启动链已实现：`packages/u-boot.scm`（fork + 补丁 + mkbootimg）、
-  `modules/sheng-bootloader.scm`（extlinux.conf）、`images/base.scm` 接入
-  `linux-sheng`、`sheng-firmware`。
-- 十种镜像已用本地 `guix repl` 求值通过；CI 实际构建尚未跑。
-- 硬件包源哈希已核对：内核/固件原值正确，U-Boot 已修正。
-- 实机刷入、首启、外设：未开始。
+- 本地 `main` 基于 `origin/boot-chain` 的 `7accabd`。U-Boot defconfig 去重补丁已用固定提交的原始配置验证，完整构建待跑。
+- 最近一次板级构建是 [build-single #43688501887](https://github.com/Murkiness4095/Guix-sheng/actions/runs/43688501887)，提交 `e69add6`。U-Boot 因 `CONFIG_CLK_QCOM_SM8550=y` 重复而中止，根镜像构建未执行，未上传镜像。
+- 十种镜像有本地求值通过记录。旧骨架曾产出根镜像，当时尚未接入 sheng 内核。当前尚无板级可刷产物和实机登录记录。
 
-## 关键结论
+## 接手后的第一轮验收
 
-- U-Boot fork 的两个远端（SushyDev、Murkiness4095）`xiaomi-sheng` 指向同一提交
-  `7025b79`；本仓库固定该提交。
-- U-Boot 的 `boot.img` 必须用 `--header_version 2`，并带 `u-boot.dtb`；
-  cmdline 含 `root=PARTLABEL=userdata`（双系统为 `linux`）。
-- 双系统 U-Boot 必须同时改 `board/qualcomm/sheng.env` 的 sysboot 分区名和
-  rescue 的 `root=PARTLABEL=`，只改 boot.img cmdline 不够。
-- Guix 默认 `root-partition` 已关闭 `metadata_csum`/`64bit`，U-Boot 可读。
-- 镜像 root 分区从 1 MiB 偏移提取；ext4 卷标与分区标签同为 `userdata`。
-- `guix system image --dry-run` 之前必须加 `-L <仓库根>`，否则
-  `(packages ...)`/`(modules ...)` 无法解析。
-
-## 下一步
-
-1. 触发 `build-single`，确认 U-Boot、内核、固件、tty 镜像构建。
-2. 按 `docs/boot-chain.md` 刷入并完成首启验收。
-3. 建立 store DB 注册，恢复 `bootrescue` 路径。
-4. 双系统与桌面变体。
+1. 用包含去重补丁的分支触发 `build-single`，输入 `variants=single-tty`。
+2. 跟踪到构建结束。同一个 run 应产出 `sheng-boot.img` 和 `single-tty.sparse.img`。将 run 链接和产物状态更新到本页。
+3. 按[启动链](boot-chain.md)进行实机验收，记录是否到达 `login:`、能否登录以及对应镜像的 run。后续工作见 [TODO](../TODO.md)。

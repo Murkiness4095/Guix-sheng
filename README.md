@@ -35,35 +35,12 @@ tty 镜像保留文本 getty。浏览器统一为 **librewolf**。
 
 CI 将输入写入 `images/settings.scm`（不提交）后构建。
 
-## 快速开始
+## 构建与进度
 
-已通过 CI 的路径（单系统 tty，镜像本体）：
-
-```sh
-guix system image -L . images/single-tty.scm
-```
-
-`-L .` 让镜像文件能加载本仓库的 `(packages ...)` 与 `(modules ...)`。
-
-本地只有官方 guix 频道时，niri/noctalia 变体需要先：
-
-```sh
-guix pull -C channels.scm
-```
-
-## 验证状态
-
-| 项目 | 状态 |
-| --- | --- |
-| 十种镜像求值 | ✅ 本地 `guix repl` 全部通过 |
-| `single-tty` 镜像构建 | ✅ CI 通过（旧骨架，未含 sheng 内核） |
-| 启动链（U-Boot → extlinux → tty） | 已实现，待 CI 构建与实机首启，见 `docs/boot-chain.md` |
-| 内核/U-Boot/固件包 | 真实包已接入；源哈希已核对；未构建 |
-| 桌面/双系统变体 | 求值通过；实机未验证 |
-| 实机刷入与启动 | 未验证 |
-
-`guix system image` 在镜像内注册 store DB 时会遇到 SQLite `database is locked`；
-`images/*.scm` 已通过 `#:register-closures? #f` 跳过该步骤（闭包仍复制，镜像可启动）。
+首个板级 TTY 尚无已验证的可刷产物。构建走 GitHub Actions 的 `build-single`，
+将 `variants` 设为 `single-tty`。当前阻塞、产物状态和 CI 记录见
+[维护交接](docs/HANDOVER.md)，实机检查见[启动链](docs/boot-chain.md)。
+仓库工作规则见 [AGENTS.md](AGENTS.md)。
 
 ## 上游来源
 

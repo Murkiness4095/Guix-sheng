@@ -8,11 +8,8 @@
 
 ## 移植基准（必须遵守，不再逐次确认）
 
-- 功能、版本和实现顺序以 [debian-sheng](https://github.com/ianchb/debian-sheng)
-  为第一参考：debian-sheng 已有的，先照做，不自行设计；debian-sheng 没有的，
-  才用 Guix 自己实现。
-- [nixos-sheng](https://github.com/Murkiness4095/nixos-sheng) 只作补充参考
-  （启动槽、菜单、世代等 NixOS 特有机制）。
+- 优先参考 [nixos-sheng](https://github.com/Murkiness4095/nixos-sheng)。已有板级实现直接复用，记录参考提交。
+- [debian-sheng](https://github.com/ianchb/debian-sheng) 用于补缺和交叉核对。系统声明、initrd 和服务接线按 Guix 接口适配。
 - 这是专有设备移植，不是自由软件发行版验收：固件、blob、专有内核配置、
   非自由组件按设备需要直接使用。Guix 的自由软件默认值不是约束，不得以
   “Guix 只有自由软件”为由删除或替换 debian-sheng 的功能。
@@ -21,3 +18,10 @@
   `packages/kernel/sm8550.config`），按 debian-sheng 的方式用 clang/`LLVM=1`
   构建。
 - 对齐结果与差异记录在 `docs/debian-alignment.md`；新增差异必须登记。
+
+## 构建与验收
+
+1. 先读交接记录和最近一次相关 CI 日志，定位第一个实际失败的步骤。检查 NixOS 参考实现，针对该步骤做最小修改并记录差异。
+2. 构建优先走 GitHub Actions。需要本地复现时使用隔离的 Nix 环境。禁止在宿主机安装 Guix、运行 `guix pull` 或启动 Guix daemon。
+3. 首轮仅用 `build-single` 的 `variants: single-tty`。跟踪运行到结束，失败时检查首个实际失败步骤，通过时检查同一 run 的 `sheng-boot.img` 和 `single-tty.sparse.img`。
+4. 将 CI 链接和产物状态写入交接记录。设备出现 `login:` 并能登录后，才将 TTY 标为验收完成。首轮验收后再扩展到双系统、桌面和外设。

@@ -63,7 +63,6 @@ fastboot reboot
   `guix-daemon` 会自己初始化数据库；GC 根尚未建立，不能依赖 `guix gc`。
 - extlinux.conf 直接引用 store 路径，未复制 `Image`/dtb 到 `/boot`，因此
   U-Boot 的 `bootrescue` 路径（`/boot/Image`）暂不可用。
-- 内核按 debian-sheng 配置构建；`CONFIG_LTO_CLANG` 等在 GCC 构建下会被
-  `oldconfig` 关闭，与 Debian 产物不完全相同。
+- 内核使用固定的 debian-sheng 配置，通过 clang 和 `LLVM=1` 构建。
 - arm64 的 `all` 目标不构建 dtbs，`linux-sheng` 额外执行 `make dtbs`，
   否则 `lib/dtbs/qcom/sm8550-xiaomi-sheng.dtb` 不存在。
