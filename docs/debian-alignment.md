@@ -11,9 +11,7 @@
 
 | 项 | debian-sheng | 本仓库 |
 | --- | --- | --- |
-| 内核源码 | `ianchb/sm8550-mainline`，默认 `sheng-7.3.4` | `code002-2/sm8550-mainline`，提交在 `packages/kernel.scm` 固定 |
-| 内核配置 | 仓库根 `sm8550.config`（7.3.4 全量配置） | 同一文件（提交固定），`olddefconfig` 适配 7.2-rc7 |
-| 内核工具链 | `CC=clang`、`LLVM=1`、`lld` | 相同；`clang`/`lld`/`llvm` 作为原生输入 |
+| 内核 | 默认使用 `ianchb/sm8550-mainline` 的预编译 release | 使用 `7.3.4` 的 `linux-xiaomi-sheng.deb`，固定 SHA-256。内核、DTB、模块一起解包并按 Guix 布局安装 |
 | 固件 | `ianchb/sheng-firmware` | 同源，`packages/firmware.scm` 固定提交 |
 | boot.img | `mkbootimg`（header v2） | `packages/mkbootimg-v2.py`，输出与 AOSP 逐字节一致 |
 | UCM / 传感器 / 充电 / 指纹 / 笔 | 各 DEBIAN 包 + systemd 单元 | `packages/firmware/`、`services/` 逐项移植 |
@@ -22,7 +20,7 @@
 
 ## 已对齐
 
-- 内核源码仓库与配置文件名。
+- 预编译内核来源。
 - 固件仓库与提交。
 - boot.img header v2 的字段与 AOSP/ debian 的 `mkbootimg` 一致。
 - 单系统根分区 `userdata`，双系统根分区 `linux`。

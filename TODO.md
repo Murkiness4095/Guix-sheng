@@ -18,7 +18,7 @@
 
 - [ ] U-Boot 包真实构建（Zig MDSS + 两个补丁 + mkbootimg）
       （CI #43688501887 的重复 defconfig 项已补丁处理，待重跑）
-- [ ] sheng 内核真实构建（`code002-2/sm8550-mainline` + `olddefconfig`）
+- [ ] sheng 验证上游 7.3.4 release 内核包接入 Guix 镜像
 - [ ] 固件包真实构建
 - [ ] tty 镜像真实构建并产出 `sheng-boot.img` + `single-tty.sparse.img`
 - [ ] 实机刷入与首启（判定见 `docs/boot-chain.md`）

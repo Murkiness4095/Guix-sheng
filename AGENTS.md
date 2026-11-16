@@ -13,10 +13,7 @@
 - 这是专有设备移植，不是自由软件发行版验收：固件、blob、专有内核配置、
   非自由组件按设备需要直接使用。Guix 的自由软件默认值不是约束，不得以
   “Guix 只有自由软件”为由删除或替换 debian-sheng 的功能。
-- 内核源码固定为 [code002-2/sm8550-mainline](https://github.com/code002-2/sm8550-mainline)；
-  配置用 debian-sheng 的 `sm8550.config`（固定提交，存放于
-  `packages/kernel/sm8550.config`），按 debian-sheng 的方式用 clang/`LLVM=1`
-  构建。
+- 内核使用 [ianchb/sm8550-mainline](https://github.com/ianchb/sm8550-mainline) 最新正式 release 的 sheng 预编译内核包。更新时固定 release 标签和资产 SHA-256，内核、DTB 和模块取自同一个包。
 - 对齐结果与差异记录在 `docs/debian-alignment.md`；新增差异必须登记。
 
 ## 构建与验收
