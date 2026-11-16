@@ -71,6 +71,10 @@ dual-system variant below."
           #~(cons* "ZIG=zig" #$flags))
          ((#:phases phases '%standard-phases)
           #~(modify-phases #$phases
+              ;; Match NixOS buildUBoot: let Kconfig resolve the board defconfig.
+              (replace 'configure
+                (lambda* (#:key make-flags #:allow-other-keys)
+                  (apply invoke "make" "sm8550_defconfig" make-flags)))
               #$@(if (string=? root-label "userdata")
                      '()
                      (list
