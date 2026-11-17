@@ -19,7 +19,7 @@
 
 1. 在 GitHub Actions 打开对应工作流，再选择 `boot-chain` 分支。
 2. 用 `image` 选择 `tty`、`niri`、`kde` 或 `gnome`。首次启动验证用
-   `tty`。选 `none` 只构建开机镜像。四种根镜像均包含 `fastfetch`。
+   `tty`。选 `none` 只构建开机镜像。四种根镜像均包含 `fastfetch`（Guix 的 `fastfetch-minimal` 包）。
 3. `desktop_username` 和 `desktop_password` 默认都是 `sheng`，对本次
    根镜像的登录生效，包括 TTY。下载同一个 run 的开机镜像和 sparse 根镜像。
    `auto_login` 默认开启。TTY 会直接进入 tty1 的用户 shell，桌面会启动对应会话。

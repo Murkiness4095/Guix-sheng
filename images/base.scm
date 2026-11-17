@@ -10,7 +10,7 @@
              (gnu services sddm)
              (gnu services sound)
              (gnu services xorg)
-             ((gnu packages admin) #:select (fastfetch))
+             ((gnu packages admin) #:select (fastfetch-minimal))
              (gnu packages display-managers)
              (gnu packages linux)
              (gnu packages librewolf)
@@ -174,7 +174,7 @@ The tty image keeps a text getty from %base-services."
                     %base-user-accounts))
       (groups (cons* (user-group (name "greeter")) %base-groups))
       (packages (append (if (memq desktop '(tty niri kde gnome))
-                            (list fastfetch)
+                            (list fastfetch-minimal)
                             '())
                         browser session-pkgs %base-packages))
       (services
