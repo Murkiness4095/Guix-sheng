@@ -7,13 +7,15 @@ repo=$(cd "$(dirname "$0")/.." && pwd)
 src=$1
 prefix=${2:-$(basename "$src" .scm)}
 # -L lets the image files use the repo's (packages ...) and (modules ...).
-if ! out=$("$GUIX" system image -L "$repo" "$src" 2>"$prefix.err"); then
+if ! out=$("$GUIX" system image --verbosity=2 -L "$repo" "$src" 2>"$prefix.err"); then
   echo "guix system image failed: $src" >&2
   tail -60 "$prefix.err" >&2
   while IFS= read -r logfile; do
     if test -r "$logfile"; then
       echo "Build log: $logfile" >&2
       gzip -dc -- "$logfile" | tail -120 >&2 || true
+    elif [[ ${GITHUB_ACTIONS:-} == true ]]; then
+      sudo gzip -dc -- "$logfile" | tail -120 >&2 || true
     fi
   done < <(grep "View build log at" "$prefix.err" | grep -oE "/var/log/guix/drvs/[[:alnum:]/_-]+\.drv\.gz" | sort -u)
   exit 1
