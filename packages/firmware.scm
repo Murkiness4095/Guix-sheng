@@ -24,7 +24,9 @@
          "1glxnlgd57bq3yrd8lv7dkdjrcbmbq7dv4n9sgaprcyc3l29gll9"))))
     (build-system copy-build-system)
     (arguments
-     (list #:install-plan #~'(("." "lib/firmware"))))
+     (list #:strip-binaries? #f
+           #:validate-runpath? #f
+           #:install-plan #~'(("." "lib/firmware"))))
     (synopsis "Firmware blobs for Xiaomi Pad 6S Pro (sheng)")
     (description "Vendor firmware for sm8550 peripherals: ath12k WLAN,
 Cirrus CS35L43 speaker DSP, Novatek touch, fingerprint TA and others.")
