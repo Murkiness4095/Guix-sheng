@@ -25,6 +25,7 @@
              (packages kernel)
              (packages firmware)
              (services adsprpcd)
+             (services grow-root)
              (services sensors)
              (services thp)
              (services ucm))
@@ -205,6 +206,7 @@ The tty image keeps a text getty from %base-services."
               (delete mingetty-service-type)
               (delete console-font-service-type)))
         (sheng-desktop-services)
+        (list (sheng-grow-root-service root-label))
         desktop-service
         (if vendor-services?
             (list (sheng-ucm-service) (sheng-thp-service)

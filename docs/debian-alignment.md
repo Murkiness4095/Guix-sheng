@@ -52,3 +52,8 @@
 `modules/audio.nix`、`modules/firmware.nix` 和 THP systemd 单元。
 默认 TTY 首启镜像仍可单独验证。WirePlumber、HiFi 启动应用、
 指纹、充电和其余设备服务待接线，实机触控和音频待验证。
+
+根分区扩容参照 NixOS-sheng `2be57fe` 的 `modules/hardware.nix` 中
+`fileSystems."/".autoResize`。Guix 由 Shepherd 在根分区挂载和 udev 就绪后
+运行 `resize2fs`。只有当前可写的 ext4 根挂载与工作流对应的
+`userdata` 或 `linux` 指向同一设备时才扩容。每次启动均可安全重试。

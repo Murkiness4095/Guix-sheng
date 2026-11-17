@@ -20,6 +20,9 @@ scripts/install-single.sh sheng-boot.img single-tty.sparse.img
 fastboot reboot
 ```
 
+新镜像启动后会扩展 ext4 根文件系统到现有分区边界。登录后用
+`df -h /` 核对容量。
+
 ## 首启验收
 
 1. 观察 U-Boot 菜单与倒计时，确认能够回到 ABL fastboot。
