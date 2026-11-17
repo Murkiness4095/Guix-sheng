@@ -446,7 +446,7 @@
                              (string-append fp "/libfprint-2.so.2.0.0"))
                      (install-file "udev/99-qcomtee-fpc.rules"
                                    (string-append #$output "/lib/udev/rules.d"))))))))
-    (native-inputs (list meson ninja patchelf pkg-config xz))
+    (native-inputs (list meson ninja patchelf pkg-config xz (list glib "bin")))
     (inputs (list glib glibc gusb nss pixman))
     (supported-systems '("aarch64-linux"))
     (home-page "https://github.com/ianchb/xiaomi-sheng-fingerprint")
