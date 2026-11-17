@@ -41,3 +41,9 @@ fastboot reboot
 - `modules/sheng-bootloader.scm` 生成 extlinux 启动文件。
 - `images/single-tty.scm` 和 `images/dual-tty.scm` 分别使用
   `userdata` 和 `linux`。
+
+## 从 Guix 返回 ABL fastboot
+
+运行 `sudo reboot`，在 U-Boot 菜单选择 `Reboot to fastboot (bootloader)`。
+NixOS 的 `systemctl reboot --reboot-argument=bootloader` 属于 systemd
+接口。TTY 镜像预装 ncurses，提供 `clear` 和 `reset`。
