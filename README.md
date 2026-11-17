@@ -31,8 +31,8 @@
 | `build-single` | `sheng-boot.img` | `single-tty.sparse.img` |
 | `build-dual` | `sheng-boot-dual.img` | `dual-tty.sparse.img` |
 
-首个 [单系统 TTY CI](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44044743355)
-已上传配对的开机镜像与 sparse 根镜像，实机登录待验证。
+[单系统 TTY 修正版](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44065603032)
+已在实机从 `userdata` 启动并自动登录到 TTY。
 手动构建可选 `vendor_services`，接入试验性的板级 UCM、触控和传感器服务。
 
 ## 文档

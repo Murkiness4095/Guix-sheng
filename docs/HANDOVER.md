@@ -1,6 +1,7 @@
 # 维护交接
 
 ## 当前状态
+- `userdata` / A 槽实机首启通过：清空 `dtbo_a` 后经 extlinux 自动登录 tty1，`fastfetch` 确认 Guix System 及 Linux 7.3.4-sm8550。使用 [#44065603032](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44065603032)。WCD938x 耳机阻抗检测报错待排查。
 - 实机首刷 #44058228439 后未进入 Guix；本地展开其 sparse 根镜像，ext4 主超级块无效。CI 改用实际分区表提取并检查 extlinux。已通过串口确认平板回到 NixOS，仍使用 `linux` 和原有 ESP。
 - [外设集成 TTY #44058228439](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44058228439) 成功上传开机和根镜像。实机待验。
 - [单系统 TTY #44044743355](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44044743355) 已成功上传配对产物。实机登录待验证。

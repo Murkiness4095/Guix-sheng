@@ -77,6 +77,9 @@ dual-system variant below."
               (replace 'configure
                 (lambda* (#:key make-flags #:allow-other-keys)
                   (apply invoke "make" "sm8550_defconfig" make-flags)
+                  (unless #$efi?
+                    (substitute* "board/qualcomm/sheng.env"
+                      (("^bootmenu_0=Boot NixOS=") "bootmenu_0=Boot Guix=")))
                   (when #$efi?
                     (invoke "bash" "scripts/config" "--enable" "EFI_LOADER"
                             "--enable" "CMD_BOOTEFI"
