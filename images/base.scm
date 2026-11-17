@@ -128,7 +128,7 @@ The tty image keeps a text getty from %base-services."
            (service greetd-service-type (sheng-greetd-config desktop auto-login?))))
     (else '())))
 
-(define* (sheng-os #:key (desktop 'tty) (hostname "sheng") (root-label "linux")
+(define* (sheng-os #:key (desktop 'tty) (hostname "guix") (root-label "linux")
                    (auto-login? desktop-auto-login?)
                    (vendor-services? sheng-vendor-services?))
   "Return an <operating-system>.  DESKTOP: tty, kde, gnome, niri, noctalia."

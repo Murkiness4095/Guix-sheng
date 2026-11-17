@@ -3,7 +3,7 @@
 (use-modules (gnu) (gnu image) (gnu system image) (guix gexp))
 
 (define the-os
-  (sheng-os #:desktop 'niri #:hostname "sheng" #:root-label "userdata"))
+  (sheng-os #:desktop 'niri #:root-label "userdata"))
 
 (image
  (inherit mbr-disk-image)
