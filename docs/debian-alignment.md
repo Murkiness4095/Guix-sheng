@@ -40,3 +40,13 @@
 
 - 新增或消除差异时更新本表，并在 `TODO.md` 保留对应待办。
 - 参考的 debian-sheng 版本变化时，重新核对内核分支、配置和固件提交。
+
+## 外设服务接线
+
+`sheng-os` 可用 `#:vendor-services? #t` 接入首批外设配置。当前包括
+合并板级和通用 UCM2 配置后的 `ALSA_CONFIG_UCM2`，以及等待触控驱动
+节点后启动 THP 的 Shepherd 服务，以及 FastRPC 的可写 SSC 注册表、
+传感器代理及其 udev、D-Bus、Polkit 接线。参考 NixOS-sheng 的
+`modules/audio.nix`、`modules/firmware.nix` 和 THP systemd 单元。
+默认 TTY 首启镜像仍可单独验证。WirePlumber、HiFi 启动应用、
+指纹、充电和其余设备服务待接线，实机触控和音频待验证。

@@ -23,7 +23,11 @@
              (midnight services noctalia-greeter)
              (modules sheng-bootloader)
              (packages kernel)
-             (packages firmware))
+             (packages firmware)
+             (services adsprpcd)
+             (services sensors)
+             (services thp)
+             (services ucm))
 
 ;; Build-time identity settings.  CI writes images/settings.scm from the
 ;; workflow inputs; local builds fall back to these defaults.
@@ -37,6 +41,9 @@
 
 (define desktop-auto-login?
   (if (defined? 'sheng-desktop-auto-login?) sheng-desktop-auto-login? #t))
+
+(define sheng-vendor-services?
+  (and (defined? 'sheng-enable-vendor-services?) sheng-enable-vendor-services?))
 
 (define (sheng-niri-desktop desktop-name exec-line)
   "Package providing a wayland-session desktop entry."
@@ -121,7 +128,8 @@ The tty image keeps a text getty from %base-services."
     (else '())))
 
 (define* (sheng-os #:key (desktop 'tty) (hostname "sheng") (root-label "linux")
-                   (auto-login? desktop-auto-login?))
+                   (auto-login? desktop-auto-login?)
+                   (vendor-services? sheng-vendor-services?))
   "Return an <operating-system>.  DESKTOP: tty, kde, gnome, niri, noctalia."
   (let* ((desktop-service
           (case desktop
@@ -198,6 +206,11 @@ The tty image keeps a text getty from %base-services."
               (delete console-font-service-type)))
         (sheng-desktop-services)
         desktop-service
+        (if vendor-services?
+            (list (sheng-ucm-service) (sheng-thp-service)
+                  (service sheng-adsprpcd-service-type)
+                  (sheng-sensors-service))
+            '())
         noctalia-config
         (append (sheng-login-services desktop auto-login?)
                 (list (service openssh-service-type))))))))

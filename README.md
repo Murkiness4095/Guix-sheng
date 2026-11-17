@@ -30,9 +30,9 @@
 | `build-single` | `sheng-boot.img` | `single-tty.sparse.img` |
 | `build-dual` | `sheng-boot-dual.img` | `dual-tty.sparse.img` |
 
-当前已经构建并下载过 [单系统 U-Boot 开机镜像](https://github.com/Murkiness4095/Guix-sheng/actions/runs/43949538335)。
-[TTY 完整构建曾在内核阶段失败](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44013162160)，
-实机登录尚无验收记录。以对应运行的日志和产物为准。
+首个 [单系统 TTY CI](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44044743355)
+已上传配对的开机镜像与 sparse 根镜像，实机登录待验证。
+手动构建可选 `vendor_services`，接入试验性的板级 UCM、触控和传感器服务。
 
 ## 文档
 

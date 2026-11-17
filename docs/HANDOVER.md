@@ -1,6 +1,7 @@
 # 维护交接
 
 ## 当前状态
+- [单系统 TTY #44044743355](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44044743355) 已成功上传配对产物。实机登录待验证。
 
 - 本地 `main` 基于 `origin/boot-chain` 的 `7accabd`。U-Boot defconfig 去重补丁已用固定提交的原始配置验证，完整构建待跑。
 - 内核按 NixOS-sheng 的 7.3.4 配方从源码构建，待单系统 CI 验证。
