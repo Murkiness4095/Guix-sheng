@@ -1,0 +1,46 @@
+name: Build or restore the sheng kernel
+description: Cache the signed kernel store closure independently of image settings
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache/restore@v4
+      id: cache
+      with:
+        path: ${{ runner.temp }}/sheng-kernel
+        key: sheng-kernel-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('channels.scm', 'packages/kernel.scm', 'packages/kernel/**') }}
+    - name: Import the kernel store closure
+      if: steps.cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: |
+        set -o pipefail
+        cache="$RUNNER_TEMP/sheng-kernel"
+        if ! { sudo "$GUIX" archive --authorize < "$cache/signing.pub" &&
+               zstd -dc "$cache/kernel.nar.zst" | "$GUIX" archive --import; }; then
+          echo '::warning::Kernel cache import failed. Guix will build missing store items.'
+        fi
+    - name: Build the shared kernel
+      id: build
+      shell: bash
+      run: |
+        kernel=$("$GUIX" build -L . -e '(@ (packages kernel) linux-sheng)')
+        echo "kernel=$kernel" >> "$GITHUB_OUTPUT"
+    - name: Export the kernel store closure
+      id: export
+      if: steps.cache.outputs.cache-hit != 'true' && github.event_name != 'pull_request'
+      continue-on-error: true
+      shell: bash
+      env:
+        KERNEL: ${{ steps.build.outputs.kernel }}
+      run: |
+        set -o pipefail
+        cache="$RUNNER_TEMP/sheng-kernel"
+        mkdir -p "$cache"
+        sudo test -f /etc/guix/signing-key.sec || sudo "$GUIX" archive --generate-key
+        sudo cat /etc/guix/signing-key.pub > "$cache/signing.pub"
+        sudo "$GUIX" archive --export -r "$KERNEL" | zstd -T0 -o "$cache/kernel.nar.zst"
+    - uses: actions/cache/save@v4
+      if: steps.export.outcome == 'success'
+      continue-on-error: true
+      with:
+        path: ${{ runner.temp }}/sheng-kernel
+        key: ${{ steps.cache.outputs.cache-primary-key }}

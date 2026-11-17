@@ -2,9 +2,9 @@ name: build-single
 on:
   push:
     branches: [main]
-    paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/actions/guix-pull/**", ".github/workflows/build-single.yml"]
+    paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-single.yml"]
   pull_request:
-    paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/actions/guix-pull/**", ".github/workflows/build-single.yml"]
+    paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-single.yml"]
   workflow_dispatch:
     inputs:
       image:
@@ -68,6 +68,11 @@ jobs:
           done
         env:
           IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty single-kde single-gnome single-niri' }}
+      - name: Build sheng firmware before the kernel
+        if: ${{ inputs.image != 'none' }}
+        run: '"$GUIX" build -L . -e "(@ (packages firmware) sheng-firmware)"'
+      - uses: ./.github/actions/sheng-kernel
+        if: ${{ inputs.image != 'none' }}
       - name: Build all single-system images
         if: ${{ inputs.image != 'none' }}
         run: |

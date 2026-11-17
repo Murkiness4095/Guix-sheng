@@ -29,8 +29,9 @@
 - 暖运行导入签名归档并直接调用恢复的 Guix。归档为空、导入失败或 profile
   不可用时回退到 `guix pull`。缓存仅包含归档、公钥和 profile 路径，私钥留在
   runner。Pull request 可以读取可见缓存，保存仅在非 PR 运行执行。
-- 当前缓存范围是 Guix profile。U-Boot、内核、固件及根镜像的构建结果仍由现有
-  substitutes 和 job 内 store 提供。GitHub 的分支缓存可见性规则仍适用。
+- 根镜像构建前单独构建 `linux-sheng` 并导出其 store 闭包。单系统、双系统
+  和 EFI 共用该缓存；键由系统、架构、频道锁定和内核配方及文件内容决定。
+  缓存保存早于根镜像构建，后续固件或镜像失败也可复用。
 
 ## 构建时身份
 

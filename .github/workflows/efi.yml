@@ -24,6 +24,9 @@ jobs:
           wget https://guix.gnu.org/install.sh -O /tmp/guix-install.sh
           yes | sudo bash /tmp/guix-install.sh
       - uses: ./.github/actions/guix-pull
+      - name: Build sheng firmware before the kernel
+        run: '"$GUIX" build -L . -e "(@ (packages firmware) sheng-firmware)"'
+      - uses: ./.github/actions/sheng-kernel
       - name: Build GRUB EFI, root filesystem and U-Boot
         env:
           LAYOUT: ${{ inputs.layout || 'dual' }}
