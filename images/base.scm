@@ -16,6 +16,11 @@
              ((gnu packages ncurses) #:select (ncurses))
              (gnu packages librewolf)
              (gnu packages window-management)
+             ((gnu packages shells) #:select (fish))
+             ((gnu packages shellutils) #:select (starship))
+             ((gnu packages terminals) #:select (kitty))
+             ((gnu packages version-control) #:select (git))
+             ((gnu packages xdisorg) #:select (fuzzel))
              (guix packages)
              (guix build-system trivial)
              (guix gexp)
@@ -146,7 +151,7 @@ The tty image keeps a text getty from %base-services."
             (else '())))
          (session-pkgs
           (case desktop
-            ((niri) (list niri (sheng-niri-desktop "niri" "niri")))
+            ((niri) (list niri fuzzel (sheng-niri-desktop "niri" "niri")))
             ((noctalia) (list niri noctalia
                                (sheng-niri-desktop "niri-noctalia"
                                                    "niri -c /etc/sheng/niri-noctalia.kdl")))
@@ -181,6 +186,7 @@ The tty image keeps a text getty from %base-services."
                            %base-file-systems))
       (users (cons* (user-account
                       (name desktop-username)
+                      (shell (file-append fish "/bin/fish"))
                       (password desktop-password-hash)
                       (group "users")
                       (supplementary-groups '("wheel" "netdev" "audio" "video" "input"))
@@ -192,7 +198,7 @@ The tty image keeps a text getty from %base-services."
                       (home-directory "/var/lib/noctalia-greeter"))
                     %base-user-accounts))
       (groups (cons* (user-group (name "greeter")) %base-groups))
-      (packages (append (list ncurses)
+      (packages (append (list ncurses fish starship kitty git)
                         (if (memq desktop '(tty niri kde gnome))
                             (list fastfetch-minimal)
                             '())
