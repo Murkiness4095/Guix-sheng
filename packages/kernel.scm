@@ -45,7 +45,9 @@
         #~(modify-phases #$phases
             (add-after 'unpack 'apply-nixos-board-changes
               (lambda _
-                (invoke "sh" "-e" #$(local-file "kernel/nixos-post-patch.sh"))))
+                (invoke "sh" "-e" #$(local-file "kernel/nixos-post-patch.sh"))
+                (substitute* "arch/arm64/tools/Makefile"
+                  (("/bin/sh -e") "$(CONFIG_SHELL) -e"))))
             (replace 'configure
               (lambda* (#:key make-flags #:allow-other-keys)
                 (copy-file #$%sm8550-config ".config")

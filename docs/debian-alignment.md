@@ -12,6 +12,7 @@
 | 项 | debian-sheng | 本仓库 |
 | --- | --- | --- |
 | 内核 | 默认使用 `ianchb/sm8550-mainline` 的预编译 release | 按 NixOS-sheng `2be57fe` 从 `87ac0f2` 编译，复用 Debian 全量配置及 NixOS 配置片段和源码修改 |
+| 内核 ARM64 头文件生成 | NixOS 构建环境能访问 `/bin/sh` | Guix 沙箱改用 Kbuild 的 `$(CONFIG_SHELL)`（CI #44020864761） |
 | 固件 | `ianchb/sheng-firmware` | 同源，`packages/firmware.scm` 固定提交 |
 | boot.img | `mkbootimg`（header v2） | `packages/mkbootimg-v2.py`，输出与 AOSP 逐字节一致 |
 | UCM / 传感器 / 充电 / 指纹 / 笔 | 各 DEBIAN 包 + systemd 单元 | `packages/firmware/`、`services/` 逐项移植 |
