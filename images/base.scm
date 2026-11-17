@@ -165,7 +165,8 @@ The tty image keeps a text getty from %base-services."
         (if (eq? desktop 'tty)
             %base-services
             (modify-services %base-services
-              (delete mingetty-service-type)))
+              (delete mingetty-service-type)
+              (delete console-font-service-type)))
         (sheng-desktop-services)
         desktop-service
         noctalia-config

@@ -10,6 +10,12 @@ prefix=${2:-$(basename "$src" .scm)}
 if ! out=$("$GUIX" system image -L "$repo" "$src" 2>"$prefix.err"); then
   echo "guix system image failed: $src" >&2
   tail -60 "$prefix.err" >&2
+  while IFS= read -r logfile; do
+    if test -r "$logfile"; then
+      echo "Build log: $logfile" >&2
+      gzip -dc -- "$logfile" | tail -120 >&2 || true
+    fi
+  done < <(sed -n "s/.*View build log at '\([^']*\.gz\)'.*/\1/p" "$prefix.err" | sort -u)
   exit 1
 fi
 disk=$(printf '%s\n' "$out" | tail -1)
