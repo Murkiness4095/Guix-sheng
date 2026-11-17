@@ -12,6 +12,9 @@
              (gnu services xorg)
              ((gnu packages admin) #:select (fastfetch-minimal))
              (gnu packages display-managers)
+             ((gnu packages fcitx5)
+              #:select (fcitx5 fcitx5-chinese-addons fcitx5-configtool
+                        fcitx5-gtk fcitx5-gtk4 fcitx5-qt))
              (gnu packages linux)
              ((gnu packages ncurses) #:select (ncurses))
              (gnu packages librewolf)
@@ -199,7 +202,10 @@ The tty image keeps a text getty from %base-services."
                     %base-user-accounts))
       (groups (cons* (user-group (name "greeter")) %base-groups))
       (packages (append (list ncurses fish starship git)
-                        (if (eq? desktop 'tty) '() (list kitty))
+                        (if (eq? desktop 'tty)
+                            '()
+                            (list kitty fcitx5 fcitx5-chinese-addons
+                                  fcitx5-configtool fcitx5-gtk fcitx5-gtk4 fcitx5-qt))
                         (if (memq desktop '(tty niri kde gnome))
                             (list fastfetch-minimal)
                             '())
