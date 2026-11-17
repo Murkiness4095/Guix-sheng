@@ -148,6 +148,9 @@ The tty image keeps a text getty from %base-services."
       (timezone "Asia/Shanghai")
       (locale "en_US.utf8")
       (kernel linux-sheng)
+      ;; UFS, its Qualcomm platform driver, and ext4 are built into linux-sheng.
+      ;; Include the configured USB keyboard modules instead of the generic PC list.
+      (initrd-modules (list "usbhid" "hid-generic"))
       (kernel-arguments
        (list "console=ttyMSM0,115200n8" "console=ttyGS0,115200n8"
              "console=tty0" "fbcon=map:0" "loglevel=4" "rootwait"))
