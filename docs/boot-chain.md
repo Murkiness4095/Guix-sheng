@@ -79,3 +79,17 @@ fastboot reboot
 并比较 Guix sparse 镜像的展开大小和目标分区容量。现有
 `scripts/install-single.sh` 会写两个启动槽并擦除 `userdata`，
 不能用于这个布局。Guix dual 根镜像及实机切换尚待验证。
+
+## 可选 GRUB EFI 启动
+
+`Guix EFI bundle` 工作流按 `layout` 构建 TTY 套件。启动链为
+ABL → U-Boot EFI → Guix 标准 GRUB EFI → Guix 内核和 initrd。
+常规单、双系统工作流继续使用 extlinux。
+
+套件包含 EFI 版开机镜像、独立 GPT 分区 `sheng-esp` 的 FAT32 镜像，
+以及写入 `userdata`（single）或 `linux`（dual）的根镜像。
+U-Boot 从 ESP 加载 `BOOTAA64.EFI` 和 sheng DTB。GRUB 按
+`Guix_image` 卷标加载生成的 `/boot/grub/grub.cfg`。
+
+仅有 `userdata` 和 `linux` 的设备可继续使用 extlinux。EFI 套件另需
+独立 ESP，与 NixOS 共存时需确认 ESP 归属。实机 EFI 启动待验证。

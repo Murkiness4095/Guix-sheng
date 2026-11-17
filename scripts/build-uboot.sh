@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build the Android boot image ABL loads: U-Boot + mkbootimg wrapper.
-# Usage: scripts/build-uboot.sh [single|dual]
+# Usage: scripts/build-uboot.sh [single|dual|efi-single|efi-dual]
 # Produces sheng-boot.img or sheng-boot-dual.img in the current directory.
 set -euo pipefail
 GUIX=${GUIX:-guix}
@@ -9,7 +9,9 @@ mode=${1:-single}
 case "$mode" in
   single) package=u-boot-sheng; out=sheng-boot.img ;;
   dual)   package=u-boot-sheng-dual; out=sheng-boot-dual.img ;;
-  *) echo "usage: $0 [single|dual]" >&2; exit 1 ;;
+  efi-single) package=u-boot-sheng-efi; out=sheng-boot-efi.img ;;
+  efi-dual) package=u-boot-sheng-efi-dual; out=sheng-boot-efi.img ;;
+  *) echo "usage: $0 [single|dual|efi-single|efi-dual]" >&2; exit 1 ;;
 esac
 store=$("$GUIX" build -L "$repo" -e "(@ (packages u-boot) $package)")
 test -f "$store/boot.img" || { echo "no boot.img in $store" >&2; exit 1; }
