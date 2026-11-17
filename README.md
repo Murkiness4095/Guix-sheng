@@ -26,6 +26,7 @@ Xiaomi Pad 6S Pro（sheng）的 GNU Guix（aarch64）移植。设备支持参考
 
 KDE 使用 **SDDM**，GNOME 使用 **GDM**，niri/noctalia 使用 **noctalia greeter**，
 tty 镜像保留文本 getty。浏览器统一为 **librewolf**。
+TTY、niri、KDE 和 GNOME 镜像预装 `fastfetch`，覆盖单系统和双系统。
 双系统镜像根分区标签为 `linux`（Android A / Guix B）。
 
 构建时可自定义桌面用户名/密码（`workflow_dispatch` 输入）：
