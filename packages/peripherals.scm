@@ -18,6 +18,7 @@
   #:use-module (gnu packages serialization)
   #:use-module (gnu packages xdisorg)
   #:use-module (guix build-system copy)
+  #:use-module (guix build-system trivial)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system meson)
   #:use-module (guix build-system linux-module)
@@ -56,23 +57,23 @@
     (source (flat-source
              "https://gitlab.postmarketos.org/alghiffaryfa19/pmaports/-/raw/sheng/device/testing/device-xiaomi-sheng/HiFi.conf"
              "HiFi.conf" "10fxwmn1i9zmjacawl9yxh8105xjliy8675i5di604jhpvv4z7lg"))
-    (build-system copy-build-system)
+    (build-system trivial-build-system)
     (arguments
-     (list #:install-plan #~'(("HiFi.conf" "share/alsa/ucm2/Xiaomi/sheng/"))
-           #:phases
-           #~(modify-phases %standard-phases
-               (replace 'unpack
-                 (lambda* (#:key source #:allow-other-keys)
-                   (copy-file source "HiFi.conf")))
-               (add-after 'install 'install-profile
-                 (lambda _
-                   (let ((ucm (string-append #$output "/share/alsa/ucm2")))
-                     (copy-file
-                      #$(local-file "firmware/alsa-ucm-sheng/Xiaomi-Pad6SPro.conf")
-                      (string-append ucm "/Xiaomi/sheng/Xiaomi-Pad6SPro.conf"))
-                     (mkdir-p (string-append ucm "/conf.d/sm8550"))
-                     (symlink "../../Xiaomi/sheng/Xiaomi-Pad6SPro.conf"
-                              (string-append ucm "/conf.d/sm8550/Xiaomi-Pad6SPro.conf"))))))))
+     (list #:modules '((guix build utils))
+           #:builder
+           #~(begin
+               (use-modules (guix build utils))
+               (let* ((ucm (string-append #$output "/share/alsa/ucm2"))
+                      (profile (string-append ucm "/Xiaomi/sheng"))
+                      (aliases (string-append ucm "/conf.d/sm8550")))
+                 (mkdir-p profile)
+                 (mkdir-p aliases)
+                 (copy-file #$source (string-append profile "/HiFi.conf"))
+                 (copy-file
+                  #$(local-file "firmware/alsa-ucm-sheng/Xiaomi-Pad6SPro.conf")
+                  (string-append profile "/Xiaomi-Pad6SPro.conf"))
+                 (symlink "../../Xiaomi/sheng/Xiaomi-Pad6SPro.conf"
+                          (string-append aliases "/Xiaomi-Pad6SPro.conf"))))))
     (home-page "https://gitlab.postmarketos.org/alghiffaryfa19/pmaports")
     (synopsis "ALSA UCM profile for Xiaomi Pad 6S Pro")
     (description "Installs the WCD938X mixer and routing profile for sheng.")
@@ -402,6 +403,7 @@
                            #$(flat-source
                               "https://deb.debian.org/debian/pool/main/libf/libfprint/libfprint_1.94.10.orig.tar.xz"
                               "libfprint_1.94.10.orig.tar.xz" "0ljb92qlpxzmkawmbfsz720v4jnyxim77dbdlwmrhi3qpq42fn7z"))
+                   (setenv "CC" "gcc")
                    (let ((backend (string-append (getcwd) "/build/native/backend"))
                          (libfprint (string-append (getcwd) "/build/native/libfprint")))
                      (invoke "sh" "scripts/build-backend.sh" backend)
