@@ -12,8 +12,7 @@
   #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (guix utils)
-  #:export (u-boot-sheng-efi u-boot-sheng-efi-dual
-            u-boot-sheng
+  #:export (u-boot-sheng
             u-boot-sheng-dual))
 
 (define %u-boot-sheng-commit
@@ -47,7 +46,7 @@
               (local-file "u-boot/patches/fix-fastboot-menu-reboot-mode.patch")
               (local-file "u-boot/patches/deduplicate-sm8550-clock-config.patch")))))))
 
-(define* (make-u-boot-sheng #:key (root-label "userdata") (efi? #f))
+(define* (make-u-boot-sheng #:key (root-label "userdata"))
   "Return U-Boot for sheng, with a boot.img whose cmdline roots at ROOT-LABEL.
 ROOT-LABEL is also written into the fork's default environment by the
 dual-system variant below."
@@ -58,10 +57,9 @@ dual-system variant below."
                    "g_serial.use_acm=1 root=PARTLABEL=" root-label)))
     (package
       (inherit base)
-      (name (string-append (if efi? "u-boot-sheng-efi" "u-boot-sheng")
-                           (if (string=? root-label "userdata")
-                               ""
-                               "-dual")))
+      (name (if (string=? root-label "userdata")
+                "u-boot-sheng"
+                "u-boot-sheng-dual"))
       (native-inputs
        (modify-inputs (package-native-inputs base)
          (append zig-0.15 xxd python-wrapper)))
@@ -77,23 +75,8 @@ dual-system variant below."
               (replace 'configure
                 (lambda* (#:key make-flags #:allow-other-keys)
                   (apply invoke "make" "sm8550_defconfig" make-flags)
-                  (unless #$efi?
-                    (substitute* "board/qualcomm/sheng.env"
-                      (("^bootmenu_0=Boot NixOS=") "bootmenu_0=Boot Guix=")))
-                  (when #$efi?
-                    (invoke "bash" "scripts/config" "--enable" "EFI_LOADER"
-                            "--enable" "CMD_BOOTEFI"
-                            "--enable" "PARTITION_TYPE_GUID"
-                            "--enable" "CMD_FAT"
-                            "--enable" "EFI_VARIABLE_NO_STORE"
-                            "--disable" "EFI_CAPSULE_ON_DISK"
-                            "--disable" "EFI_RUNTIME_UPDATE_CAPSULE")
-                    (apply invoke "make" "olddefconfig" make-flags)
-                    (substitute* "board/qualcomm/sheng.env"
-                      (("^bootmenu_0=Boot NixOS=.*")
-                       "bootmenu_0=Boot Guix (GRUB EFI)=run bootguixefi\n"))
-                    (invoke "sh" "-c" "cat \"$1\" >> board/qualcomm/sheng.env"
-                            "sh" #$(local-file "u-boot/guix-efi.env")))))
+                  (substitute* "board/qualcomm/sheng.env"
+                    (("^bootmenu_0=Boot NixOS=") "bootmenu_0=Boot Guix="))))
               #$@(if (string=? root-label "userdata")
                      '()
                      (list
@@ -142,9 +125,3 @@ whose cmdline selects the root filesystem by PARTLABEL."))))
 
 (define u-boot-sheng-dual
   (make-u-boot-sheng #:root-label "linux"))
-
-(define u-boot-sheng-efi
-  (make-u-boot-sheng #:efi? #t))
-
-(define u-boot-sheng-efi-dual
-  (make-u-boot-sheng #:efi? #t #:root-label "linux"))

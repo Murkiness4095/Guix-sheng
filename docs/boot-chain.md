@@ -41,4 +41,3 @@ fastboot reboot
 - `modules/sheng-bootloader.scm` 生成 extlinux 启动文件。
 - `images/single-tty.scm` 和 `images/dual-tty.scm` 分别使用
   `userdata` 和 `linux`。
-- EFI 的独立套件见 [GRUB EFI 安装指南](efi-install.md)。

@@ -11,7 +11,6 @@
 | Guix 使用整个或已缩小的 `userdata` | `build-single` | `userdata` | U-Boot → extlinux |
 | 保留 `userdata` 上的 Android 或 NixOS | `build-dual` | `linux` | 独立 ABL 槽 → U-Boot → extlinux |
 | 保留 `linux` 上的 NixOS | `build-single` | `userdata` | 独立 ABL 槽 → U-Boot → extlinux |
-| 已准备独立 `sheng-esp` | `Guix EFI bundle` | 按布局选 `userdata` 或 `linux` | U-Boot EFI → GRUB EFI |
 
 已有 `userdata` 和 `linux` 两个分区、希望保留 NixOS 的设备，从
 [双系统安装指南](docs/dual-boot.md)开始。
@@ -37,10 +36,10 @@
 手动构建可选 `vendor_services`，接入试验性的板级 UCM、触控和传感器服务。
 
 ## 文档
+Guix EFI 实验保留在 [codex/efi](https://github.com/Murkiness4095/Guix-sheng/tree/codex/efi)。
 
 - [单系统首启与 extlinux 验收](docs/boot-chain.md)
 - [双系统安装与 NixOS 共存](docs/dual-boot.md)
-- [可选 GRUB EFI 安装套件](docs/efi-install.md)
 - [最小 Guix 系统声明](examples/minimal/README.md)
 - [CI、固定频道与缓存](docs/CI.md)
 - [维护交接](docs/HANDOVER.md)与[上游实现差异](docs/debian-alignment.md)
