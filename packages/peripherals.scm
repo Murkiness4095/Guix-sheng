@@ -200,6 +200,7 @@
     (build-system gnu-build-system)
     (arguments
      (list #:tests? #f
+           #:make-flags #~'("CC=gcc")
            #:phases
            #~(modify-phases %standard-phases
                (delete 'configure)
