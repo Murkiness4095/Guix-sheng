@@ -1,26 +1,63 @@
-# 双系统安装指南
+# 双系统安装与切换
 
-ABL 按启动槽加载各系统自己的开机镜像。Guix 工作流名称决定
-U-Boot 查找的根分区，与设备上装了几个系统无关。
+参考 [NixOS-sheng 双系统指南](https://github.com/Murkiness4095/nixos-sheng/blob/2be57fe7da35b0b98963cc5da233ad6765d5c134/docs/dual-boot.md)。
+ABL 通过 A/B 槽选择系统。Guix 的 U-Boot 从对应根分区读取 extlinux。
 
-| 已有系统 | Guix 根分区 | 同一次 CI 的 Guix 产物 |
+## 构建产物
+
+| 项目 | Guix 使用 userdata | Guix 使用 linux |
 | --- | --- | --- |
-| NixOS 在 `linux` | `userdata` | `build-single` 的 `sheng-boot.img` 和 `single-tty.sparse.img` |
-| Android 或 NixOS 在 `userdata` | `linux` | `build-dual` 的 `sheng-boot-dual.img` 和 `dual-tty.sparse.img` |
+| 根分区 GPT 名称 | `userdata` | `linux` |
+| GitHub Actions | `build-single` | `build-dual` |
+| 开机镜像 | `sheng-boot.img` | `sheng-boot-dual.img` |
+| TTY 根镜像 | `single-tty.sparse.img` | `dual-tty.sparse.img` |
+
+在对应工作流选 `image=tty`，下载同一个 run 的两个文件。刷写前备份目标根分区、
+启动槽和 DTBO，确认 sparse 镜像展开后能放进目标分区。以下命令在 ABL fastboot
+执行，`fastboot devices` 应只列出目标平板。
 
 ## 保留 linux 上的 NixOS
 
-[单系统 TTY CI](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44044743355)
-已产出 Guix 所需的两个文件。先确认 NixOS 当前根分区、启动槽和 ESP
-实际位置。比如 NixOS 占用 B 槽，就保留 `boot_b`、`linux`
-和它的 ESP，Guix 用 `boot_a` 与 `userdata`。如果 NixOS 占用 A
-槽，就交换两个启动槽，根分区选择不变。
+以下布局已经验证 Guix 首启。NixOS 用 B 槽和 `linux`，其 EFI 文件位于独立
+`sheng-esp`。Guix 用 A 槽和 `userdata`。如果 NixOS 当前在 A 槽，先按
+实际布局调换命令里的 A/B 槽，根分区仍用 `userdata`。
 
-只有确认 NixOS 的启动文件无需从 `userdata` 读取后，才覆盖该分区。
-先备份目标启动槽与 `userdata`，并核对 sparse 根镜像展开后能放进
-缩小后的分区。可以先写 Guix 根镜像并临时加载开机镜像验证，
-通过[首启验收](boot-chain.md#首启验收)后再写入 Guix 使用的启动槽。
-之后通过 ABL 切槽，验证两个系统都能进入。
+以下操作清空 `userdata` 和 A 槽的旧 DTBO。确认 NixOS 的根和启动文件
+均位于其他分区后执行。
 
-`scripts/install-single.sh` 会同时覆盖两个启动槽，不能用于这套
-共存布局。Guix 的实机首启和切槽待验证。
+```sh
+fastboot erase dtbo_a &&
+fastboot flash boot_a sheng-boot.img &&
+fastboot erase userdata &&
+fastboot flash userdata single-tty.sparse.img &&
+fastboot set_active a &&
+fastboot reboot
+```
+
+## 保留 A 槽的 Android
+
+以下步骤适用于 Android A 槽已能启动，且已经有可覆盖的 `linux` 分区。
+Guix 使用 B 槽。Guix 这套布局仍待实机验证。
+
+```sh
+fastboot erase dtbo_b &&
+fastboot flash boot_b sheng-boot-dual.img &&
+fastboot erase linux &&
+fastboot flash linux dual-tty.sparse.img &&
+fastboot set_active b &&
+fastboot reboot
+```
+
+先擦目标根分区是为了清理 sparse 镜像跳过的旧数据。两套布局都应避开
+`scripts/install-single.sh`，因为它会同时写两个启动槽。
+
+## 切换系统与验收
+
+进入 ABL fastboot 后，选择目标系统的槽，再重启。例如在第一套布局回到 NixOS：
+
+```sh
+fastboot set_active b
+fastboot reboot
+```
+
+Guix 首启后按 [extlinux 验收](boot-chain.md#首启验收)确认登录、内核版本和根分区。

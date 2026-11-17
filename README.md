@@ -12,8 +12,8 @@
 | 保留 `userdata` 上的 Android 或 NixOS | `build-dual` | `linux` | 独立 ABL 槽 → U-Boot → extlinux |
 | 保留 `linux` 上的 NixOS | `build-single` | `userdata` | 独立 ABL 槽 → U-Boot → extlinux |
 
-已有 `userdata` 和 `linux` 两个分区、希望保留 NixOS 的设备，从
-[双系统安装指南](docs/dual-boot.md)开始。
+保留现有系统时，先按它占用的根分区选择 Guix 产物，再按 A/B 槽刷写。
+见[双系统安装与切换](docs/dual-boot.md)。
 
 ## 构建并下载
 
