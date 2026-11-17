@@ -35,6 +35,9 @@
 (define desktop-password-hash
   (if (defined? 'sheng-desktop-password-hash) sheng-desktop-password-hash #f))
 
+(define desktop-auto-login?
+  (if (defined? 'sheng-desktop-auto-login?) sheng-desktop-auto-login? #t))
+
 (define (sheng-niri-desktop desktop-name exec-line)
   "Package providing a wayland-session desktop entry."
   (package
@@ -70,7 +73,7 @@
         (service network-manager-service-type)
         (service bluetooth-service-type)))
 
-(define (sheng-greetd-config)
+(define (sheng-greetd-config desktop auto-login?)
   (greetd-configuration
    (greeter-supplementary-groups '("video" "input"))
    (terminals
@@ -78,6 +81,15 @@
            (terminal-vt "1")
            (terminal-switch #t)
            (extra-shepherd-requirement '(elogind))
+           (initial-session-user (and auto-login? desktop-username))
+           (initial-session-command
+            (greetd-user-session
+             (command (file-append niri "/bin/niri"))
+             (command-args
+              (if (eq? desktop 'noctalia)
+                  '("-c" "/etc/sheng/niri-noctalia.kdl")
+                  '()))
+             (xdg-session-type "wayland")))
            (default-session-command
             (greetd-noctalia-greeter-session
              (package noctalia-greeter))))
@@ -87,22 +99,29 @@
           (greetd-terminal-configuration (terminal-vt "5"))
           (greetd-terminal-configuration (terminal-vt "6"))))))
 
-(define (sheng-login-services desktop)
+(define (sheng-login-services desktop auto-login?)
   "Return the display manager for DESKTOP.
 KDE and GNOME use their own greeters; niri sessions use the noctalia greeter.
 The tty image keeps a text getty from %base-services."
   (case desktop
     ((kde)
      (list (service sddm-service-type
-                    (sddm-configuration (sddm sddm)))))
+                    (sddm-configuration
+                     (sddm sddm)
+                     (auto-login-user (if auto-login? desktop-username ""))
+                     (auto-login-session (if auto-login? "plasma.desktop" ""))))))
     ((gnome)
-     (list (service gdm-service-type)))
+     (list (service gdm-service-type
+                    (gdm-configuration
+                     (auto-login? auto-login?)
+                     (default-user (and auto-login? desktop-username))))))
     ((niri noctalia)
      (list (service noctalia-greeter-service-type)
-           (service greetd-service-type (sheng-greetd-config))))
+           (service greetd-service-type (sheng-greetd-config desktop auto-login?))))
     (else '())))
 
-(define* (sheng-os #:key (desktop 'tty) (hostname "sheng") (root-label "linux"))
+(define* (sheng-os #:key (desktop 'tty) (hostname "sheng") (root-label "linux")
+                   (auto-login? desktop-auto-login?))
   "Return an <operating-system>.  DESKTOP: tty, kde, gnome, niri, noctalia."
   (let* ((desktop-service
           (case desktop
@@ -163,12 +182,19 @@ The tty image keeps a text getty from %base-services."
         ;; Keep a text getty only for the tty image; graphical variants
         ;; replace it with their own display manager.
         (if (eq? desktop 'tty)
-            %base-services
+            (modify-services %base-services
+              (mingetty-service-type config =>
+                (if (and auto-login?
+                         (string=? (mingetty-configuration-tty config) "tty1"))
+                    (mingetty-configuration
+                     (inherit config)
+                     (auto-login desktop-username))
+                    config)))
             (modify-services %base-services
               (delete mingetty-service-type)
               (delete console-font-service-type)))
         (sheng-desktop-services)
         desktop-service
         noctalia-config
-        (append (sheng-login-services desktop)
+        (append (sheng-login-services desktop auto-login?)
                 (list (service openssh-service-type))))))))

@@ -22,6 +22,8 @@
    `tty`。选 `none` 只构建开机镜像。四种根镜像均包含 `fastfetch`。
 3. `desktop_username` 和 `desktop_password` 默认都是 `sheng`，对本次
    根镜像的登录生效，包括 TTY。下载同一个 run 的开机镜像和 sparse 根镜像。
+   `auto_login` 默认开启。TTY 会直接进入 tty1 的用户 shell，桌面会启动对应会话。
+   取消勾选可恢复登录界面，已有系统可在 `sheng-os` 调用中设置 `#:auto-login? #f`。
 
 | 工作流 | 开机镜像 | 根镜像示例 |
 | --- | --- | --- |

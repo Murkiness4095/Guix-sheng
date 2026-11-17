@@ -12,6 +12,10 @@ on:
         type: choice
         default: tty
         options: [none, tty, niri, kde, gnome]
+      auto_login:
+        description: Log in automatically at boot
+        type: boolean
+        default: true
       desktop_username:
         description: Login name for the selected root image
         default: sheng
@@ -34,11 +38,15 @@ jobs:
       - name: Write build-time identity settings
         env:
           UNAME: ${{ inputs.desktop_username }}
+          AUTO_LOGIN: ${{ github.event_name != 'workflow_dispatch' || inputs.auto_login }}
           UPASS: ${{ inputs.desktop_password }}
         run: |
           uname=${UNAME:-sheng}; pass=${UPASS:-sheng}
           hash=$(openssl passwd -6 "$pass")
           printf '(define sheng-desktop-username "%s")\n(define sheng-desktop-password-hash "%s")\n' "$uname" "$hash" > images/settings.scm
+          auto_login='#f'
+          if [[ "$AUTO_LOGIN" == true ]]; then auto_login='#t'; fi
+          printf '(define sheng-desktop-auto-login? %s)\n' "$auto_login" >> images/settings.scm
       - name: Restore Guix state
         uses: actions/cache/restore@v4
         with:
