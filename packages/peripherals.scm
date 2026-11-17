@@ -436,6 +436,8 @@
                       (lambda (listener)
                         (let ((name (basename listener)))
                           (install-file listener listeners)
+                          (invoke "patchelf" "--add-rpath" glibc-lib
+                                  (string-append listeners "/" name))
                           (symlink name
                                    (string-append listeners "/"
                                                   (substring name 0 (- (string-length name) 4))))))
