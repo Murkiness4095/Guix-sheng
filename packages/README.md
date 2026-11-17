@@ -1,8 +1,18 @@
-# packages
+# Sheng packages
 
-Guix package definitions for sheng: kernel, U-Boot, firmware, vendor libs.
-Pin source commits; do not silently upgrade.
+`kernel.scm`, `u-boot.scm`, and `firmware.scm` provide the board's boot
+components. `peripherals.scm` contains the Scheme ports of the old Nix
+recipes from `eb1826e`. The original firmware-blob recipe is covered by
+`sheng-firmware`.
 
-The old Nix packaging recipes are available in Git history at `eb1826e`.
-For peripherals that still need a Guix package, use the corresponding
-nixos-sheng recipe as the reference. Local sources and patches remain here.
+Build a peripheral from the repository root in CI or the isolated build
+environment. For example:
+
+```sh
+guix build -L . -e '(@ (packages peripherals) sheng-thp)'
+```
+
+The peripheral package workflow validates the recipes independently from the
+root images. Shepherd services, image integration, and hardware validation
+are pending. Systemd unit files from the Nix reference remain available
+in Git history for translating service dependencies and startup commands.

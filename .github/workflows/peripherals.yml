@@ -1,0 +1,42 @@
+name: Sheng peripheral packages
+on:
+  push:
+    branches: [boot-chain]
+    paths:
+      - .github/workflows/peripherals.yml
+      - packages/peripherals.scm
+      - packages/firmware/**
+      - packages/kernel/mdss-test-module/**
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Guix and zstd
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget zstd
+          wget https://guix.gnu.org/install.sh -O /tmp/guix-install.sh
+          yes | sudo bash /tmp/guix-install.sh
+      - uses: ./.github/actions/guix-pull
+      - uses: ./.github/actions/sheng-kernel
+      - name: Build peripheral packages
+        run: |
+          "$GUIX" build -L . --keep-going \
+            -e '(@ (packages peripherals) alsa-ucm-sheng)' \
+            -e '(@ (packages peripherals) sheng-fastrpc)' \
+            -e '(@ (packages peripherals) sheng-libssc)' \
+            -e '(@ (packages peripherals) sheng-iio-sensor-proxy)' \
+            -e '(@ (packages peripherals) sheng-charger-mode)' \
+            -e '(@ (packages peripherals) sheng-devauth)' \
+            -e '(@ (packages peripherals) sheng-fingerprint)' \
+            -e '(@ (packages firmware) sheng-firmware)' \
+            -e '(@ (packages peripherals) sheng-keyboard-helper)' \
+            -e '(@ (packages peripherals) sheng-mipps-auth)' \
+            -e '(@ (packages peripherals) sheng-pen-status)' \
+            -e '(@ (packages peripherals) sheng-sensors)' \
+            -e '(@ (packages peripherals) sheng-thp)' \
+            -e '(@ (packages peripherals) sheng-mdss-test-module)'

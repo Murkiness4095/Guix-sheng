@@ -15,7 +15,7 @@
 | 内核 ARM64 头文件生成 | NixOS 构建环境能访问 `/bin/sh` | Guix 沙箱改用 Kbuild 的 `$(CONFIG_SHELL)`（CI #44020864761） |
 | 固件 | `ianchb/sheng-firmware` | 同源，`packages/firmware.scm` 固定提交 |
 | boot.img | `mkbootimg`（header v2） | `packages/mkbootimg-v2.py`，输出与 AOSP 逐字节一致 |
-| UCM / 传感器 / 充电 / 指纹 / 笔 | 各 DEBIAN 包 + systemd 单元 | `packages/firmware/`、`services/` 逐项移植 |
+| UCM / 传感器 / 充电 / 指纹 / 笔 | 各 DEBIAN 包 + systemd 单元 | `packages/peripherals.scm` 对应原 NixOS 配方；独立 CI 验证，Shepherd 接线待完成 |
 | 根文件系统 | Debian rootfs + systemd | Guix 镜像 + shepherd |
 | 刷机 | `boot.img` + `rootfs.img` 到 `boot`/`userdata` 或 `linux` | `scripts/install-single.sh` / 双系统待做 |
 

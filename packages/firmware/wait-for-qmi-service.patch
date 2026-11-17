@@ -1,0 +1,20 @@
+--- a/src/libssc-client.c
++++ b/src/libssc-client.c
+@@ -19,0 +20 @@
++#include <unistd.h>
+@@ -365,6 +366,9 @@
+-	for (GList *l = qrtr_bus_peek_nodes (priv->bus); l != NULL; l = l->next) {
+-		node = l->data;
+-
+-		if (node && qrtr_node_lookup_port (node, QMI_SERVICE_SSC) >= 0) {
+-			found = TRUE;
+-			break;
++	for (int attempt = 0; attempt < 5; attempt++) {
++		sleep(1);
++		for (GList *l = qrtr_bus_peek_nodes (priv->bus); l != NULL; l = l->next) {
++			node = l->data;
++
++			if (node && qrtr_node_lookup_port (node, QMI_SERVICE_SSC) >= 0) {
++				found = TRUE;
++				break;
++			}
