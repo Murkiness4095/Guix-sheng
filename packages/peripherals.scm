@@ -99,7 +99,10 @@
                    (let ((test-program (string-append #$output "/bin/fastrpc_test"))
                          (test-data (string-append #$output "/share/fastrpc_test")))
                      (when (file-exists? test-program) (delete-file test-program))
-                     (when (file-exists? test-data) (delete-file-recursively test-data))))))))
+                     (when (file-exists? test-data) (delete-file-recursively test-data))
+                   (let ((test-libraries (string-append #$output "/lib/fastrpc_test")))
+                     (when (file-exists? test-libraries)
+                       (delete-file-recursively test-libraries)))))))))
     (native-inputs (list autoconf automake libtool pkg-config patchelf))
     (inputs (list libyaml))
     (home-page "https://github.com/qualcomm/fastrpc")
@@ -152,7 +155,7 @@
                    (substitute* "meson.build"
                      (("polkit_gobject_dep.get_pkgconfig_variable\\('policydir'\\)")
                       "get_option('prefix') / 'share' / 'polkit-1' / 'actions'")))))))
-    (native-inputs (list pkg-config))
+    (native-inputs (list pkg-config (list glib "bin")))
     (inputs (list glib libgudev eudev polkit sheng-libssc))
     (home-page "https://gitlab.freedesktop.org/hadess/iio-sensor-proxy")
     (synopsis "IIO sensor proxy with sheng SSC support")
@@ -215,6 +218,7 @@
 
 (define* (ssc-make-arguments #:key keyboard?)
   (list #:tests? #f
+        #:make-flags #~'("CC=gcc")
         #:phases
         #~(modify-phases %standard-phases
             (delete 'configure)
@@ -285,22 +289,15 @@
            #:install-plan #~'(("xiaomi-charger-mode" "libexec/"))
            #:phases
            #~(modify-phases %standard-phases
-               (add-after 'install 'set-elf-interpreter
-                 (lambda* (#:key inputs #:allow-other-keys)
-                   (let ((program (string-append #$output "/libexec/xiaomi-charger-mode")))
-                     (chmod program #o755)
-                     (invoke "patchelf" "--set-interpreter"
-                             (search-input-file inputs "/lib/ld-linux-aarch64.so.1")
-                             program)
-                     (invoke "patchelf" "--add-rpath"
-                             (dirname (search-input-file inputs "/lib/ld-linux-aarch64.so.1"))
-                             program)))))))
-    (native-inputs (list patchelf))
-    (inputs (list glibc))
+               (add-after 'install 'make-charger-script-executable
+                 (lambda _
+                   (chmod (string-append #$output "/libexec/xiaomi-charger-mode")
+                          #o755))))))
+    (inputs (list python))
     (supported-systems '("aarch64-linux"))
     (home-page "https://github.com/ianchb/xiaomi-charger-mode")
     (synopsis "Charger-mode display for sheng")
-    (description "Installs the upstream framebuffer charging screen binary.")
+    (description "Installs the upstream Python framebuffer charging screen.")
     (license #f)))
 
 (define sheng-mipps-auth
@@ -396,9 +393,11 @@
            #:phases
            #~(modify-phases %standard-phases
                (delete 'configure)
+               (add-after 'unpack 'verify-upstream-runtime
+                 (lambda _
+                   (invoke "sha256sum" "-c" "prebuilt/aarch64/SHA256SUMS")))
                (replace 'build
                  (lambda _
-                   (invoke "sha256sum" "-c" "prebuilt/aarch64/SHA256SUMS")
                    (setenv "LIBFPRINT_TARBALL"
                            #$(flat-source
                               "https://deb.debian.org/debian/pool/main/libf/libfprint/libfprint_1.94.10.orig.tar.xz"
@@ -428,7 +427,7 @@
                                 (string-append glibc-lib "/ld-linux-aarch64.so.1") program)
                         (invoke "patchelf" "--add-rpath"
                                 (string-append glibc-lib ":" listeners) program))
-                      (find-files libexec "."))
+                      (list (string-append libexec "/qteesupplicant")))
                      (for-each
                       (lambda (listener)
                         (let ((name (basename listener)))
