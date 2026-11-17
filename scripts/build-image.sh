@@ -15,7 +15,7 @@ if ! out=$("$GUIX" system image -L "$repo" "$src" 2>"$prefix.err"); then
       echo "Build log: $logfile" >&2
       gzip -dc -- "$logfile" | tail -120 >&2 || true
     fi
-  done < <(sed -n "s/.*View build log at '\([^']*\.gz\)'.*/\1/p" "$prefix.err" | sort -u)
+  done < <(grep "View build log at" "$prefix.err" | grep -oE "/var/log/guix/drvs/[[:alnum:]/_-]+\.drv\.gz" | sort -u)
   exit 1
 fi
 disk=$(printf '%s\n' "$out" | tail -1)
