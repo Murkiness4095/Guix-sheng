@@ -1,5 +1,8 @@
 name: Guix EFI bundle
 on:
+  push:
+    branches: [boot-chain]
+    paths: [".github/workflows/efi.yml", "images/efi-tty.scm", "scripts/build-efi.sh", "packages/u-boot/guix-efi.env"]
   workflow_dispatch:
     inputs:
       layout:
@@ -23,11 +26,11 @@ jobs:
       - uses: ./.github/actions/guix-pull
       - name: Build GRUB EFI, root filesystem and U-Boot
         env:
-          LAYOUT: ${{ inputs.layout }}
+          LAYOUT: ${{ inputs.layout || 'dual' }}
         run: scripts/build-efi.sh "$LAYOUT"
       - uses: actions/upload-artifact@v4
         with:
-          name: sheng-guix-efi-${{ inputs.layout }}
+          name: sheng-guix-efi-${{ inputs.layout || 'dual' }}
           path: efi-bundle/
           if-no-files-found: error
           compression-level: 0
