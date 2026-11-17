@@ -42,7 +42,7 @@
 ## 产物
 
 `scripts/build-image.sh` 调用 `guix system image -L .`，失败时打印 stderr；成功后从
-1 MiB 偏移提取 root 分区为 ext4，并尽可能转换为 Android sparse。artifact 名
+实际分区表提取 ext4 分区，检查文件系统和 extlinux 配置，再转换为 Android sparse。artifact 名
 `sheng-<variant>`，同时包含 U-Boot 的 `sheng-boot.img`。
 
 ## 求值先行

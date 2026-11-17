@@ -15,4 +15,4 @@ examples/             最小 / 桌面 / 双系统 / 多机 / tmpfs
 
 镜像由 `(image (inherit mbr-disk-image) ...)` 生成，root 分区 initializer
 以 `#:register-closures? #f` 跳过镜像内 store DB 注册（规避 CI 沙箱的
-SQLite 锁），闭包仍被复制；分区从 1 MiB 偏移处提取为 ext4。
+SQLite 锁），闭包仍被复制；按分区表实际位置提取 ext4 根分区。
