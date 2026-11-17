@@ -1,6 +1,7 @@
 # 维护交接
 
 ## 当前状态
+- [外设集成 TTY #44058228439](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44058228439) 成功上传开机和根镜像。实机待验。
 - [单系统 TTY #44044743355](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44044743355) 已成功上传配对产物。实机登录待验证。
 
 - 本地 `main` 基于 `origin/boot-chain` 的 `7accabd`。U-Boot defconfig 去重补丁已用固定提交的原始配置验证，完整构建待跑。

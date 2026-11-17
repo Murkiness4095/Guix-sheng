@@ -98,6 +98,5 @@ jobs:
           name: sheng-dual-images
           path: |
             sheng-boot-dual.img
-            *.ext4
             *.sparse.img
             failures.txt

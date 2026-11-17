@@ -407,7 +407,9 @@
                    (let ((backend (string-append (getcwd) "/build/native/backend"))
                          (libfprint (string-append (getcwd) "/build/native/libfprint")))
                      (invoke "sh" "scripts/build-backend.sh" backend)
-                     (invoke "sh" "scripts/build-libfprint.sh" backend libfprint))))
+                     (setenv "LD_LIBRARY_PATH" backend)
+                     (invoke "sh" "scripts/build-libfprint.sh" backend libfprint)
+                     (unsetenv "LD_LIBRARY_PATH"))))
                (replace 'install
                  (lambda* (#:key inputs #:allow-other-keys)
                    (let* ((fp (string-append #$output "/lib/xiaomi-sheng-fingerprint"))

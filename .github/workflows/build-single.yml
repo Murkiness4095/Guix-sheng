@@ -98,6 +98,5 @@ jobs:
           name: sheng-single-images
           path: |
             sheng-boot.img
-            *.ext4
             *.sparse.img
             failures.txt
