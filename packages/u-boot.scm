@@ -78,7 +78,7 @@ dual-system variant below."
                 (lambda* (#:key make-flags #:allow-other-keys)
                   (apply invoke "make" "sm8550_defconfig" make-flags)
                   (when #$efi?
-                    (invoke "sh" "scripts/config" "--enable" "EFI_LOADER"
+                    (invoke "bash" "scripts/config" "--enable" "EFI_LOADER"
                             "--enable" "CMD_BOOTEFI"
                             "--enable" "PARTITION_TYPE_GUID"
                             "--enable" "CMD_FAT"
@@ -87,8 +87,8 @@ dual-system variant below."
                             "--disable" "EFI_RUNTIME_UPDATE_CAPSULE")
                     (apply invoke "make" "olddefconfig" make-flags)
                     (substitute* "board/qualcomm/sheng.env"
-                      (("^bootmenu_0=Boot NixOS=.*$")
-                       "bootmenu_0=Boot Guix (GRUB EFI)=run bootguixefi"))
+                      (("^bootmenu_0=Boot NixOS=.*")
+                       "bootmenu_0=Boot Guix (GRUB EFI)=run bootguixefi\n"))
                     (invoke "sh" "-c" "cat \"$1\" >> board/qualcomm/sheng.env"
                             "sh" #$(local-file "u-boot/guix-efi.env")))))
               #$@(if (string=? root-label "userdata")
