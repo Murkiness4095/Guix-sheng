@@ -3,6 +3,7 @@
 (define-module (packages firmware)
   #:use-module (guix build-system copy)
   #:use-module (guix download)
+  #:use-module (guix gexp)
   #:use-module (guix packages)
   #:export (sheng-firmware))
 
