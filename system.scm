@@ -1,14 +1,4 @@
-;; system.scm — top-level Guix System declaration for sheng.
-(use-modules (gnu)
-             (modules boot)
-             (modules filesystems)
-             (modules networking))
+;; Top-level sheng system declaration for an ext4 root labelled linux.
+(load (string-append (dirname (current-filename)) "/images/base.scm"))
 
-(operating-system
-  (host-name "sheng")
-  (timezone "Asia/Shanghai")
-  (locale "en_US.utf8")
-  (bootloader sheng-bootloader)
-  (file-systems (append (sheng-file-systems) %base-file-systems))
-  (services (append (sheng-networking-services) %base-services))
-  (packages %base-packages))
+(sheng-os #:desktop 'tty #:hostname "sheng" #:root-label "linux")
