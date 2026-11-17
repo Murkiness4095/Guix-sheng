@@ -7,9 +7,11 @@ on:
     paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/workflows/build-dual.yml"]
   workflow_dispatch:
     inputs:
-      variants:
-        description: Space-separated image names
-        default: dual-tty dual-kde dual-gnome dual-niri dual-noctalia
+      image:
+        description: Image variant (none builds only boot.img)
+        type: choice
+        default: tty
+        options: [none, tty, niri, kde, gnome, noctalia]
       desktop_username:
         description: Desktop user name
         default: sheng
@@ -58,7 +60,12 @@ jobs:
             ~/.cache/guix
             ~/.config/guix
           key: guix-state-${{ hashFiles('channels.scm') }}
+      - name: Build U-Boot boot.img
+        run: |
+          export GUIX="$HOME/.config/guix/current/bin/guix"
+          scripts/build-uboot.sh dual
       - name: Evaluate all images
+        if: ${{ inputs.image != 'none' }}
         run: |
           set -o pipefail
           export GUIX="$HOME/.config/guix/current/bin/guix"
@@ -67,12 +74,9 @@ jobs:
             "$GUIX" system image -L . --dry-run "images/$img.scm" 2>&1 | tail -20 || exit 1
           done
         env:
-          IMAGES: ${{ inputs.variants || 'dual-tty dual-kde dual-gnome dual-niri dual-noctalia' }}
-      - name: Build U-Boot boot.img
-        run: |
-          export GUIX="$HOME/.config/guix/current/bin/guix"
-          scripts/build-uboot.sh dual
+          IMAGES: ${{ inputs.image && format('dual-{0}', inputs.image) || 'dual-tty dual-kde dual-gnome dual-niri dual-noctalia' }}
       - name: Build all dual-system images
+        if: ${{ inputs.image != 'none' }}
         run: |
           export GUIX="$HOME/.config/guix/current/bin/guix"
           set -e
@@ -82,7 +86,7 @@ jobs:
           done
           test ! -s failures.txt
         env:
-          IMAGES: ${{ inputs.variants || 'dual-tty dual-kde dual-gnome dual-niri dual-noctalia' }}
+          IMAGES: ${{ inputs.image && format('dual-{0}', inputs.image) || 'dual-tty dual-kde dual-gnome dual-niri dual-noctalia' }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:

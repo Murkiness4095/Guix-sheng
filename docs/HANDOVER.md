@@ -11,6 +11,6 @@
 
 ## 接手后的第一轮验收
 
-1. 用包含去重补丁的分支触发 `build-single`，输入 `variants=single-tty`。
+1. 用包含去重补丁的分支触发 `build-single`，输入 `image=tty`。
 2. 跟踪到构建结束。同一个 run 应产出 `sheng-boot.img` 和 `single-tty.sparse.img`。将 run 链接和产物状态更新到本页。
 3. 按[启动链](boot-chain.md)进行实机验收，记录是否到达 `login:`、能否登录以及对应镜像的 run。后续工作见 [TODO](../TODO.md)。

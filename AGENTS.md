@@ -20,5 +20,5 @@
 
 1. 先读交接记录和最近一次相关 CI 日志，定位第一个实际失败的步骤。检查 NixOS 参考实现，针对该步骤做最小修改并记录差异。
 2. 构建优先走 GitHub Actions。需要本地复现时使用隔离的 Nix 环境。禁止在宿主机安装 Guix、运行 `guix pull` 或启动 Guix daemon。
-3. 首轮仅用 `build-single` 的 `variants: single-tty`。跟踪运行到结束，失败时检查首个实际失败步骤，通过时检查同一 run 的 `sheng-boot.img` 和 `single-tty.sparse.img`。
+3. 首轮仅用 `build-single` 的 `image: tty`。跟踪运行到结束，失败时检查首个实际失败步骤，通过时检查同一 run 的 `sheng-boot.img` 和 `single-tty.sparse.img`。
 4. 将 CI 链接和产物状态写入交接记录。设备出现 `login:` 并能登录后，才将 TTY 标为验收完成。首轮验收后再扩展到双系统、桌面和外设。

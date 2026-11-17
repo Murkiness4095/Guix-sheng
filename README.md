@@ -39,7 +39,9 @@ CI 将输入写入 `images/settings.scm`（不提交）后构建。
 ## 构建与进度
 
 首个板级 TTY 尚无已验证的可刷产物。构建走 GitHub Actions 的 `build-single`，
-将 `variants` 设为 `single-tty`。当前阻塞、产物状态和 CI 记录见
+手动运行时选择 `boot-chain` 分支和 `image` 下拉项。
+TTY、niri、KDE、GNOME、noctalia 各构建一种根镜像，`none` 只构建开机镜像。
+当前阻塞、产物状态和 CI 记录见
 [维护交接](docs/HANDOVER.md)，实机检查见[启动链](docs/boot-chain.md)。
 仓库工作规则见 [AGENTS.md](AGENTS.md)。
 

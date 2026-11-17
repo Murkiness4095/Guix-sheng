@@ -7,13 +7,11 @@ on:
     paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/workflows/build-single.yml"]
   workflow_dispatch:
     inputs:
-      variants:
-        description: Space-separated image names
-        default: single-tty single-kde single-gnome single-niri single-noctalia
-      boot_only:
-        description: Build only the ABL boot image
-        type: boolean
-        default: false
+      image:
+        description: Image variant (none builds only boot.img)
+        type: choice
+        default: tty
+        options: [none, tty, niri, kde, gnome, noctalia]
       desktop_username:
         description: Desktop user name
         default: sheng
@@ -67,7 +65,7 @@ jobs:
           export GUIX="$HOME/.config/guix/current/bin/guix"
           scripts/build-uboot.sh single
       - name: Evaluate all images
-        if: ${{ !inputs.boot_only }}
+        if: ${{ inputs.image != 'none' }}
         run: |
           set -o pipefail
           export GUIX="$HOME/.config/guix/current/bin/guix"
@@ -76,9 +74,9 @@ jobs:
             "$GUIX" system image -L . --dry-run "images/$img.scm" 2>&1 | tail -20 || exit 1
           done
         env:
-          IMAGES: ${{ inputs.variants || 'single-tty single-kde single-gnome single-niri single-noctalia' }}
+          IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty single-kde single-gnome single-niri single-noctalia' }}
       - name: Build all single-system images
-        if: ${{ !inputs.boot_only }}
+        if: ${{ inputs.image != 'none' }}
         run: |
           export GUIX="$HOME/.config/guix/current/bin/guix"
           set -e
@@ -88,7 +86,7 @@ jobs:
           done
           test ! -s failures.txt
         env:
-          IMAGES: ${{ inputs.variants || 'single-tty single-kde single-gnome single-niri single-noctalia' }}
+          IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty single-kde single-gnome single-niri single-noctalia' }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
