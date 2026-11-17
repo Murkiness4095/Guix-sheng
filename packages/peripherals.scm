@@ -118,6 +118,8 @@
        (sha256 (base32 "1f160liwswlv3v48s3l4pmx7a01aaxwcq3gan0mabkpw14893sw0"))
        (patches (list (local-file "firmware/wait-for-qmi-service.patch")))))
     (build-system meson-build-system)
+    ;; Upstream check launches an SSC mock server over a host QRTR socket.
+    (arguments (list #:tests? #f))
     (native-inputs (list pkg-config protobuf python))
     (inputs (list glib))
     (propagated-inputs (list protobuf-c libqmi))
@@ -449,7 +451,7 @@
     (home-page "https://github.com/ianchb/xiaomi-sheng-fingerprint")
     (synopsis "FPC1553 fingerprint backend and Qualcomm TEE runtime")
     (description "Builds the sheng libfprint backend and installs its QTEE runtime.")
-    (license (list license:asl2.0 license:lgpl2.1+ #f))))
+    (license (list license:asl2.0 license:lgpl2.1+))))
 
 (define sheng-mdss-test-module
   (package
