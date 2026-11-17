@@ -1,0 +1,54 @@
+name: Pull pinned Guix with a store cache
+description: Restore or build the pinned Guix profile closure
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache/restore@v4
+      id: cache
+      with:
+        path: ${{ runner.temp }}/sheng-guix-profile
+        key: sheng-guix-profile-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('channels.scm') }}
+    - name: Import pinned Guix profile
+      id: restore
+      if: steps.cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: |
+        set -o pipefail
+        cache="$RUNNER_TEMP/sheng-guix-profile"
+        profile=$(cat "$cache/profile")
+        if [[ "$profile" == /gnu/store/* ]] &&
+           sudo guix archive --authorize < "$cache/signing.pub" &&
+           zstd -dc "$cache/profile.nar.zst" | guix archive --import &&
+           test -x "$profile/bin/guix"; then
+          echo "GUIX=$profile/bin/guix" >> "$GITHUB_ENV"
+          echo 'restored=true' >> "$GITHUB_OUTPUT"
+        else
+          echo '::warning::Could not restore Guix profile closure. Falling back to guix pull.'
+        fi
+    - name: Pull pinned channels
+      if: steps.restore.outputs.restored != 'true'
+      shell: bash
+      run: |
+        guix pull -C channels.scm
+        echo "GUIX=$(readlink -f "$HOME/.config/guix/current")/bin/guix" >> "$GITHUB_ENV"
+    - name: Export pinned Guix profile
+      id: export
+      if: steps.cache.outputs.cache-hit != 'true' && github.event_name != 'pull_request'
+      continue-on-error: true
+      shell: bash
+      run: |
+        set -o pipefail
+        cache="$RUNNER_TEMP/sheng-guix-profile"
+        mkdir -p "$cache"
+        profile=$(dirname "$(dirname "$GUIX")")
+        installer_guix=$(command -v guix)
+        sudo test -f /etc/guix/signing-key.sec || sudo "$installer_guix" archive --generate-key
+        sudo cat /etc/guix/signing-key.pub > "$cache/signing.pub"
+        sudo "$installer_guix" archive --export -r "$profile" | zstd -T0 -o "$cache/profile.nar.zst"
+        printf '%s\n' "$profile" > "$cache/profile"
+    - uses: actions/cache/save@v4
+      if: steps.export.outcome == 'success'
+      continue-on-error: true
+      with:
+        path: ${{ runner.temp }}/sheng-guix-profile
+        key: ${{ steps.cache.outputs.cache-primary-key }}

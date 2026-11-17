@@ -33,5 +33,5 @@
 
 ## 已知成本
 
-- 每次 CI 冷启动 `guix pull` 约 30 分钟；`guix archive` 缓存不可用（签名密钥在 /etc/guix）。
+- CI 冷启动需编译固定频道；暖启动可复用 Guix profile 闭包，见 [CI 缓存](docs/CI.md)。
 - 内核与 U-Boot 各需一次完整构建，同 job 内复用。

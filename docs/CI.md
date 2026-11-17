@@ -2,8 +2,8 @@
 
 ## 工作流
 
-- `build-single`：单系统五种镜像（tty/kde/gnome/niri/noctalia）
-- `build-dual`：双系统五种镜像
+- `build-single`：单系统四种镜像（tty/niri/kde/gnome）
+- `build-dual`：双系统四种镜像
 - 每条工作流是**单个 job**：`guix pull -C channels.scm` 一次，再循环构建所有
   变体，避免每个镜像重复拉取/编译 Guix。
 - 触发路径：`images/**`、`scripts/**`、`channels.scm`、对应 workflow 文件。
@@ -20,19 +20,17 @@
 
 ## 缓存
 
-Guix 没有 `cache-nix-action` 的等价物：
-
-- 上游包：默认 substitute（`ci.guix.gnu.org` / `bordeaux`）。
-- `~/.cache/guix` 与 `~/.config/guix` 由 `actions/cache/restore`/`save` 复用：
-  pull 成功后就保存，即使后面的求值或构建失败也不丢。
-- 但这些目录只有 Git checkout、profile 链接和元数据，**不含 `/gnu/store` 闭包**。
-  runner 每次是干净机器，因此 `guix pull` 仍会重新编译 pinned Guix（约 30 分钟）；
-  缓存只能省掉重复下载 channel 和部分元数据。
-- 不缓存 store 闭包：`guix archive --export` 默认签名，密钥在 `/etc/guix`，
-  非 root 不可用；镜像体积也超过仓库 10 GB 缓存上限。
-- `guix publish --cache` 可做远程二进制缓存，但需要持久存储；本仓库未配置。
-
-因此每次冷运行仍需一次完整 `guix pull`，这是当前主要固定成本。
+- 上游包继续使用 Guix 默认 substitutes。
+- `guix-state` 缓存频道 checkout 和用户配置。它命中时，干净 runner 仍缺少
+  profile 指向的 store 对象。
+- 单、双系统使用共享的 `.github/actions/guix-pull`。冷运行时在频道拉取成功后，
+  用 `guix archive --export -r` 导出整个已编译 profile 闭包，压缩并保存到
+  GitHub Actions Cache。键包含系统、架构和 `channels.scm` 哈希。
+- 暖运行导入签名归档并直接调用恢复的 Guix。归档为空、导入失败或 profile
+  不可用时回退到 `guix pull`。缓存仅包含归档、公钥和 profile 路径，私钥留在
+  runner。Pull request 可以读取可见缓存，保存仅在非 PR 运行执行。
+- 当前缓存范围是 Guix profile。U-Boot、内核、固件及根镜像的构建结果仍由现有
+  substitutes 和 job 内 store 提供。GitHub 的分支缓存可见性规则仍适用。
 
 ## 构建时身份
 
@@ -52,7 +50,6 @@ Guix 没有 `cache-nix-action` 的等价物：
 `guix system image -L . --dry-run images/<variant>.scm` 逐个求值。任何未绑定变量或
 服务类型错误会在实际构建前失败，避免把时间花在错误的镜像上。
 
-`workflow_dispatch` 的 `variants` 输入可以选择只构建部分镜像；手动运行时用它先验证
-`single-tty`。
+手动运行时，`image=tty` 构建 TTY 根镜像，`image=none` 只构建开机镜像。
 
 注意：镜像文件返回 `<image>` 记录，不能用 `guix system build` 求值。
