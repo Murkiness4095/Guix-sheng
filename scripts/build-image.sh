@@ -17,7 +17,7 @@ if ! out=$("$GUIX" system image --verbosity=2 -L "$repo" "$src" 2>"$prefix.err")
     elif [[ ${GITHUB_ACTIONS:-} == true ]]; then
       sudo gzip -dc -- "$logfile" | tail -120 >&2 || true
     fi
-  done < <(grep "View build log at" "$prefix.err" | grep -oE "/var/log/guix/drvs/[[:alnum:]/_-]+\.drv\.gz" | sort -u)
+  done < <(grep "View build log at" "$prefix.err" | grep -oE "/var/log/guix/drvs/[[:alnum:]/_.-]+\.drv\.gz" | sort -u)
   exit 1
 fi
 disk=$(printf '%s\n' "$out" | tail -1)
