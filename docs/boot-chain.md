@@ -66,3 +66,16 @@ fastboot reboot
 - Guix 按 NixOS-sheng 配方构建 Image、DTB 和模块。
 - arm64 的 `all` 目标不构建 dtbs，`linux-sheng` 额外执行 `make dtbs`，
   否则 `lib/dtbs/qcom/sm8550-xiaomi-sheng.dtb` 不存在。
+
+## 在现有 userdata 和 linux 上共存
+
+可以沿用两个现有 GPT 分区和两个 ABL 启动槽。保留使用 `userdata`
+的 NixOS 单系统及其启动槽，让 Guix 的 dual 开机镜像使用另一槽，
+并把 Guix 的 dual 根镜像放到 `linux`。如果 NixOS 当前从 A 槽启动，
+对应布局就是 A → NixOS → userdata，B → Guix → linux。
+通过 ABL 的槽位选择切换。现有 NixOS EFI 路径继续由其原来的启动槽加载。
+
+部署前确认 NixOS 实际使用的槽和 EFI 存储位置，确认 `linux` 可覆盖，
+并比较 Guix sparse 镜像的展开大小和目标分区容量。现有
+`scripts/install-single.sh` 会写两个启动槽并擦除 `userdata`，
+不能用于这个布局。Guix dual 根镜像及实机切换尚待验证。
