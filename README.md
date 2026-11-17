@@ -10,6 +10,7 @@
 | --- | --- | --- | --- |
 | Guix 使用整个或已缩小的 `userdata` | `build-single` | `userdata` | U-Boot → extlinux |
 | 保留 `userdata` 上的 Android 或 NixOS | `build-dual` | `linux` | 独立 ABL 槽 → U-Boot → extlinux |
+| 保留 `linux` 上的 NixOS | `build-single` | `userdata` | 独立 ABL 槽 → U-Boot → extlinux |
 | 已准备独立 `sheng-esp` | `Guix EFI bundle` | 按布局选 `userdata` 或 `linux` | U-Boot EFI → GRUB EFI |
 
 已有 `userdata` 和 `linux` 两个分区、希望保留 NixOS 的设备，从

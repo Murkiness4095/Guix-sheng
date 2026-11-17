@@ -1,34 +1,26 @@
 # 双系统安装指南
 
-布局对应 NixOS-sheng 的独立 `linux` 根分区做法。ABL 在两个启动槽之间
-切换，两个系统各自保留自己的开机镜像。以下以 NixOS 已占用 A 槽为例。
+ABL 按启动槽加载各系统自己的开机镜像。Guix 工作流名称决定
+U-Boot 查找的根分区，与设备上装了几个系统无关。
 
-| ABL 槽位 | 系统 | GPT 根分区名 | 启动文件 |
-| --- | --- | --- | --- |
-| A | 现有 NixOS | `userdata` | 保留原 `boot_a` 和已有 EFI 文件 |
-| B | Guix System | `linux` | Guix 的 `sheng-boot-dual.img` |
+| 已有系统 | Guix 根分区 | 同一次 CI 的 Guix 产物 |
+| --- | --- | --- |
+| NixOS 在 `linux` | `userdata` | `build-single` 的 `sheng-boot.img` 和 `single-tty.sparse.img` |
+| Android 或 NixOS 在 `userdata` | `linux` | `build-dual` 的 `sheng-boot-dual.img` 和 `dual-tty.sparse.img` |
 
-如果现有系统在 B 槽，保留 B 槽并用 A 槽装 Guix。保留 Android 时
-同样先确认它实际占用的槽。原来安装 NixOS 时选择的工作流名称无法证明
-当前使用哪个槽。
+## 保留 linux 上的 NixOS
 
-## 准备产物和核对分区
+[单系统 TTY CI](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44044743355)
+已产出 Guix 所需的两个文件。先确认 NixOS 当前根分区、启动槽和 ESP
+实际位置。比如 NixOS 占用 B 槽，就保留 `boot_b`、`linux`
+和它的 ESP，Guix 用 `boot_a` 与 `userdata`。如果 NixOS 占用 A
+槽，就交换两个启动槽，根分区选择不变。
 
-1. 用 `build-dual` 的 `image=tty` 构建，取得同一 run 的
-   `sheng-boot-dual.img` 和 `dual-tty.sparse.img`。
-2. 在现有系统确认根挂载与 GPT 标签，进入 ABL fastboot 后用
-   `fastboot getvar current-slot` 核对槽位。检查目标 `linux` 可覆盖，
-   并确认 sparse 展开大小小于等于目标分区容量。
-3. 备份目标启动槽和 `linux` 上需保留的数据。已有 EFI 的 NixOS
-   同时核对 ESP 位置，保留现有 ESP。Guix 的 extlinux 路线无需另建 ESP。
+只有确认 NixOS 的启动文件无需从 `userdata` 读取后，才覆盖该分区。
+先备份目标启动槽与 `userdata`，并核对 sparse 根镜像展开后能放进
+缩小后的分区。可以先写 Guix 根镜像并临时加载开机镜像验证，
+通过[首启验收](boot-chain.md#首启验收)后再写入 Guix 使用的启动槽。
+之后通过 ABL 切槽，验证两个系统都能进入。
 
-## 部署和切换
-
-先将 Guix 根镜像写入 `linux`，有条件时用 ABL 的临时启动加载
-`sheng-boot-dual.img` 验证。确认进到 `login:` 并能登录后，再将
-开机镜像刷到 Guix 对应的槽。下次在 ABL fastboot 用
-`fastboot set_active a` 或 `fastboot set_active b` 选择对应系统。
-
-`scripts/install-single.sh` 会写两个启动槽并擦除 `userdata`，
-不能用于这套共存布局。Guix 双系统的实机登录和切槽仍待验证。
-启动后按[首启验收](boot-chain.md#首启验收)核对实际根分区。
+`scripts/install-single.sh` 会同时覆盖两个启动槽，不能用于这套
+共存布局。Guix 的实机首启和切槽待验证。
