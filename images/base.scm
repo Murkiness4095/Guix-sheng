@@ -73,6 +73,12 @@
   (list (service dbus-root-service-type)
         (service elogind-service-type)
         (service polkit-service-type)
+        (simple-service
+         'sheng-networkmanager-authorization polkit-service-type
+         (list (file-union
+                "sheng-networkmanager-polkit"
+                `(("share/polkit-1/rules.d/49-sheng-networkmanager.rules"
+                   ,(local-file "../services/polkit/49-sheng-networkmanager.rules"))))))
         (service accountsservice-service-type)
         (service upower-service-type)
         ;; NetworkManager's default shepherd requirement is 'wireless-daemon,
