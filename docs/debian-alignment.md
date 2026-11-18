@@ -73,10 +73,10 @@ QMI 重试补丁在解包后应用。
 
 | 功能 | 当前 Guix 状态 |
 | --- | --- |
-| 键盘盖 | 认证接线在 `codex/keyboard-auth` 验证中。折叠角度策略、麦克风静音灯同步和背光权限规则还未接线。 |
+| 键盘盖 | 认证接线在 `codex/keyboard-auth` 验证中。折叠角度策略接入 `vendor_services`。麦克风静音灯同步和背光权限规则还未接线。 |
 | 音频 | 板级 UCM 需启用 `vendor_services`。WirePlumber 板级规则和开机 HiFi verb 尚未接入。 |
-| 触控、触控笔、传感器 | THP、FastRPC 和传感器代理需启用 `vendor_services`。触控笔状态托盘尚未接入桌面会话。 |
-| 指纹和充电 | 有打包配方。fprintd 后端和固件路径、MIPPS 充电认证及充电模式服务尚未接到系统。 |
+| 触控、触控笔、传感器 | THP、FastRPC 和传感器代理需启用 `vendor_services`。桌面镜像启用同一选项时启动触控笔状态托盘。 |
+| 指纹和充电 | MIPPS 充电认证规则接入 `vendor_services`。fprintd 后端和固件路径、充电模式服务尚未接到系统。 |
 | 摄像头 | 尚未接入 libcamera/WirePlumber 摄像头发现及 Qt GStreamer 环境。 |
 | 桌面与存储 | 已接入内部 UFS 维护分区隐藏规则。KDE 登录界面的屏幕键盘尚未接入。 |
 | 双系统与更新 | extlinux 和根分区扩容已接线。启动槽成功标记仍是骨架。旧 CI 镜像的 store 数据库注册阻碍现有世代的可靠滚动更新。EFI 在单独分支。 |

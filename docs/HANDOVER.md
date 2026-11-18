@@ -1,6 +1,8 @@
 # 维护交接
 
 ## 当前状态
+- 已发布镜像仍跳过 store 闭包注册。提交 `377b839` 恢复所有根镜像的闭包注册并保留 SQLite 非 WAL 模式，构建脚本在生成 sparse 前验证 SQLite 与 extlinux 启动世代。验证运行 [#44242273958](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44242273958)，产物及实机更新待验。
+- 键盘认证首轮 [#44241262865](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44241262865) 在 `patchelf` 处理 QTEE 的 `sfs_config` 脚本时失败。改由 Shepherd 调用 Guix coreutils 创建上游要求的两个目录，复验并入上面的 TTY CI。
 - 键盘和触控板同时失灵时，实机仍显示 `keyboard_attached=1`，每约 12 秒的唤醒写入返回 0。IRQ 读到有效的厂商帧 `0x22`，已看到子命令 `0xf0`、`0x28`、`0x25`、`0x64`，没有看到键盘 `0x05/0x06` 或触控板 `0x19` 报告。故障窗口未看到驱动处理的认证子命令 `0x24/0x31/0x32`，内核日志也无认证超时。Guix GNOME 有 `/dev/nanosic_auth` 和 `/dev/tee0`，但没有运行 NixOS-sheng 的键盘认证服务。认证服务缺失是移植差异，尚未证明它触发本次故障。抓取完成后重绑，两个 HID 设备重新枚举。
 - Nanosic 诊断内核 [#44228797818](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44228797818) 构建通过。现有 GNOME 的 7.3.4 内核也能用 tracefs 实时检查键盘报告头与 HID 投递，无需切换镜像。正常时实机按 Shift 观察到 I²C 返回 0、帧头 0x57、报告类型 0x05，随后调用 `hid_input_report`。独立环形缓冲 `/sys/kernel/debug/tracing/instances/sheng_kbd/trace` 保留诊断记录，探针只读返回值和帧头的三个字段。复发时应在重绑前比对同样的按键动作。尚未确认永久修复。
 - 键盘失灵时 HID 仍绑定，按 Shift 无输入事件。经 SSH 重绑 `nanosic_wn8030` 的 `2-004c` 后，键盘和触控板重新枚举，键盘事件恢复且实机确认可用。触发原因待定位。

@@ -35,6 +35,7 @@
   #:use-module (modules sheng-bootloader)
   #:use-module (packages kernel)
   #:use-module (packages firmware)
+  #:use-module (services accessories)
   #:use-module (services adsprpcd)
   #:use-module (services grow-root)
   #:use-module (services keyboard-auth)
@@ -220,9 +221,15 @@ The tty image keeps a text getty from %base-services."
               (sheng-keyboard-auth-service))
         desktop-service
         (if vendor-services?
-            (list (sheng-ucm-service) (sheng-thp-service)
-                  (service sheng-adsprpcd-service-type)
-                  (sheng-sensors-service))
+            (append
+             (list (sheng-ucm-service) (sheng-thp-service)
+                   (service sheng-adsprpcd-service-type)
+                   (sheng-sensors-service)
+                   (sheng-keyboard-angle-service)
+                   (sheng-mipps-service))
+             (if (eq? desktop 'tty)
+                 '()
+                 (list (sheng-pen-autostart-service))))
             '())
         noctalia-config
         (append (sheng-login-services desktop auto-login? username)
