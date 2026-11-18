@@ -12,7 +12,6 @@
   #:use-module (gnu services xorg)
   #:use-module ((gnu packages admin) #:select (fastfetch-minimal))
   #:use-module (gnu packages display-managers)
-  #:use-module ((gnu packages text-editors) #:select (zed))
   #:use-module ((gnu packages fcitx5)
               #:select (fcitx5 fcitx5-chinese-addons fcitx5-configtool
                         fcitx5-gtk fcitx5-gtk4 fcitx5-qt))
@@ -22,7 +21,7 @@
   #:use-module (gnu packages window-management)
   #:use-module ((gnu packages shells) #:select (fish))
   #:use-module ((gnu packages shellutils) #:select (starship))
-  #:use-module ((gnu packages terminals) #:select (kitty))
+  #:use-module ((gnu packages terminals) #:select (alacritty kitty))
   #:use-module ((gnu packages version-control) #:select (git))
   #:use-module ((gnu packages xdisorg) #:select (fuzzel))
   #:use-module ((gnu packages xfce) #:select (thunar))
@@ -38,6 +37,7 @@
   #:use-module (modules sheng-bootloader)
   #:use-module (packages kernel)
   #:use-module (packages firmware)
+  #:use-module (packages zed)
   #:use-module (services accessories)
   #:use-module (services audio)
   #:use-module (services fingerprint)
@@ -47,15 +47,6 @@
   #:use-module (services sensors)
   #:use-module (services thp)
   #:export (sheng-os))
-
-;; Zed builds in release mode, but the ARM64 test build assembles FP16
-;; instructions without enabling fullfp16 in gemm-f16.
-(define sheng-zed
-  (package
-    (inherit zed)
-    (arguments
-     (substitute-keyword-arguments (package-arguments zed)
-       ((#:tests? _ #t) #f)))))
 
 (define (sheng-niri-desktop desktop-name exec-line)
   "Package providing a wayland-session desktop entry."
@@ -206,7 +197,7 @@ The tty image keeps a text getty from %base-services."
       (packages (append (list ncurses fish starship git)
                         (if (eq? desktop 'tty)
                             '()
-                            (list kitty sheng-zed fcitx5 fcitx5-chinese-addons
+                            (list alacritty kitty sheng-zed fcitx5 fcitx5-chinese-addons
                                   fcitx5-configtool fcitx5-gtk fcitx5-gtk4 fcitx5-qt))
                         (if (memq desktop '(tty niri kde gnome))
                             (list fastfetch-minimal)
