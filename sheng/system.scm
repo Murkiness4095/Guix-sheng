@@ -31,6 +31,7 @@
   #:use-module (midnight packages noctalia)
   #:use-module (midnight packages noctalia-greeter)
   #:use-module (midnight services noctalia-greeter)
+  #:use-module (modules internal-storage)
   #:use-module (modules sheng-bootloader)
   #:use-module (packages kernel)
   #:use-module (packages firmware)
@@ -215,6 +216,7 @@ The tty image keeps a text getty from %base-services."
               (delete console-font-service-type)))
         (sheng-desktop-services)
         (list (sheng-grow-root-service root-label)
+              (sheng-internal-storage)
               (sheng-keyboard-auth-service))
         desktop-service
         (if vendor-services?

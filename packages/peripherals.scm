@@ -437,8 +437,7 @@
                                 (string-append glibc-lib "/ld-linux-aarch64.so.1") program)
                         (invoke "patchelf" "--add-rpath"
                                 (string-append glibc-lib ":" listeners) program))
-                      (list (string-append libexec "/qteesupplicant")
-                            (string-append libexec "/fpc-sfs-config")))
+                      (list (string-append libexec "/qteesupplicant")))
                      (for-each
                       (lambda (listener)
                         (let ((name (basename listener)))

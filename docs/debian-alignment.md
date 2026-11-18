@@ -1,8 +1,9 @@
 # 与 debian-sheng 的功能对齐
 
-第一参考：[ianchb/debian-sheng](https://github.com/ianchb/debian-sheng)
-（`master`，提交 `a93aaa1`）。debian-sheng 已有的做法、版本和文件优先照搬；
-只有它没有的（Guix 系统集成、shepherd 服务、extlinux 生成）才在本仓库实现。
+第一参考是 [NixOS-sheng](https://github.com/Murkiness4095/nixos-sheng) 的
+`2be57fe7da35b0b98963cc5da233ad6765d5c134`。
+[debian-sheng](https://github.com/ianchb/debian-sheng) 的 `a93aaa1`
+用于补缺和交叉核对。系统集成按 Guix 和 Shepherd 接口实现。
 
 专有设备移植：固件 blob、非自由内核配置、专有用户态组件按 debian-sheng 的
 清单直接使用，不以 Guix 的自由软件默认值为准。
@@ -34,7 +35,7 @@
 | U-Boot defconfig | Debian 直启没有此步骤；NixOS 用 `buildUBoot` | 固定的 U-Boot 提交 `7025b79` 中 `CONFIG_CLK_QCOM_SM8550=y` 重复两次，Guix 构建拒绝重复项（CI #43688501887）；源补丁删除一条，保留同一取值；配置阶段直接调用 make sm8550_defconfig，对齐 NixOS，避开 Guix 额外的一致性检查（CI #43945937332） |
 | U-Boot 菜单 | 默认入口显示 Boot NixOS | Guix 使用 Boot Guix 标签，extlinux 命令保持同一入口 |
 | 启动方式 | 内核 `Image.gz` + 追加 dtb 的 boot.img，ABL 直接启动，无 initrd；cmdline 仅 `root=PARTLABEL=` | U-Boot → extlinux，内核 `Image` + 独立 `FDT` + Guix initrd | 首个 TTY 沿用 NixOS 的 U-Boot 路线；Debian 直启保留为参考 |
-| 根文件系统初始化 | Debian `/sbin/init` | Guix initrd + `gnu.system=` | 暂不取消 initrd；`#:register-closures? #f` 的 store DB 问题首启后处理 |
+| 根文件系统初始化 | Debian `/sbin/init` | Guix initrd + `gnu.system=` | 镜像构建注册 store 闭包并关闭 WAL，构建后检查 SQLite；旧镜像需单独处理 |
 | 用户态服务：systemd 单元 | Guix 用 shepherd | 按 `services/` 逐项等价实现 |
 | 桌面：debian 可选 GNOME/KDE/server | Guix 提供 tty/kde/gnome/niri/noctalia | 保留现有变体，功能对齐 debian 的 server/GNOME/KDE |
 
@@ -67,3 +68,15 @@ QMI 重试补丁在解包后应用。
 ## 键盘盖认证
 
 参考 NixOS-sheng `2be57fe7da35b0b98963cc5da233ad6765d5c134` 的固件模块。所有 Guix 镜像默认由 Shepherd 启动 QTEE 安全文件系统配置、QTEE 监听器和 `xiaomi_devauth`。认证程序沿用固定源码与 `devauth.mbn`，通过 `/dev/nanosic_auth` 与驱动通信。QTEE 运行时仍来自现有 sheng-fingerprint 软件包。待验证实机认证和键盘空闲后输入。
+
+## NixOS 板级服务核对
+
+| 功能 | 当前 Guix 状态 |
+| --- | --- |
+| 键盘盖 | 认证接线在 `codex/keyboard-auth` 验证中。折叠角度策略、麦克风静音灯同步和背光权限规则还未接线。 |
+| 音频 | 板级 UCM 需启用 `vendor_services`。WirePlumber 板级规则和开机 HiFi verb 尚未接入。 |
+| 触控、触控笔、传感器 | THP、FastRPC 和传感器代理需启用 `vendor_services`。触控笔状态托盘尚未接入桌面会话。 |
+| 指纹和充电 | 有打包配方。fprintd 后端和固件路径、MIPPS 充电认证及充电模式服务尚未接到系统。 |
+| 摄像头 | 尚未接入 libcamera/WirePlumber 摄像头发现及 Qt GStreamer 环境。 |
+| 桌面与存储 | 已接入内部 UFS 维护分区隐藏规则。KDE 登录界面的屏幕键盘尚未接入。 |
+| 双系统与更新 | extlinux 和根分区扩容已接线。启动槽成功标记仍是骨架。旧 CI 镜像的 store 数据库注册阻碍现有世代的可靠滚动更新。EFI 在单独分支。 |

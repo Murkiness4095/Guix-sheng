@@ -41,6 +41,26 @@ if ! grep -qiE '^[[:space:]]*LINUX[[:space:]]+' <<< "$config"; then
   echo "Missing extlinux kernel entry in $prefix.ext4" >&2
   exit 1
 fi
+system=$(sed -nE 's/.*gnu\.system=(\/gnu\/store\/[^[:space:]]+).*/\1/p' <<< "$config" | head -n 1)
+test -n "$system" || { echo "Missing Guix system path in extlinux" >&2; exit 1; }
+database_dir=$(mktemp -d)
+trap 'rm -r -- "$database_dir"' EXIT
+debugfs -R "dump /var/guix/db/db.sqlite $database_dir/db.sqlite" "$prefix.ext4"
+python3 - "$database_dir/db.sqlite" "$system" <<'PY'
+import sqlite3
+import sys
+from pathlib import Path
+
+database, system = sys.argv[1:]
+with sqlite3.connect(Path(database).as_uri() + "?mode=ro", uri=True) as conn:
+    if conn.execute("PRAGMA quick_check").fetchall() != [("ok",)]:
+        sys.exit("The image store database failed SQLite quick_check")
+    if not conn.execute("SELECT 1 FROM ValidPaths WHERE path = ?", (system,)).fetchone():
+        sys.exit(f"The image store database has no registration for {system}")
+    if conn.execute("PRAGMA foreign_key_check").fetchone():
+        sys.exit("The image store database contains broken references")
+print(f"Registered boot system: {system}")
+PY
 if command -v img2simg >/dev/null; then
   img2simg "$prefix.ext4" "$prefix.sparse.img"
 fi

@@ -17,5 +17,4 @@
               (apply (@ (gnu build image) initialize-root-partition)
                      root
                      (append args
-                             (list #:register-closures? #f
-                                   #:wal-mode? #f)))))))))
+                             (list #:wal-mode? #f)))))))))

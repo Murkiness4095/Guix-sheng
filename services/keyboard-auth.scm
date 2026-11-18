@@ -1,6 +1,7 @@
 (define-module (services keyboard-auth)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
+  #:use-module ((gnu packages base) #:select (coreutils))
   #:use-module (guix gexp)
   #:use-module (packages peripherals)
   #:export (sheng-keyboard-auth-service))
@@ -13,8 +14,10 @@
          (unless (file-exists? "/dev/tee0")
            (sleep 1)
            (wait-for-tee)))
-       (unless (zero? (system* #$(file-append sheng-fingerprint
-                                             "/libexec/fpc-sfs-config")))
+       (unless (zero? (system* #$(file-append coreutils "/bin/install")
+                               "-d" "-m" "0777"
+                               "/var/lib/tee/qtee_supplicant"
+                               "/var/lib/qtee_supplicant/vendor/tzstorage"))
          (error "QTEE secure file system configuration failed"))
        (setenv "LD_LIBRARY_PATH"
                #$(file-append sheng-fingerprint "/lib/qtee-listeners"))
