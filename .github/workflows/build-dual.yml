@@ -2,9 +2,9 @@ name: build-dual
 on:
   push:
     branches: [main]
-    paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-dual.yml"]
+    paths: ["images/**", "sheng/**", "packages/**", "modules/**", "services/**", ".guix-channel", "scripts/**", "channels.scm", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-dual.yml"]
   pull_request:
-    paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-dual.yml"]
+    paths: ["images/**", "sheng/**", "packages/**", "modules/**", "services/**", ".guix-channel", "scripts/**", "channels.scm", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-dual.yml"]
   workflow_dispatch:
     inputs:
       image:

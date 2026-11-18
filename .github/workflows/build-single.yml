@@ -2,9 +2,9 @@ name: build-single
 on:
   push:
     branches: [main]
-    paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-single.yml"]
+    paths: ["images/**", "sheng/**", "packages/**", "modules/**", "services/**", ".guix-channel", "scripts/**", "channels.scm", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-single.yml"]
   pull_request:
-    paths: ["images/**", "packages/**", "modules/**", "scripts/**", "channels.scm", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-single.yml"]
+    paths: ["images/**", "sheng/**", "packages/**", "modules/**", "services/**", ".guix-channel", "scripts/**", "channels.scm", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-single.yml"]
   workflow_dispatch:
     inputs:
       image:

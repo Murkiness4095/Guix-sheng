@@ -1,0 +1,11 @@
+(channel
+ (version 0)
+ (dependencies
+  (channel
+   (name midnight)
+   (url "https://codeberg.org/stampede/midnight.git")
+   (introduction
+    (channel-introduction
+     (version 0)
+     (commit "d97d1568954cfcbf543c9fcdfd5771e2b730ae19")
+     (signer "640A 2C3C E948 22D3 394B 40C3 CAFA EECA 00FF 9B1E"))))))

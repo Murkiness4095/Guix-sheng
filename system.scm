@@ -1,4 +1,4 @@
-;; Top-level sheng system declaration for an ext4 root labelled linux.
-(load (string-append (dirname (current-filename)) "/images/base.scm"))
+;; Top-level extlinux configuration using the linux partition.
+(use-modules (sheng system))
 
 (sheng-os #:desktop 'tty #:root-label "linux")

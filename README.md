@@ -38,6 +38,7 @@
 手动构建可选 `vendor_services`，接入试验性的板级 UCM、触控和传感器服务。
 
 ## 文档
+个人系统配置可通过 Guix channel 导入 `(sheng system)`。见[最小样板](examples/minimal/README.md)。
 Guix EFI 实验保留在 [codex/efi](https://github.com/Murkiness4095/Guix-sheng/tree/codex/efi)。
 
 - [单系统首启与 extlinux 验收](docs/boot-chain.md)

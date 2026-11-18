@@ -8,7 +8,7 @@
 | 多机部署（对应 NixOS flake-parts） | [multi-host](multi-host/) |
 | 易失根 + 选择性持久化 | [tmpfs-root.scm](tmpfs-root.scm) |
 
-样板只增加个人设置；内核、U-Boot、固件与根分区约定由仓库的 `images/base.scm`
+样板只增加个人设置；内核、U-Boot、固件与根分区约定由频道的 `(sheng system)`
 和 `packages/` 提供。不要把 x86 的 GRUB/EFI、NVIDIA 或整盘分区配置带进来。
 
 ```sh
