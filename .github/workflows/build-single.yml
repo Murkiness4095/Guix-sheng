@@ -63,6 +63,25 @@ jobs:
             ~/.config/guix
           key: guix-state-${{ hashFiles('channels.scm') }}
       - uses: ./.github/actions/guix-pull
+      - name: Check store registration with the pinned Guix
+        if: ${{ inputs.image != 'none' }}
+        run: |
+          fixture=$(mktemp -d)
+          item=/gnu/store/00000000000000000000000000000000-sheng-registration-check
+          mkdir -p "$fixture/gnu/store" "$fixture/var/guix/db"
+          printf 'fixture\n' > "$fixture$item"
+          printf '%s\n\n0\n' "$item" > "$fixture/graph"
+          "$GUIX" repl scripts/register-image-closures.scm "$fixture" "$fixture/graph"
+          python3 - "$fixture/var/guix/db/db.sqlite" "$item" <<'PY'
+          import sqlite3
+          import sys
+          from pathlib import Path
+
+          database, item = sys.argv[1:]
+          with sqlite3.connect(Path(database).as_uri() + "?mode=ro", uri=True) as conn:
+              if not conn.execute("SELECT 1 FROM ValidPaths WHERE path = ?", (item,)).fetchone():
+                  sys.exit("Fixture was not registered")
+          PY
       - name: Build U-Boot boot.img
         run: |
           scripts/build-uboot.sh single
