@@ -11,5 +11,5 @@
                  (register-items db (call-with-input-file file read-reference-graph)
                                  #:prefix prefix
                                  #:registration-time
-                                 (make-date 0 0 0 0 1 1 1970 0)))
+                                 (make-time time-utc 0 0)))
                (cons graph graphs)))))
