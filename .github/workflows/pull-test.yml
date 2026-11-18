@@ -9,11 +9,19 @@ jobs:
       - name: Install Guix
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget zstd
+          sudo apt-get install -y wget zstd ripgrep
           wget https://guix.gnu.org/install.sh -O /tmp/guix-install.sh
           yes | sudo bash /tmp/guix-install.sh
       - uses: ./.github/actions/guix-pull
       - name: Evaluate the standalone sheng sample
         run: |
-          "$GUIX" time-machine -C examples/minimal/channels.scm -- \
-            system build --dry-run examples/minimal/system.scm
+          set -o pipefail
+          if "$GUIX" time-machine -C examples/minimal/channels.scm -- \
+              system build --dry-run examples/minimal/system.scm 2>&1 | tee channel-test.log; then
+            exit 0
+          fi
+          while IFS= read -r logfile; do
+            echo "Builder log $logfile"
+            sudo gzip -dc -- "$logfile" | tail -200 || true
+          done < <(rg -o '/var/log/guix/drvs/[[:alnum:]/_.-]+\.drv\.gz' channel-test.log | sort -u)
+          exit 1
