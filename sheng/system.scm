@@ -25,6 +25,7 @@
   #:use-module ((gnu packages terminals) #:select (kitty))
   #:use-module ((gnu packages version-control) #:select (git))
   #:use-module ((gnu packages xdisorg) #:select (fuzzel))
+  #:use-module ((gnu packages xfce) #:select (thunar))
   #:use-module (guix packages)
   #:use-module (guix utils)
   #:use-module (guix build-system trivial)
@@ -155,8 +156,8 @@ The tty image keeps a text getty from %base-services."
             (else '())))
          (session-pkgs
           (case desktop
-            ((niri) (list niri fuzzel (sheng-niri-desktop "niri" "niri")))
-            ((noctalia) (list niri noctalia
+            ((niri) (list niri fuzzel thunar (sheng-niri-desktop "niri" "niri")))
+            ((noctalia) (list niri noctalia thunar
                                (sheng-niri-desktop "niri-noctalia"
                                                    "niri -c /etc/sheng/niri-noctalia.kdl")))
             (else '())))
