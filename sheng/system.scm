@@ -26,10 +26,12 @@
   #:use-module ((gnu packages version-control) #:select (git))
   #:use-module ((gnu packages xdisorg) #:select (fuzzel))
   #:use-module (guix packages)
+  #:use-module (guix base16)
+  #:use-module (guix download)
   #:use-module (guix build-system trivial)
   #:use-module (guix gexp)
   #:use-module (midnight packages noctalia)
-  #:use-module (midnight packages noctalia-greeter)
+  #:use-module ((midnight packages noctalia-greeter) #:prefix midnight:)
   #:use-module (midnight services noctalia-greeter)
   #:use-module (modules camera)
   #:use-module (modules internal-storage)
@@ -45,6 +47,21 @@
   #:use-module (services sensors)
   #:use-module (services thp)
   #:export (sheng-os))
+
+;; Preserve midnight's pinned greeter revision without a Git checkout in CI.
+(define noctalia-greeter
+  (package
+    (inherit midnight:noctalia-greeter)
+    (source
+     (origin
+       (inherit (package-source midnight:noctalia-greeter))
+       (method url-fetch)
+       (uri (string-append "https://codeload.github.com/noctalia-dev/noctalia-greeter/tar.gz/"
+                           "af0bf4b1e1c40738db917b04c9c0563b4f718953"))
+       (file-name "noctalia-greeter-1.7.0.tar.gz")
+       (sha256
+        (base16-string->bytevector
+         "f62b35c1511fba8c42b35cffb627b5b34f8a4b1cfba48f760d9f8b073b45abb4"))))))
 
 (define (sheng-niri-desktop desktop-name exec-line)
   "Package providing a wayland-session desktop entry."
