@@ -63,3 +63,7 @@
 仓库保存原始归档，SHA-256 为
 `80eb911009fccea52ab0ea0dcc78572a00757abd840e8dc81e9b72cd230526b8`。
 QMI 重试补丁在解包后应用。
+
+## 键盘盖认证
+
+参考 NixOS-sheng `2be57fe7da35b0b98963cc5da233ad6765d5c134` 的固件模块。所有 Guix 镜像默认由 Shepherd 启动 QTEE 安全文件系统配置、QTEE 监听器和 `xiaomi_devauth`。认证程序沿用固定源码与 `devauth.mbn`，通过 `/dev/nanosic_auth` 与驱动通信。QTEE 运行时仍来自现有 sheng-fingerprint 软件包。待验证实机认证和键盘空闲后输入。

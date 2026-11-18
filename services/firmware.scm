@@ -4,8 +4,8 @@
   #:export (sheng-firmware-service-type))
 
 ;; TODO: translate systemd units to shepherd services:
-;; adsprpcd-sensorspd, iio-sensor-proxy, sheng-devauth, qteesupplicant,
-;; sfsconfig, xiaomi-sheng-thp, xiaomi-mipps-auth, xiaomi-charger-mode,
+;; adsprpcd-sensorspd, iio-sensor-proxy,
+;; xiaomi-sheng-thp, xiaomi-mipps-auth, xiaomi-charger-mode,
 ;; sheng-sensors-data, keyboard helpers, pen status, fprintd env.
 (define sheng-firmware-service-type
   (service-type

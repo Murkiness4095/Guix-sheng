@@ -36,6 +36,7 @@
   #:use-module (packages firmware)
   #:use-module (services adsprpcd)
   #:use-module (services grow-root)
+  #:use-module (services keyboard-auth)
   #:use-module (services sensors)
   #:use-module (services thp)
   #:use-module (services ucm)
@@ -213,7 +214,8 @@ The tty image keeps a text getty from %base-services."
               (delete mingetty-service-type)
               (delete console-font-service-type)))
         (sheng-desktop-services)
-        (list (sheng-grow-root-service root-label))
+        (list (sheng-grow-root-service root-label)
+              (sheng-keyboard-auth-service))
         desktop-service
         (if vendor-services?
             (list (sheng-ucm-service) (sheng-thp-service)

@@ -209,10 +209,12 @@
                (delete 'configure)
                (add-after 'unpack 'set-firmware-location
                  (lambda _
-                   (substitute* "main.c"
-                     (("/usr/lib/firmware/qcom/sm8550/sheng")
-                      #$(file-append sheng-firmware
-                                     "/lib/firmware/qcom/sm8550/sheng")))))
+                   (let ((firmware #$(file-append sheng-firmware
+                                                 "/lib/firmware/qcom/sm8550/sheng")))
+                     (unless (file-exists? (string-append firmware "/devauth.mbn"))
+                       (error "Missing sheng keyboard authentication firmware"))
+                     (substitute* "main.c"
+                       (("/usr/lib/firmware/qcom/sm8550/sheng") firmware)))))
                (replace 'install
                  (lambda _
                    (install-file "xiaomi_devauth" (string-append #$output "/bin")))))))
@@ -435,7 +437,8 @@
                                 (string-append glibc-lib "/ld-linux-aarch64.so.1") program)
                         (invoke "patchelf" "--add-rpath"
                                 (string-append glibc-lib ":" listeners) program))
-                      (list (string-append libexec "/qteesupplicant")))
+                      (list (string-append libexec "/qteesupplicant")
+                            (string-append libexec "/fpc-sfs-config")))
                      (for-each
                       (lambda (listener)
                         (let ((name (basename listener)))
