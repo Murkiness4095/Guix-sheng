@@ -80,3 +80,5 @@ QMI 重试补丁在解包后应用。
 | 摄像头 | 尚未接入 libcamera/WirePlumber 摄像头发现及 Qt GStreamer 环境。 |
 | 桌面与存储 | 已接入内部 UFS 维护分区隐藏规则。KDE 登录界面的屏幕键盘尚未接入。 |
 | 双系统与更新 | extlinux 和根分区扩容已接线。启动槽成功标记仍是骨架。旧 CI 镜像的 store 数据库注册阻碍现有世代的可靠滚动更新。EFI 在单独分支。 |
+
+外设扩展继续参考 NixOS-sheng `2be57fe`。`vendor_services` 启用 HiFi UCM 初始化、WirePlumber 音频规则、键盘灯权限和按内核参数启动的充电界面。桌面同时启用键盘静音灯辅助程序、摄像头配置和板级 fprintd 服务。接线待 CI 构建和实机验收。

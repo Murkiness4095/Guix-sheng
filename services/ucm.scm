@@ -4,7 +4,7 @@
   #:use-module (gnu system pam)
   #:use-module (guix gexp)
   #:use-module (packages peripherals)
-  #:export (sheng-ucm-service))
+  #:export (sheng-ucm-service sheng-ucm-directory))
 
 (define sheng-ucm-directory
   (directory-union "sheng-alsa-ucm2"
