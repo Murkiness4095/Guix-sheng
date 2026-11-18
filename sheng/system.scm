@@ -26,6 +26,7 @@
   #:use-module ((gnu packages version-control) #:select (git))
   #:use-module ((gnu packages xdisorg) #:select (fuzzel))
   #:use-module (guix packages)
+  #:use-module (guix utils)
   #:use-module (guix build-system trivial)
   #:use-module (guix gexp)
   #:use-module (midnight packages noctalia)
@@ -45,6 +46,15 @@
   #:use-module (services sensors)
   #:use-module (services thp)
   #:export (sheng-os))
+
+;; Zed builds in release mode, but the ARM64 test build assembles FP16
+;; instructions without enabling fullfp16 in gemm-f16.
+(define sheng-zed
+  (package
+    (inherit zed)
+    (arguments
+     (substitute-keyword-arguments (package-arguments zed)
+       ((#:tests? _ #t) #f)))))
 
 (define (sheng-niri-desktop desktop-name exec-line)
   "Package providing a wayland-session desktop entry."
@@ -195,7 +205,7 @@ The tty image keeps a text getty from %base-services."
       (packages (append (list ncurses fish starship git)
                         (if (eq? desktop 'tty)
                             '()
-                            (list kitty zed fcitx5 fcitx5-chinese-addons
+                            (list kitty sheng-zed fcitx5 fcitx5-chinese-addons
                                   fcitx5-configtool fcitx5-gtk fcitx5-gtk4 fcitx5-qt))
                         (if (memq desktop '(tty niri kde gnome))
                             (list fastfetch-minimal)
