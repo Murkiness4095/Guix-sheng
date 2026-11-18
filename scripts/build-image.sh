@@ -44,10 +44,17 @@ system=$(sed -nE 's/.*gnu\.system=(\/gnu\/store\/[^[:space:]]+).*/\1/p' <<< "$co
 test -n "$system" || { echo "Missing Guix system path in extlinux" >&2; exit 1; }
 database_dir=$(mktemp -d)
 trap 'rm -r -- "$database_dir"' EXIT
-debugfs -R "rdump /var/guix/sheng-reference-graphs $database_dir" "$prefix.ext4"
-graphs=("$database_dir"/sheng-reference-graphs/[0-9]*)
-test -f "${graphs[0]}" || { echo "Missing Guix reference graphs" >&2; exit 1; }
-mkdir -p "$database_dir/gnu"
+graph_dir=/var/guix/sheng-reference-graphs
+graph_entries=$(debugfs -R "ls -p $graph_dir" "$prefix.ext4")
+graphs=()
+while IFS= read -r name; do
+  graph="$database_dir/graph-$name"
+  debugfs -R "dump $graph_dir/$name $graph" "$prefix.ext4"
+  test -s "$graph" || { echo "Missing Guix reference graph $name" >&2; exit 1; }
+  graphs+=("$graph")
+done < <(awk -F/ '$6 ~ /^[0-9]+$/ { print $6 }' <<< "$graph_entries")
+(( ${#graphs[@]} > 0 )) || { echo "Missing Guix reference graphs" >&2; exit 1; }
+mkdir -p "$database_dir/gnu" "$database_dir/var/guix/db"
 ln -s /gnu/store "$database_dir/gnu/store"
 "$GUIX" repl "$repo/scripts/register-image-closures.scm" "$database_dir" "${graphs[@]}"
 database="$database_dir/var/guix/db/db.sqlite"

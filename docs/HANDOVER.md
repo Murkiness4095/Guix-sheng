@@ -1,6 +1,7 @@
 # 维护交接
 
 ## 当前状态
+- [#44254594748](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44254594748) 已生成 TTY 磁盘并提取两个引用图，外部注册脚本因 `register-closure` 私有绑定不可用退出。改用 Guix 的数据库和引用图接口，并用单文件提取避免 `rdump` 修改属主。
 - [#44242273958](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44242273958) 已通过键盘认证依赖构建，复制 572 个 store 项后，Guix 镜像沙箱内注册闭包报 SQLite `database is locked`。改在提取 ext4 后、沙箱外按原始引用图注册并检查启动世代，再写入数据库。旧镜像的注册需另行恢复。
 - 键盘认证首轮 [#44241262865](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44241262865) 在 `patchelf` 处理 QTEE 的 `sfs_config` 脚本时失败。改由 Shepherd 调用 Guix coreutils 创建上游要求的两个目录，复验并入上面的 TTY CI。
 - 键盘和触控板同时失灵时，实机仍显示 `keyboard_attached=1`，每约 12 秒的唤醒写入返回 0。IRQ 读到有效的厂商帧 `0x22`，已看到子命令 `0xf0`、`0x28`、`0x25`、`0x64`，没有看到键盘 `0x05/0x06` 或触控板 `0x19` 报告。故障窗口未看到驱动处理的认证子命令 `0x24/0x31/0x32`，内核日志也无认证超时。Guix GNOME 有 `/dev/nanosic_auth` 和 `/dev/tee0`，但没有运行 NixOS-sheng 的键盘认证服务。认证服务缺失是移植差异，尚未证明它触发本次故障。抓取完成后重绑，两个 HID 设备重新枚举。
