@@ -37,10 +37,6 @@ jobs:
           sudo apt-get install -y wget parted dosfstools mtools e2fsprogs android-sdk-libsparse-utils zstd
           wget https://guix.gnu.org/install.sh -O /tmp/guix-install.sh
           yes | sudo bash /tmp/guix-install.sh
-          # Guix fetchers run as unprivileged build users.
-          if sudo test -e /etc/gitconfig; then
-            sudo chmod a+r /etc/gitconfig
-          fi
       - name: Check boot.img layout
         run: python3 tests/bootimg-v2.py
       - name: Write build-time identity settings
@@ -70,6 +66,7 @@ jobs:
       - name: Check the greeter package used by the desktop service
         if: ${{ inputs.image == 'niri' || github.event_name != 'workflow_dispatch' }}
         run: |
+          bash scripts/seed-noctalia-greeter.sh
           "$GUIX" build -e '(@ (midnight packages noctalia-greeter) noctalia-greeter)'
       - name: Check store registration with the pinned Guix
         if: ${{ inputs.image != 'none' }}
