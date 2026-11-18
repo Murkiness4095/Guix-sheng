@@ -35,7 +35,6 @@ start=${BASH_REMATCH[1]}
 size=${BASH_REMATCH[2]}
 dd if="$disk" of="$prefix.ext4" bs=4M skip="$start" count="$size" \
   iflag=skip_bytes,count_bytes status=progress
-e2fsck -fn "$prefix.ext4"
 config=$(debugfs -R 'cat /boot/extlinux/extlinux.conf' "$prefix.ext4")
 if ! grep -qiE '^[[:space:]]*LINUX[[:space:]]+' <<< "$config"; then
   echo "Missing extlinux kernel entry in $prefix.ext4" >&2
@@ -45,8 +44,14 @@ system=$(sed -nE 's/.*gnu\.system=(\/gnu\/store\/[^[:space:]]+).*/\1/p' <<< "$co
 test -n "$system" || { echo "Missing Guix system path in extlinux" >&2; exit 1; }
 database_dir=$(mktemp -d)
 trap 'rm -r -- "$database_dir"' EXIT
-debugfs -R "dump /var/guix/db/db.sqlite $database_dir/db.sqlite" "$prefix.ext4"
-python3 - "$database_dir/db.sqlite" "$system" <<'PY'
+debugfs -R "rdump /var/guix/sheng-reference-graphs $database_dir" "$prefix.ext4"
+graphs=("$database_dir"/sheng-reference-graphs/[0-9]*)
+test -f "${graphs[0]}" || { echo "Missing Guix reference graphs" >&2; exit 1; }
+mkdir -p "$database_dir/gnu"
+ln -s /gnu/store "$database_dir/gnu/store"
+"$GUIX" repl "$repo/scripts/register-image-closures.scm" "$database_dir" "${graphs[@]}"
+database="$database_dir/var/guix/db/db.sqlite"
+python3 - "$database" "$system" <<'PY'
 import sqlite3
 import sys
 from pathlib import Path
@@ -61,6 +66,11 @@ with sqlite3.connect(Path(database).as_uri() + "?mode=ro", uri=True) as conn:
         sys.exit("The image store database contains broken references")
 print(f"Registered boot system: {system}")
 PY
+debugfs -w -R 'mkdir /var/guix/db' "$prefix.ext4"
+debugfs -w -R "write $database /var/guix/db/db.sqlite" "$prefix.ext4"
+debugfs -R "dump /var/guix/db/db.sqlite $database_dir/check.sqlite" "$prefix.ext4"
+cmp "$database" "$database_dir/check.sqlite"
+e2fsck -fn "$prefix.ext4"
 if command -v img2simg >/dev/null; then
   img2simg "$prefix.ext4" "$prefix.sparse.img"
 fi

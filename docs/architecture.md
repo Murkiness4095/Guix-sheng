@@ -13,7 +13,8 @@ scripts/build-image.sh  guix system image + 提取 ext4 分区
 examples/             最小 / 桌面 / 双系统 / 多机 / tmpfs
 ```
 
-镜像由 `(image (inherit mbr-disk-image) ...)` 生成。根分区初始化时复制并
-注册 store 闭包，关闭 SQLite WAL。提取 ext4 后，构建脚本检查数据库
-完整性、引用一致性和 extlinux 指向的系统注册，再生成 sparse 产物。
+镜像由 `(image (inherit mbr-disk-image) ...)` 生成。根分区初始化时复制
+store 闭包并保留 Guix 生成的引用图。提取 ext4 后，构建脚本在镜像沙箱外
+注册闭包，检查数据库完整性、引用一致性和 extlinux 指向的系统注册，
+再把数据库写入 ext4 并生成 sparse 产物。
 已刷入的旧镜像需要单独恢复闭包注册。

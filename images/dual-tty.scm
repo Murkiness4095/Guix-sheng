@@ -12,9 +12,4 @@
   (list (partition
          (inherit root-partition)
          (label "linux")
-         (initializer
-          #~(lambda (root . args)
-              (apply (@ (gnu build image) initialize-root-partition)
-                     root
-                     (append args
-                             (list #:wal-mode? #f)))))))))
+         (initializer sheng-root-initializer)))))
