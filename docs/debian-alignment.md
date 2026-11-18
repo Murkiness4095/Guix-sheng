@@ -57,3 +57,9 @@
 `fileSystems."/".autoResize`。Guix 由 Shepherd 在根分区挂载和 udev 就绪后
 运行 `resize2fs`。只有当前可写的 ext4 根挂载与工作流对应的
 `userdata` 或 `linux` 指向同一设备时才扩容。每次启动均可安全重试。
+
+`libssc` 仍固定到 NixOS-sheng 使用的 `033e2a32095c024d6dbdfb1d4ae1db4a94be32f1`。
+由于 GitHub runner 多次从 Codeberg 下载返回 504（如 #44161062321），
+仓库保存原始归档，SHA-256 为
+`80eb911009fccea52ab0ea0dcc78572a00757abd840e8dc81e9b72cd230526b8`。
+QMI 重试补丁在解包后应用。

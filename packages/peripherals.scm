@@ -115,15 +115,18 @@
   (package
     (name "sheng-libssc")
     (version "0.4.4")
-    (source
-     (origin
-       (method url-fetch)
-       (uri "https://codeberg.org/DylanVanAssche/libssc/archive/033e2a32095c024d6dbdfb1d4ae1db4a94be32f1.tar.gz")
-       (sha256 (base32 "1f160liwswlv3v48s3l4pmx7a01aaxwcq3gan0mabkpw14893sw0"))
-       (patches (list (local-file "firmware/wait-for-qmi-service.patch")))))
+    ;; Exact Codeberg archive for 033e2a32095c024d6dbdfb1d4ae1db4a94be32f1.
+    (source (local-file "firmware/libssc-033e2a3.tar.gz"))
     (build-system meson-build-system)
     ;; Upstream check launches an SSC mock server over a host QRTR socket.
-    (arguments (list #:tests? #f))
+    (arguments
+     (list #:tests? #f
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'apply-qmi-retry-patch
+                 (lambda _
+                   (invoke "patch" "-p1" "-i"
+                           #$(local-file "firmware/wait-for-qmi-service.patch")))))))
     (native-inputs (list pkg-config protobuf python))
     (inputs (list glib))
     (propagated-inputs (list protobuf-c libqmi))
