@@ -18,7 +18,7 @@
 ## 构建并下载
 
 1. 在 GitHub Actions 打开对应工作流，再选择 `main` 分支。
-2. 用 `image` 选择 `tty`、`niri`、`kde` 或 `gnome`。首次启动验证用
+2. 用 `image` 选择 `tty`、`niri`、`noctalia`、`kde` 或 `gnome`。首次启动验证用
    `tty`。选 `none` 只构建开机镜像。四种根镜像均包含 `fastfetch`（Guix 的 `fastfetch-minimal` 包）。
    默认主机名为 `guix`。
    所有镜像预装 Fish、Starship 和 Git，登录账号默认使用 Fish。桌面镜像预装 Kitty 和 Zed，niri 镜像额外预装 Fuzzel。

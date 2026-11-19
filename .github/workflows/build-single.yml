@@ -11,7 +11,7 @@ on:
         description: Image variant (none builds only boot.img)
         type: choice
         default: tty
-        options: [none, tty, niri, kde, gnome]
+        options: [none, tty, niri, noctalia, kde, gnome]
       auto_login:
         description: Log in automatically at boot
         type: boolean
@@ -24,7 +24,7 @@ on:
         description: Login name for the selected root image
         default: sheng
       desktop_password:
-        description: Login password for the selected root image
+        description: Login password for the selected root image (visible in run metadata)
         default: sheng
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
