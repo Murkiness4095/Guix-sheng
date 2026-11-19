@@ -36,7 +36,8 @@
 
 [单系统 TTY 修正版](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44065603032)
 已在实机从 `userdata` 启动并自动登录到 TTY。
-手动构建可选 `vendor_services`，接入试验性的板级 UCM、触控和传感器服务。
+`vendor_services` 默认开启，接入试验性的板级 UCM、触控、音频、传感器和充电服务；
+取消勾选可构建精简闭包。push 构建同样开启。
 
 ## 文档
 个人系统配置可通过 Guix channel 导入 `(sheng system)`。见[最小样板](examples/minimal/README.md)。

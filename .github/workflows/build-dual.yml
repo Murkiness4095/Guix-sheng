@@ -19,7 +19,7 @@ on:
       vendor_services:
         description: Enable experimental sheng touch, audio and sensor services
         type: boolean
-        default: false
+        default: true
       desktop_username:
         description: Login name for the selected root image
         default: sheng
@@ -54,7 +54,7 @@ jobs:
       - name: Write build-time identity settings
         env:
           UNAME: ${{ inputs.desktop_username }}
-          VENDOR_SERVICES: ${{ inputs.vendor_services }}
+          VENDOR_SERVICES: ${{ github.event_name != 'workflow_dispatch' || inputs.vendor_services }}
           AUTO_LOGIN: ${{ github.event_name != 'workflow_dispatch' || inputs.auto_login }}
           UPASS: ${{ inputs.desktop_password }}
         run: |
