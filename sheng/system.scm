@@ -24,7 +24,6 @@
   #:use-module ((gnu packages terminals) #:select (alacritty kitty))
   #:use-module ((gnu packages version-control) #:select (git))
   #:use-module ((gnu packages xdisorg) #:select (fuzzel))
-  #:use-module ((gnu packages xfce) #:select (thunar))
   #:use-module (guix packages)
   #:use-module (guix utils)
   #:use-module (guix build-system trivial)
@@ -37,6 +36,7 @@
   #:use-module (modules sheng-bootloader)
   #:use-module (packages kernel)
   #:use-module (packages firmware)
+  #:use-module (packages thunar)
   #:use-module (packages zed)
   #:use-module (services accessories)
   #:use-module (services audio)
@@ -147,8 +147,8 @@ The tty image keeps a text getty from %base-services."
             (else '())))
          (session-pkgs
           (case desktop
-            ((niri) (list niri fuzzel thunar (sheng-niri-desktop "niri" "niri")))
-            ((noctalia) (list niri noctalia thunar
+            ((niri) (list niri fuzzel sheng-thunar (sheng-niri-desktop "niri" "niri")))
+            ((noctalia) (list niri noctalia sheng-thunar
                                (sheng-niri-desktop "niri-noctalia"
                                                    "niri -c /etc/sheng/niri-noctalia.kdl")))
             (else '())))

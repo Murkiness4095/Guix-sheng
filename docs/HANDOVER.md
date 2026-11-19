@@ -1,6 +1,7 @@
 # 维护交接
 
 ## 当前状态
+- [#44381881864](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44381881864) 与 #44366125828 均在 Thunar 4.20.10 的 bootstrap 遭遇 autogen.sh 执行权限错误。改用同版本的 Xfce 正式源码归档及随附 configure，保留 GVfs。
 - [#44263012512](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44263012512) 的单系统 TTY 镜像已通过闭包注册、SQLite 完整性与引用检查、启动世代注册检查和 ext4 写回检查，并上传 `sheng-boot.img` 与 `single-tty.sparse.img`。实机新世代切换与回滚待验证。已刷入的旧 GNOME 不受这次镜像修复影响。
 - [#44256485674](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44256485674) 已在镜像外打开 SQLite 并读到 571 个 store 项，但注册时间误传整数，Guix 要求 SRFI-19 日期。改用 UTC epoch 日期，并在单系统 CI 构建前用相同的 Guix 和注册器验证一个小闭包。
 - [#44254594748](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44254594748) 已生成 TTY 磁盘并提取两个引用图，外部注册脚本因 `register-closure` 私有绑定不可用退出。改用 Guix 的数据库和引用图接口，并用单文件提取避免 `rdump` 修改属主。
