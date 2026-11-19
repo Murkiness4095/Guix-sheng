@@ -37,10 +37,9 @@
 
 ## 构建时身份
 
-CI 固定把账号 `sheng`、密码 `sheng` 和自动登录写入 `images/settings.scm`
-（不提交），由 `images/base.scm` 读取；本地构建没有该文件时使用同样默认值。
-要换账号、密码或关闭自动登录，在 `sheng-os` 调用里传 `#:username`、
-`#:password-hash`、`#:auto-login?`，不要改工作流输入。
+`workflow_dispatch` 输入 `desktop_username`、`desktop_password` 和
+`auto_login` 写入 `images/settings.scm`（不提交），由 `images/base.scm` 读取。
+本地构建没有该文件时回退为 `sheng`、自动登录。
 
 ## 产物
 
