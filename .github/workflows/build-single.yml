@@ -30,6 +30,9 @@ on:
         description: Export signed store closures for offline generation updates
         type: boolean
         default: true
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   images:
     runs-on: ubuntu-24.04-arm
@@ -112,7 +115,7 @@ jobs:
             "$GUIX" system image -L . --dry-run "images/$img.scm" 2>&1 | tail -20 || exit 1
           done
         env:
-          IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty single-kde single-gnome single-niri' }}
+          IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty' }}
       - name: Build sheng firmware before the kernel
         if: ${{ inputs.image != 'none' }}
         run: '"$GUIX" build -L . -e "(@ (packages firmware) sheng-firmware)"'
@@ -128,7 +131,7 @@ jobs:
           done
           test ! -s failures.txt
         env:
-          IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty single-kde single-gnome single-niri' }}
+          IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty' }}
       - name: Export store closures
         if: ${{ inputs.export_closures && inputs.image != 'none' }}
         run: |
@@ -145,7 +148,7 @@ jobs:
           (cd closures && sha256sum ./*.nar.zst > SHA256SUMS)
           ls -lh closures
         env:
-          IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty single-kde single-gnome single-niri' }}
+          IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty' }}
       - uses: actions/upload-artifact@v4
         if: ${{ inputs.export_closures && inputs.image != 'none' }}
         with:

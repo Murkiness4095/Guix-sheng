@@ -2,10 +2,12 @@
 
 ## 工作流
 
-- `build-single`：单系统四种镜像（tty/niri/kde/gnome）
-- `build-dual`：双系统四种镜像
-- 每条工作流是**单个 job**：`guix pull -C channels.scm` 一次，再循环构建所有
-  变体，避免每个镜像重复拉取/编译 Guix。
+- `build-single`：单系统镜像（tty/niri/kde/gnome）
+- `build-dual`：双系统镜像
+- push/PR 只构建 `tty` 变体；手动运行用 `image` 选择单个变体，四个桌面
+  变体不再在每次 push 时串行构建。
+- 每条工作流是**单个 job**：`guix pull -C channels.scm` 一次，手工运行时
+  只构建所选变体。相同分支的新 run 取消旧 run。
 - 触发路径：`images/**`、`scripts/**`、`channels.scm`、对应 workflow 文件。
 
 ## 频道
