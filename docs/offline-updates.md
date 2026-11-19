@@ -75,9 +75,9 @@ guix system delete-generations
 
 ## 限制
 
-- 启动菜单目前是 `PROMPT 0`，会自动启动默认世代；开机选世代需要把
-  `modules/sheng-bootloader.scm` 的 `PROMPT` 改成 `1`，在串口下输入
-  `guix-gen-N`。否则只能在系统内切换。
+- extlinux 现在生成 U-Boot 菜单：`MENU TITLE`、每个世代的 `MENU LABEL`（附
+  `gnu.system` 短哈希）、`PROMPT 1` 和默认超时；菜单可选择旧世代，
+  `DEFAULT` 仍指向 `guix-default`。
 - `desktop`、`vendor_services` 与 CI 不同时会引入闭包外的包，需本地编译。
 - 每代钉住一份闭包，先确认根分区空间。
 - 更换 `channels.scm` 会使全部 store path 失效，需同时导入新的 Guix 闭包。
