@@ -53,13 +53,14 @@
 `guix system image -L . --dry-run images/<variant>.scm` 逐个求值。任何未绑定变量或
 服务类型错误会在实际构建前失败，避免把时间花在错误的镜像上。
 
-手动运行时，`image=tty` 构建 TTY 根镜像，`image=none` 只构建开机镜像。
+手动运行时用 `image` 选择 `tty`、`niri`、`kde` 或 `gnome`；开机镜像随任一变体
+一起构建。
 
 注意：镜像文件返回 `<image>` 记录，不能用 `guix system build` 求值。
 
 ## 闭包导出
 
-`workflow_dispatch` 且 `image` 不是 `none` 时，镜像构建后自动运行
+`workflow_dispatch` 时，镜像构建后自动运行
 `scripts/export-closure.sh`，从 ext4 镜像的 extlinux 配置取出
 `gnu.system=`，导出签名的 store 闭包和固定频道 Guix 闭包，连同公钥
 打包为 `sheng-single-closures` / `sheng-dual-closures`。平板端导入和

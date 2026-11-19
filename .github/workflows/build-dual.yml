@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
     inputs:
       image:
-        description: Image variant (none builds only boot.img)
+        description: Image variant
         type: choice
         default: tty
-        options: [none, tty, niri, kde, gnome]
+        options: [tty, niri, kde, gnome]
       auto_login:
         description: Log in automatically at boot
         type: boolean
@@ -92,7 +92,7 @@ jobs:
             "$GUIX" system image -L . --dry-run "images/$img.scm" 2>&1 | tail -20 || exit 1
           done
         env:
-          IMAGES: ${{ inputs.image && format('dual-{0}', inputs.image) || 'dual-tty' }}
+          IMAGES: ${{ inputs.image && format('dual-{0}', inputs.image) || 'dual-tty dual-niri dual-kde dual-gnome' }}
       - name: Build sheng firmware before the kernel
         if: ${{ inputs.image != 'none' }}
         run: '"$GUIX" build -L . -e "(@ (packages firmware) sheng-firmware)"'

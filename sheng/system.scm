@@ -101,10 +101,7 @@
            (initial-session-command
             (greetd-user-session
              (command (file-append niri "/bin/niri"))
-             (command-args
-              (if (eq? desktop 'noctalia)
-                  '("-c" "/etc/sheng/niri-noctalia.kdl")
-                  '()))
+             (command-args '("-c" "/etc/sheng/niri-noctalia.kdl"))
              (xdg-session-type "wayland")))
            (default-session-command
             (greetd-noctalia-greeter-session
@@ -131,7 +128,7 @@ The tty image keeps a text getty from %base-services."
                     (gdm-configuration
                      (auto-login? auto-login?)
                      (default-user (and auto-login? username))))))
-    ((niri noctalia)
+    ((niri)
      (list (service noctalia-greeter-service-type)
            (service greetd-service-type (sheng-greetd-config desktop auto-login? username))))
     (else '())))
@@ -139,7 +136,7 @@ The tty image keeps a text getty from %base-services."
 (define* (sheng-os #:key (desktop 'tty) (hostname "guix") (root-label "linux")
                    (username "sheng") (password-hash #f)
                    (auto-login? #t) (vendor-services? #f))
-  "Return an <operating-system>.  DESKTOP: tty, kde, gnome, niri, noctalia."
+  "Return an <operating-system>.  DESKTOP: tty, kde, gnome, niri."
   (let* ((desktop-service
           (case desktop
             ((kde) (list (service plasma-desktop-service-type)))
@@ -147,13 +144,12 @@ The tty image keeps a text getty from %base-services."
             (else '())))
          (session-pkgs
           (case desktop
-            ((niri) (list niri fuzzel sheng-thunar (sheng-niri-desktop "niri" "niri")))
-            ((noctalia) (list niri noctalia sheng-thunar
-                               (sheng-niri-desktop "niri-noctalia"
-                                                   "niri -c /etc/sheng/niri-noctalia.kdl")))
+            ((niri) (list niri noctalia fuzzel sheng-thunar
+                          (sheng-niri-desktop "niri"
+                                              "niri -c /etc/sheng/niri-noctalia.kdl")))
             (else '())))
          (noctalia-config
-          (if (eq? desktop 'noctalia)
+          (if (eq? desktop 'niri)
               (list (extra-special-file
                      "/etc/sheng/niri-noctalia.kdl"
                      (plain-file "niri-noctalia.kdl"
