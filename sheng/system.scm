@@ -244,4 +244,5 @@ The tty image keeps a text getty from %base-services."
             '())
         noctalia-config
         (append (sheng-login-services desktop auto-login? username)
-                (list (service openssh-service-type))))))))
+                (list (service ntp-service-type)
+                      (service openssh-service-type))))))))
