@@ -35,6 +35,7 @@
   #:use-module (modules internal-storage)
   #:use-module (modules sheng-bootloader)
   #:use-module (packages kernel)
+  #:use-module (packages niri)
   #:use-module (packages firmware)
   #:use-module (packages thunar)
   #:use-module (packages zed)
@@ -152,8 +153,12 @@ The tty image keeps a text getty from %base-services."
           (if (eq? desktop 'niri)
               (list (extra-special-file
                      "/etc/sheng/niri-noctalia.kdl"
-                     (plain-file "niri-noctalia.kdl"
-                                 "spawn-at-startup \"noctalia\"\n")))
+                     (mixed-text-file
+                      "niri-noctalia.kdl"
+                      "include \""
+                      (file-append niri-default-config
+                                   "/share/niri/default-config.kdl")
+                      "\"\nspawn-at-startup \"noctalia\"\n")))
               '()))
          (browser (if (eq? desktop 'tty) '() (list librewolf))))
     (operating-system
