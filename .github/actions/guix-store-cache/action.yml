@@ -1,0 +1,23 @@
+name: Restore built Guix store
+description: Import the cached store closure for one image variant
+inputs:
+  variant:
+    description: Image variant name (tty, niri, kde, gnome)
+    required: true
+outputs:
+  cache-hit:
+    value: ${{ steps.cache.outputs.cache-hit }}
+  cache-primary-key:
+    value: ${{ steps.cache.outputs.cache-primary-key }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache/restore@v4
+      id: cache
+      with:
+        path: ${{ runner.temp }}/sheng-store
+        key: sheng-store-v1-${{ runner.os }}-${{ runner.arch }}-${{ inputs.variant }}-${{ hashFiles('channels.scm', 'packages/**', 'modules/**', 'services/**', 'sheng/**', 'scripts/**') }}
+    - name: Import cached store closure
+      if: steps.cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: scripts/store-cache-import.sh "$RUNNER_TEMP/sheng-store"

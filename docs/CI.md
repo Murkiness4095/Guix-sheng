@@ -34,6 +34,14 @@
 - 根镜像构建前单独构建 `linux-sheng` 并导出其 store 闭包。单系统、双系统
   和 EFI 共用该缓存；键由系统、架构、频道锁定和内核配方及文件内容决定。
   缓存保存早于根镜像构建，后续固件或镜像失败也可复用。
+- `guix-state` 以前只有 restore 没有 save，且只存在于 `boot-chain` 作用域，
+  分支合并后 main 每次冷拉。现在非 PR 运行结束后回写。
+- 镜像 store 闭包由 `.github/actions/guix-store-cache` 处理：构建前按
+  `sheng-store-v1-<variant>-<tree hash>` 导入，未命中时用
+  `scripts/store-cache-export.sh` 导出所选系统的签名闭包并保存。键包含
+  `channels.scm`、`packages/**`、`modules/**`、`services/**`、`sheng/**`、
+  `scripts/**` 和变体；`images/settings.scm` 的随机盐不影响包闭包。
+  GitHub 仓库缓存上限 10 GB，桌面变体分开 key。
 
 ## 构建时身份
 

@@ -75,6 +75,15 @@ jobs:
             ~/.config/guix
           key: guix-state-${{ hashFiles('channels.scm') }}
       - uses: ./.github/actions/guix-pull
+      - name: Save Guix state
+        if: ${{ github.event_name != 'pull_request' }}
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.cache/guix
+            ~/.config/guix
+          key: guix-state-${{ hashFiles('channels.scm') }}
       - name: Check the greeter package used by the desktop service
         if: ${{ inputs.image == 'niri' || github.event_name != 'workflow_dispatch' }}
         run: |
@@ -98,6 +107,10 @@ jobs:
         run: '"$GUIX" build -L . -e "(@ (packages firmware) sheng-firmware)"'
       - uses: ./.github/actions/sheng-kernel
         if: ${{ inputs.image != 'none' }}
+      - uses: ./.github/actions/guix-store-cache
+        id: store
+        with:
+          variant: ${{ inputs.image || 'tty' }}
       - name: Build all dual-system images
         if: ${{ inputs.image != 'none' }}
         run: |
@@ -109,6 +122,24 @@ jobs:
           test ! -s failures.txt
         env:
           IMAGES: ${{ inputs.image && format('dual-{0}', inputs.image) || 'dual-tty' }}
+      - name: Export built store closure
+        id: store-export
+        if: ${{ success() && steps.store.outputs.cache-hit != 'true' && github.event_name != 'pull_request' }}
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          systems=()
+          for img in $IMAGES; do systems+=("$(cat "$img.system")"); done
+          scripts/store-cache-export.sh "$RUNNER_TEMP/sheng-store" "${systems[@]}"
+        env:
+          IMAGES: ${{ inputs.image && format('dual-{0}', inputs.image) || 'dual-tty' }}
+      - name: Save built store closure
+        if: ${{ steps.store-export.outcome == 'success' }}
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/sheng-store
+          key: ${{ steps.store.outputs.cache-primary-key }}
       - name: Export store closures
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.image != 'none' }}
         run: |
