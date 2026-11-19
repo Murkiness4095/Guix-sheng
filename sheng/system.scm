@@ -35,7 +35,7 @@
   #:use-module (modules internal-storage)
   #:use-module (modules sheng-bootloader)
   #:use-module (packages kernel)
-  #:use-module (packages niri)
+  #:use-module (packages sheng-niri)
   #:use-module (packages firmware)
   #:use-module (packages thunar)
   #:use-module (packages zed)

@@ -1,6 +1,6 @@
 ;; niri's default key bindings, installed as a file so the sheng session
 ;; config can include them instead of replacing them.
-(define-module (packages niri)
+(define-module (packages sheng-niri)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix build-system copy)
