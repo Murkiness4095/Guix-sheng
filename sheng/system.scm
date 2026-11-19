@@ -159,7 +159,7 @@ The tty image keeps a text getty from %base-services."
                      (plain-file "niri-noctalia.kdl"
                                  "spawn-at-startup \"noctalia\"\n")))
               '()))
-         (browser (list librewolf)))
+         (browser (if (eq? desktop 'tty) '() (list librewolf))))
     (operating-system
       (host-name hostname)
       (timezone "Asia/Shanghai")
