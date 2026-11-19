@@ -169,7 +169,8 @@ jobs:
             scripts/export-closure.sh "$img.ext4" "closures/$img.nar.zst"
             cp "$img.system" "closures/$img.system"
           done
-          profile=$(dirname "$(dirname "$(readlink -f "$GUIX")")")
+          profile=$(dirname "$(dirname "$GUIX")")
+          test -d "$profile" || { echo "no Guix profile at $profile" >&2; exit 1; }
           "$GUIX" archive --export -r "$profile" | zstd -T0 -o "closures/guix-$(basename "$profile").nar.zst"
           sudo cat /etc/guix/signing-key.pub > closures/signing-key.pub
           (cd closures && sha256sum ./*.nar.zst > SHA256SUMS)
