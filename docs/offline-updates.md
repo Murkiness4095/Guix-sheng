@@ -30,8 +30,29 @@ zstd -dc guix-*.nar.zst | sudo guix archive --import
 
 分片下载时先拼接：`cat part* | zstd -dc | sudo guix archive --import`。
 
-生成新世代必须使用与 CI 相同的 `channels.scm` 和仓库提交，否则 store
-path 不同，缺失的包会本地编译：
+## 直接注册并切换世代
+
+artifact 里的 `<variant>.system` 记录了系统 store 路径。导入闭包后直接注册为
+下一世代并切换，不重新求值配置：
+
+```sh
+sudo scripts/sheng-switch.sh "$(cat single-tty.system)"
+```
+
+脚本等价于 NixOS 的 `nix-env -p /nix/var/nix/profiles/system --set` 加
+`switch-to-configuration boot`：建 `system-N-link`、让
+`guix system switch-generation N` 重装 extlinux、运行 activate。旧世代和
+数据不动，重启后生效。
+
+前提：运行中的 Guix profile 里要有 `guix-sheng` channel，且提交包含
+`gnu/bootloader/sheng.scm`。Guix 的 `switch-generation` 按名字查
+bootloader 注册表，`sheng-extlinux` 原先不在注册表里，会报
+`sheng-extlinux: no such bootloader`；该模块把它注册进去。
+
+## 重新求值配置
+
+要应用自己的配置变更，仍用 `guix system reconfigure`。必须与 CI 使用相同的
+`channels.scm` 和仓库提交，否则 store path 不同，缺失的包会本地编译：
 
 ```sh
 sudo -i guix time-machine -C channels.scm -- \

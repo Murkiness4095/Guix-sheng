@@ -20,5 +20,5 @@
       (channel
         (name 'guix-sheng)
         (url "https://github.com/Murkiness4095/Guix-sheng.git")
-        (branch "boot-chain")
+        (branch "main")
         (commit "fb31968f552bd89dee6532d9ab86c41570a858f5")))

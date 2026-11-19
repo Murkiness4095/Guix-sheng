@@ -118,6 +118,7 @@ jobs:
           mkdir -p closures
           for img in $IMAGES; do
             scripts/export-closure.sh "$img.ext4" "closures/$img.nar.zst"
+            cp "$img.system" "closures/$img.system"
           done
           profile=$(dirname "$(dirname "$(readlink -f "$GUIX")")")
           "$GUIX" archive --export -r "$profile" | zstd -T0 -o "closures/guix-$(basename "$profile").nar.zst"
