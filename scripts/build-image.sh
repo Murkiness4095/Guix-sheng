@@ -42,6 +42,7 @@ if ! grep -qiE '^[[:space:]]*LINUX[[:space:]]+' <<< "$config"; then
 fi
 system=$(sed -nE 's/.*gnu\.system=(\/gnu\/store\/[^[:space:]]+).*/\1/p' <<< "$config" | head -n 1)
 test -n "$system" || { echo "Missing Guix system path in extlinux" >&2; exit 1; }
+printf '%s\n' "$system" > "$prefix.system"
 database_dir=$(mktemp -d)
 trap 'rm -r -- "$database_dir"' EXIT
 graph_dir=/var/guix/sheng-reference-graphs

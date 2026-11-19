@@ -26,6 +26,10 @@ on:
       desktop_password:
         description: Login password for the selected root image
         default: sheng
+      export_closures:
+        description: Export signed store closures for offline generation updates
+        type: boolean
+        default: true
 jobs:
   images:
     runs-on: ubuntu-24.04-arm
@@ -37,6 +41,15 @@ jobs:
           sudo apt-get install -y wget parted dosfstools mtools e2fsprogs android-sdk-libsparse-utils zstd
           wget https://guix.gnu.org/install.sh -O /tmp/guix-install.sh
           yes | sudo bash /tmp/guix-install.sh
+      - name: Install archive signing key
+        env:
+          SIGNING_KEY: ${{ secrets.GUIX_ARCHIVE_SIGNING_KEY }}
+          SIGNING_KEY_PUB: ${{ secrets.GUIX_ARCHIVE_SIGNING_KEY_PUB }}
+        run: |
+          if [[ -n "${SIGNING_KEY:-}" && -n "${SIGNING_KEY_PUB:-}" ]]; then
+            printf '%s\n' "$SIGNING_KEY" | sudo install -m 600 /dev/stdin /etc/guix/signing-key.sec
+            printf '%s\n' "$SIGNING_KEY_PUB" | sudo install -m 644 /dev/stdin /etc/guix/signing-key.pub
+          fi
       - name: Check boot.img layout
         run: python3 tests/bootimg-v2.py
       - name: Write build-time identity settings
@@ -97,6 +110,28 @@ jobs:
           test ! -s failures.txt
         env:
           IMAGES: ${{ inputs.image && format('dual-{0}', inputs.image) || 'dual-tty dual-kde dual-gnome dual-niri' }}
+      - name: Export store closures
+        if: ${{ inputs.export_closures && inputs.image != 'none' }}
+        run: |
+          set -euo pipefail
+          sudo test -f /etc/guix/signing-key.sec || sudo "$GUIX" archive --generate-key
+          mkdir -p closures
+          for img in $IMAGES; do
+            scripts/export-closure.sh "$img.ext4" "closures/$img.nar.zst"
+          done
+          profile=$(dirname "$(dirname "$(readlink -f "$GUIX")")")
+          "$GUIX" archive --export -r "$profile" | zstd -T0 -o "closures/guix-$(basename "$profile").nar.zst"
+          sudo cat /etc/guix/signing-key.pub > closures/signing-key.pub
+          (cd closures && sha256sum ./*.nar.zst > SHA256SUMS)
+          ls -lh closures
+        env:
+          IMAGES: ${{ inputs.image && format('dual-{0}', inputs.image) || 'dual-tty dual-kde dual-gnome dual-niri' }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ inputs.export_closures && inputs.image != 'none' }}
+        with:
+          name: sheng-dual-closures
+          path: closures/
+          retention-days: 30
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -45,6 +45,7 @@ Guix EFI 实验保留在 [codex/efi](https://github.com/Murkiness4095/Guix-sheng
 - [双系统安装与 NixOS 共存](docs/dual-boot.md)
 - [最小 Guix 系统声明](examples/minimal/README.md)
 - [CI、固定频道与缓存](docs/CI.md)
+- [离线闭包更新与世代切换](docs/offline-updates.md)
 - [维护交接](docs/HANDOVER.md)与[上游实现差异](docs/debian-alignment.md)
 
 许可证为 MIT。
