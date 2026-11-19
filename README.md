@@ -39,7 +39,7 @@
 
 ## 文档
 个人系统配置可通过 Guix channel 导入 `(sheng system)`。见[最小样板](examples/minimal/README.md)。
-Guix EFI 实验保留在 [codex/efi](https://github.com/Murkiness4095/Guix-sheng/tree/codex/efi)。
+Guix EFI 实验已并入 `main` 历史。
 
 - [单系统首启与 extlinux 验收](docs/boot-chain.md)
 - [双系统安装与 NixOS 共存](docs/dual-boot.md)
