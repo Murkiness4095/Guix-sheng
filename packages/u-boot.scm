@@ -5,6 +5,7 @@
 ;; patches, same mkbootimg arguments (taken from the stock boot.img header).
 (define-module (packages u-boot)
   #:use-module (gnu packages bootloaders)
+  #:use-module (gnu packages gcc)
   #:use-module (gnu packages python)
   #:use-module (gnu packages vim)
   #:use-module (gnu packages zig)
@@ -62,13 +63,21 @@ dual-system variant below."
                 "u-boot-sheng-dual"))
       (native-inputs
        (modify-inputs (package-native-inputs base)
-         (append zig-0.15 xxd python-wrapper)))
+         (append zig-0.15 xxd python-wrapper gcc-16)))
       (arguments
        (substitute-keyword-arguments (package-arguments base)
          ;; U-Boot's test suite does not exercise this board.
          ((#:tests? _ #t) #f)
          ((#:make-flags flags ''())
-          #~(cons* "ZIG=zig" #$flags))
+          ;; nixos-sheng builds this U-Boot with GCC 16.2.0; Guix's default
+          ;; GCC 14 produces a binary that stalls on the ABL fastboot screen
+          ;; before the menu, with identical source, config and DTB.
+          #~(append #$flags
+                    (list "ZIG=zig"
+                          (string-append "CC="
+                                         #$(file-append gcc-16 "/bin/gcc"))
+                          (string-append "HOSTCC="
+                                         #$(file-append gcc-16 "/bin/gcc")))))
          ((#:phases phases '%standard-phases)
           #~(modify-phases #$phases
               ;; Match NixOS buildUBoot: let Kconfig resolve the board defconfig.
