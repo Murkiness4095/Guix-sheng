@@ -20,13 +20,12 @@
 1. 在 GitHub Actions 打开对应工作流，再选择 `main` 分支。
 2. 用 `image` 选择 `tty`、`niri`、`kde` 或 `gnome`。首次启动验证用
    `tty`。选 `none` 只构建开机镜像。四种根镜像均包含 `fastfetch`（Guix 的 `fastfetch-minimal` 包）。
-   默认主机名为 `guix`，登录账号仍由构建输入决定。
+   默认主机名为 `guix`。
    所有镜像预装 Fish、Starship 和 Git，登录账号默认使用 Fish。桌面镜像预装 Kitty 和 Zed，niri 镜像额外预装 Fuzzel。
    桌面镜像还预装 Fcitx 5、中文拼音、配置工具及 GTK 和 Qt 输入模块。
-3. `desktop_username` 和 `desktop_password` 默认都是 `sheng`，对本次
-   根镜像的登录生效，包括 TTY。下载同一个 run 的开机镜像和 sparse 根镜像。
-   `auto_login` 默认开启。TTY 会直接进入 tty1 的用户 shell，桌面会启动对应会话。
-   取消勾选可恢复登录界面，已有系统可在 `sheng-os` 调用中设置 `#:auto-login? #f`。
+3. 登录账号固定 `sheng`/`sheng`，并自动登录；首次登录后用 `passwd` 修改。
+   下载同一个 run 的开机镜像和 sparse 根镜像。手动运行会同时导出所选变体的
+   签名闭包，用于不重刷 rootfs 的世代更新，见[离线闭包更新](docs/offline-updates.md)。
 
 | 工作流 | 开机镜像 | 根镜像示例 |
 | --- | --- | --- |

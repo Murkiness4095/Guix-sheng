@@ -12,24 +12,10 @@ on:
         type: choice
         default: tty
         options: [none, tty, niri, kde, gnome]
-      auto_login:
-        description: Log in automatically at boot
-        type: boolean
-        default: true
       vendor_services:
         description: Enable experimental sheng touch, audio and sensor services
         type: boolean
         default: false
-      desktop_username:
-        description: Login name for the selected root image
-        default: sheng
-      desktop_password:
-        description: Login password for the selected root image
-        default: sheng
-      export_closures:
-        description: Export signed store closures for offline generation updates
-        type: boolean
-        default: true
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -57,17 +43,11 @@ jobs:
         run: python3 tests/bootimg-v2.py
       - name: Write build-time identity settings
         env:
-          UNAME: ${{ inputs.desktop_username }}
           VENDOR_SERVICES: ${{ inputs.vendor_services }}
-          AUTO_LOGIN: ${{ github.event_name != 'workflow_dispatch' || inputs.auto_login }}
-          UPASS: ${{ inputs.desktop_password }}
         run: |
-          uname=${UNAME:-sheng}; pass=${UPASS:-sheng}
-          hash=$(openssl passwd -6 "$pass")
-          printf '(define sheng-desktop-username "%s")\n(define sheng-desktop-password-hash "%s")\n' "$uname" "$hash" > images/settings.scm
-          auto_login='#f'
-          if [[ "$AUTO_LOGIN" == true ]]; then auto_login='#t'; fi
-          printf '(define sheng-desktop-auto-login? %s)\n' "$auto_login" >> images/settings.scm
+          hash=$(openssl passwd -6 sheng)
+          printf '(define sheng-desktop-username "sheng")\n(define sheng-desktop-password-hash "%s")\n' "$hash" > images/settings.scm
+          printf '(define sheng-desktop-auto-login? #t)\n' >> images/settings.scm
           vendor_services='#f'
           if [[ "$VENDOR_SERVICES" == true ]]; then vendor_services='#t'; fi
           printf '(define sheng-enable-vendor-services? %s)\n' "$vendor_services" >> images/settings.scm
@@ -114,7 +94,7 @@ jobs:
         env:
           IMAGES: ${{ inputs.image && format('dual-{0}', inputs.image) || 'dual-tty' }}
       - name: Export store closures
-        if: ${{ inputs.export_closures && inputs.image != 'none' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.image != 'none' }}
         run: |
           set -euo pipefail
           sudo test -f /etc/guix/signing-key.sec || sudo "$GUIX" archive --generate-key
@@ -131,7 +111,7 @@ jobs:
         env:
           IMAGES: ${{ inputs.image && format('dual-{0}', inputs.image) || 'dual-tty' }}
       - uses: actions/upload-artifact@v4
-        if: ${{ inputs.export_closures && inputs.image != 'none' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.image != 'none' }}
         with:
           name: sheng-dual-closures
           path: closures/

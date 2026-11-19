@@ -8,8 +8,8 @@ CI 可以导出已构建系统的签名 store 闭包；平板导入后原地生�
 
 ## CI 产出
 
-`build-single` / `build-dual` 的 `workflow_dispatch` 增加 `export_closures`
-（默认勾选）。构建结束后上传 artifact：
+`build-single` / `build-dual` 手动运行（`image` 不是 `none`）会在构建后自动
+导出闭包 artifact：
 
 - `<variant>.nar.zst`：镜像启动系统的签名闭包
 - `guix-<store>.nar.zst`：固定频道 `guix pull` 的 Guix 闭包
