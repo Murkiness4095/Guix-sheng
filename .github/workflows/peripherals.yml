@@ -1,7 +1,7 @@
 name: Sheng peripheral packages
 on:
   push:
-    branches: [boot-chain]
+    branches: [main]
     paths:
       - .github/workflows/peripherals.yml
       - packages/peripherals.scm

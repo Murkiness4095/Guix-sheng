@@ -17,7 +17,7 @@
 
 ## 构建并下载
 
-1. 在 GitHub Actions 打开对应工作流，再选择 `boot-chain` 分支。
+1. 在 GitHub Actions 打开对应工作流，再选择 `main` 分支。
 2. 用 `image` 选择 `tty`、`niri`、`kde` 或 `gnome`。首次启动验证用
    `tty`。选 `none` 只构建开机镜像。四种根镜像均包含 `fastfetch`（Guix 的 `fastfetch-minimal` 包）。
    默认主机名为 `guix`，登录账号仍由构建输入决定。
