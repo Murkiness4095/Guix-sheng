@@ -4,7 +4,7 @@
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix build-system copy)
-  #:use-module (guix licenses)
+  #:use-module ((guix licenses) #:prefix license:)
   #:export (niri-default-config))
 
 (define niri-default-config
