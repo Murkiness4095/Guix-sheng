@@ -107,11 +107,11 @@ paths on the root partition, which U-Boot reads through ext4load."
                   (iota (length all-entries))
                   all-entries)
           #$@(if (pair? old-entries)
-                 (list #~(format port "~%")
-                       #$@(map entry->gexp
-                               (iota (length old-entries)
-                                     (length all-entries))
-                               old-entries))
+                 (cons #~(format port "~%")
+                       (map entry->gexp
+                            (iota (length old-entries)
+                                  (length all-entries))
+                            old-entries))
                  '()))))
 
   (computed-file "extlinux.conf" builder
