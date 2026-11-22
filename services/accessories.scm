@@ -65,7 +65,9 @@
      "ACTION==\"add\", SUBSYSTEM==\"typec\", KERNEL==\"port*-partner\", RUN+=\""
      (file-append coreutils "/bin/touch") " /run/sheng-mipps-request\"\n"
      "ACTION==\"change\", SUBSYSTEM==\"power_supply\", KERNEL==\"qcom-battmgr-usb\", ENV{POWER_SUPPLY_ONLINE}==\"1\", RUN+=\""
-     (file-append coreutils "/bin/touch") " /run/sheng-mipps-request\"\n"))))
+     (file-append sheng-mipps-auth "/libexec/xiaomi-mipps-auth") " --usb-online-trigger\"\n"
+     "ACTION==\"change\", SUBSYSTEM==\"power_supply\", KERNEL==\"qcom-battmgr-usb\", ENV{POWER_SUPPLY_ONLINE}==\"0\", RUN+=\""
+     (file-append sheng-mipps-auth "/libexec/xiaomi-mipps-auth") " --clear-notification\"\n"))))
 
 (define (sheng-pen-autostart-service)
   (simple-service

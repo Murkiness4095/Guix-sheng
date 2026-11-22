@@ -33,10 +33,12 @@
   #:use-module (midnight packages noctalia-greeter)
   #:use-module (midnight services noctalia-greeter)
   #:use-module (modules camera)
+  #:use-module (modules boot-slot)
   #:use-module (modules internal-storage)
   #:use-module (modules sheng-bootloader)
   #:use-module (packages kernel)
   #:use-module (packages sheng-niri)
+  #:use-module (packages sheng-sddm)
   #:use-module (packages firmware)
   #:use-module (packages peripherals)
   #:use-module (packages thunar)
@@ -49,6 +51,7 @@
   #:use-module (services grow-root)
   #:use-module (services keyboard-auth)
   #:use-module (services sensors)
+  #:use-module (services serial-console)
   #:use-module (services thp)
   #:export (sheng-os))
 
@@ -131,7 +134,7 @@ The tty image keeps a text getty from %base-services."
     ((kde)
      (list (service sddm-service-type
                     (sddm-configuration
-                     (sddm sddm)
+                     (sddm sheng-sddm)
                      (auto-login-user (if auto-login? username ""))
                      (auto-login-session (if auto-login? "plasma.desktop" ""))))))
     ((gnome)
@@ -204,7 +207,8 @@ The tty image keeps a text getty from %base-services."
       ;; Include the configured USB keyboard modules instead of the generic PC list.
       (initrd-modules (list "usbhid" "hid-generic"))
       (kernel-arguments
-       (list "console=ttyMSM0,115200n8" "console=ttyGS0,115200n8"
+       (list "video=DSI-1:3048x2032@120"
+             "g_serial.use_acm=1" "console=ttyMSM0,115200n8" "console=ttyGS0,115200n8"
              "console=tty0" "fbcon=map:0" "loglevel=4" "rootwait"))
       (firmware (cons* sheng-firmware %base-firmware))
       (bootloader (bootloader-configuration
@@ -255,10 +259,18 @@ The tty image keeps a text getty from %base-services."
               (delete mingetty-service-type)
               (delete console-font-service-type)))
         (sheng-desktop-services)
-        (list (sheng-grow-root-service root-label)
+        (list (sheng-boot-slot)
+              (sheng-serial-console)
+              (sheng-grow-root-service root-label)
               (sheng-internal-storage)
               (sheng-keyboard-auth-service))
         desktop-service
+        (if (eq? desktop 'kde)
+            (list (extra-special-file
+                   "/etc/sddm.conf.d/20-sheng-keyboard.conf"
+                   (plain-file "sheng-sddm-keyboard.conf"
+                               "[General]\nInputMethod=qtvirtualkeyboard\n")))
+            '())
         (if vendor-services?
             (append
              (sheng-audio-services)

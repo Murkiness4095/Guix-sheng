@@ -39,3 +39,7 @@ Zed 日志报告无法创建 surface。指定当前 Mesa 的 Freedreno Vulkan IC
 
 
 撤销个人桌面资源并入：删除壁纸、logo、Noctalia 个人配置与整份个人 niri 配置，移除首次激活复制服务。设备仓库恢复上游 niri 默认配置，仅追加 DSI-1 120Hz 和设备会话接线。个人配置继续由独立 Guix-config 管理。
+
+## 2026-11-22 补齐参考模块接线
+
+复核远程 NixOS-sheng main 仍为固定基准 2be57fe。新增 qbootctl 固定包和 Shepherd 启动成功标记、USB serial getty、所有变体的 DSI-1 120Hz 内核请求、KDE SDDM Qt6 虚拟键盘插件。MiPPS Python 调度改为请求 Shepherd，保留上游 USB online debounce 与断线通知清理。源文件语法与 diff 检查通过，充电补丁 dry-run 通过；按用户要求未启动构建，所有新路径待 CI 和实机验证。完整模块矩阵见 debian-alignment.md 最后一节。

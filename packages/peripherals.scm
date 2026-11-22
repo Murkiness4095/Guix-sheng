@@ -314,7 +314,8 @@
     (source (github-source "ianchb" "xiaomi-mipps-auth"
                            "9176efbdf276b874fc0a97912a914449a88155fb"
                            "1g43svdx8sb77mp2dhzvacvxqj8lmcq05b6xv95bczmq4sjjinq7"
-                           (list (local-file "firmware/sheng-mipps-auth/skip-unsupported-before-role-swap.patch"))))
+                           (list (local-file "firmware/sheng-mipps-auth/skip-unsupported-before-role-swap.patch")
+                                 (local-file "firmware/sheng-mipps-auth/shepherd-trigger.patch"))))
     (build-system copy-build-system)
     (arguments
      (list #:install-plan

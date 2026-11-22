@@ -99,3 +99,25 @@ Niri 的自动登录与 greeter 入口统一通过 `dbus-run-session` 启动；�
 - “已打包”“已接线”“实机功能通过”分别记录，当前不能宣称完全对齐。
 
 设备仓库使用上游 niri 默认配置并追加内屏 120Hz、Xwayland 和外设启动接线。个人主题、壁纸、logo、快捷键与辅助包由独立 Guix-config 管理。
+
+## 2026-11-22 逐模块复核与补线
+
+以下表格更新前文的旧状态。固定参考为远程 main 与本地一致的 `2be57fe7da35b0b98963cc5da233ad6765d5c134`，未升级板级源码。
+
+| NixOS 模块 | Guix 对应及本轮处理 | 验证范围 |
+| --- | --- | --- |
+| hardware | sheng/system.scm，统一追加 DSI-1 120Hz 内核模式请求；niri 另有 compositor 输出模式 | compositor 可自行选择模式，KDE/GNOME 仍待实机确认 |
+| boot-slot | modules/boot-slot.scm 从空实现改为 Shepherd oneshot，调用 qbootctl 0.2.2 -m | 固定归档 SHA-256，尚未构建及实机写槽位验证 |
+| serial-console | services/serial-console.scm，USB agetty 登录与 g_serial.use_acm=1 | 尚未实机验证 |
+| firmware | 现有 FastRPC、SSC、THP、QTEE、键盘认证、指纹、充电、LED/折叠服务 | 已有接线不等于完整功能验收 |
+| firmware/MiPPS | 保留上游 online debounce 与通知处理，Python 调度入口改为 Shepherd 请求文件；Type-C attach 直接请求认证，flock 排他执行 | 补丁 dry-run 通过，快充功率待验证 |
+| audio | UCM union、HiFi verb、Speaker/Mic3、WirePlumber 节点规则 | niri 热修复已枚举音频节点，实际播放待验收 |
+| camera | WirePlumber libcamera monitor 与 GStreamer 插件搜索路径 | 已补 libcamera，画面待验收 |
+| internal-storage | 维护分区 UFS+GPT 过滤规则一致 | 源码核对 |
+| virtual-keyboard | pinned Guix SDDM 服务默认使用 X11 greeter，不能直接套用 NixOS KWin compositor 字段；改为 Qt6 virtualkeyboard 插件封装及 InputMethod 配置 | 适配实现，登录界面待验收 |
+| extlinux/image | 现有 Guix 世代菜单、闭包注册和 ext4 提取 | 旧 TTY 有 CI/实机记录，本次未构建 |
+| desktop | 原生 Guix KDE/GNOME 服务，niri 自有用户 D-Bus、音频、托盘和 Xwayland 接线 | 不安装个人主题或壁纸 |
+| tmpfs-root / preservation | NixOS 可选持久化布局尚未提供 Guix 对应开关 | 明确未对齐，普通 ext4 root 不依赖该特性 |
+| nix-bootstrap | Nix daemon 的初始化属于 NixOS 专属机制 | Guix 使用镜像 store DB 注册及 Guix daemon |
+
+全部代码本轮仅进行语法读取、差异检查及 MiPPS 补丁匹配检查，未启动构建。不能据此宣布全功能对齐或实机验收完成。
