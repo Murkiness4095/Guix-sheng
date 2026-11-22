@@ -43,3 +43,7 @@ Zed 日志报告无法创建 surface。指定当前 Mesa 的 Freedreno Vulkan IC
 ## 2026-11-22 补齐参考模块接线
 
 复核远程 NixOS-sheng main 仍为固定基准 2be57fe。新增 qbootctl 固定包和 Shepherd 启动成功标记、USB serial getty、所有变体的 DSI-1 120Hz 内核请求、KDE SDDM Qt6 虚拟键盘插件。MiPPS Python 调度改为请求 Shepherd，保留上游 USB online debounce 与断线通知清理。源文件语法与 diff 检查通过，充电补丁 dry-run 通过；按用户要求未启动构建，所有新路径待 CI 和实机验证。完整模块矩阵见 debian-alignment.md 最后一节。
+
+## 2026-11-22 构建期间桌面失去响应
+
+USB 仍可执行命令。观测 load 约 23、15GiB 内存已用 14GiB，可用约 341–361MiB，无 swap，至少 8 个 cc1plus 同时运行并处于 D 状态。发送中断 Home reconfigure 请求后，后续 ps 未再列出编译进程。检查中还存在 shutdown 进程，随后 USB 断开，未确认桌面恢复。未由 agent 发起关机。Guix daemon 默认追加 --cores=2 --max-jobs=1，限制默认构建并行，待应用配置后生效。

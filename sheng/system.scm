@@ -79,6 +79,15 @@
     (home-page "https://github.com/Murkiness4095/Guix-sheng")
     (license #f)))
 
+(define %sheng-base-services
+  (modify-services %base-services
+    (guix-service-type config =>
+      (guix-configuration
+       (inherit config)
+       (extra-options
+        (append (guix-configuration-extra-options config)
+                '("--cores=2" "--max-jobs=1")))))))
+
 (define (sheng-desktop-services)
   (list (service dbus-root-service-type)
         (service elogind-service-type)
@@ -248,7 +257,7 @@ The tty image keeps a text getty from %base-services."
         ;; Keep a text getty only for the tty image; graphical variants
         ;; replace it with their own display manager.
         (if (eq? desktop 'tty)
-            (modify-services %base-services
+            (modify-services %sheng-base-services
               (mingetty-service-type config =>
                 (if (and auto-login?
                          (string=? (mingetty-configuration-tty config) "tty1"))
@@ -256,7 +265,7 @@ The tty image keeps a text getty from %base-services."
                      (inherit config)
                      (auto-login username))
                     config)))
-            (modify-services %base-services
+            (modify-services %sheng-base-services
               (delete mingetty-service-type)
               (delete console-font-service-type)))
         (sheng-desktop-services)
