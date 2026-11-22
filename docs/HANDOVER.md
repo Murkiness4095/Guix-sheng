@@ -51,3 +51,5 @@ USB 仍可执行命令。观测 load 约 23、15GiB 内存已用 14GiB，可用�
 ## Niri 闭包 #45039183456
 
 https://github.com/Murkiness4095/Guix-sheng/actions/runs/45039183456 在 Evaluate all images 阶段失败，未生成 niri rootfs 或闭包。相机模块错误地从 (gnu packages video) 选择 libcamera，固定 Guix 3c50593 的定义位于 (gnu packages photo)，修正导入。U-Boot 步骤已通过，不能视作根系统构建通过。
+
+#45039916915（双系统 push）已通过求值，qbootctl configure 失败：codeload URL 的下载名称为 0.2.2，没有归档后缀，Guix unpack 未展开源码。给 origin 显式设置 qbootctl-0.2.2.tar.gz，源码与哈希保持不变。

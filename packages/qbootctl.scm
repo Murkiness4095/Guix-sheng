@@ -12,6 +12,7 @@
     (version "0.2.2")
     (source (origin
               (method url-fetch)
+              (file-name (string-append "qbootctl-" version ".tar.gz"))
               (uri "https://codeload.github.com/linux-msm/qbootctl/tar.gz/refs/tags/0.2.2")
               (sha256 (base16-string->bytevector
                        "e66b361f86fac413f6a96974b4045a1fbc385f9eb6cee7fa8a26e0ca77c74a51"))))
