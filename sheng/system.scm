@@ -25,6 +25,7 @@
   #:use-module ((gnu packages terminals) #:select (alacritty kitty))
   #:use-module ((gnu packages version-control) #:select (git))
   #:use-module ((gnu packages xdisorg) #:select (fuzzel))
+  #:use-module ((gnu packages xorg) #:select (xwayland-satellite))
   #:use-module (guix packages)
   #:use-module (guix utils)
   #:use-module (guix build-system trivial)
