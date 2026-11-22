@@ -48,7 +48,8 @@
               (let* ((directory (string-append #$output "/lib/vscode"))
                      (loader (search-input-file inputs "/lib/ld-linux-aarch64.so.1"))
                      (rpath (string-join
-                             (cons directory
+                             (cons* directory
+                                    #$(file-append nss "/lib/nss")
                                    (map (lambda (input)
                                           (string-append (cdr input) "/lib"))
                                         inputs)) ":")))
@@ -78,7 +79,7 @@
      (list bash-minimal glibc (list gcc-14 "lib") glib gtk+ at-spi2-core
            alsa-lib cups nss nspr libx11 libxcb libxcomposite libxdamage
            libxext libxfixes libxrandr libxkbcommon libdrm mesa vulkan-loader
-           expat fontconfig cairo pango))
+           expat fontconfig cairo pango eudev libxkbfile))
     (supported-systems '("aarch64-linux"))
     (home-page "https://code.visualstudio.com/")
     (synopsis "Visual Studio Code for sheng")
