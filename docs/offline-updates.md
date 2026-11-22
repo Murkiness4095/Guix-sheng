@@ -4,7 +4,7 @@ CI 可以导出已构建系统的签名 store 闭包；平板导入后原地生�
 不重刷 root 镜像，旧世代和数据保留。
 
 刷写任何 root/sparse 镜像都会覆盖整个 ext4，`/var/guix` 和全部世代随之
-丢失。闭包导入是唯一不清盘的更新方式。
+丢失。可通过闭包导入或声明式 reconfigure 保留数据原地更新。
 
 ## CI 产出
 
@@ -59,7 +59,7 @@ sudo -i guix time-machine -C channels.scm -- \
      system reconfigure -L . /path/to/system.scm
 ```
 
-闭包已导入时这一步不编译内核和包，只求值、激活并重写
+闭包已导入且依赖与配置匹配时可复用对应项，再求值、激活并重写
 `/boot/extlinux/extlinux.conf`，随后重启。
 
 ## 世代管理
@@ -80,5 +80,17 @@ guix system delete-generations
   `DEFAULT` 仍指向 `guix-default`。
 - `desktop`、`vendor_services` 与 CI 不同时会引入闭包外的包，需本地编译。
 - 每代钉住一份闭包，先确认根分区空间。
-- 更换 `channels.scm` 会使全部 store path 失效，需同时导入新的 Guix 闭包。
+- channel 或配置变化可能引入新的 store 项；旧项仍然有效，可继续复用。
 - 只有 U-Boot / 分区布局变化才需要重刷 `sheng-boot.img`。
+
+## 像 flake inputs 一样更新 channel
+
+个人 `channels.scm` 中的 `guix-sheng` 使用 `main` 分支，并把 `commit` 改为希望应用的完整提交。Guix 和 midnight 保持与 CI 相同的固定提交。然后在平板的个人配置目录运行：
+
+```sh
+sudo -i guix time-machine -C /绝对路径/Guix-config/channels.scm -- system reconfigure /绝对路径/Guix-config/system.scm
+```
+
+这是用户手动执行的系统更新命令。它创建系统世代并更新 extlinux，内核变化后重启。仅修改 Home 配置时，运行 `guix time-machine -C channels-home.scm -- home reconfigure home.scm`。
+
+上述声明式 reconfigure 也能保留数据原地更新。前文“闭包导入是唯一不清盘的更新方式”应理解为使用 CI 预构建系统时的更新路径。闭包已导入只能减少相同 store 项的构建，配置或 channel 不同仍可能触发构建。新 channel 提交不会使旧 store 项失效，同一内容和依赖仍可复用。

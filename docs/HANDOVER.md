@@ -34,3 +34,7 @@
 Guix 实机 192.168.1.122 的 niri 配置只有 noctalia 启动行，缺少默认快捷键、用户 D-Bus 和音频会话。通过 SSH 补起共享用户总线、PipeWire、pipewire-pulse、WirePlumber、手写笔托盘和麦克风静音辅助程序。D-Bus 已返回注册的 StatusNotifierItem，wpctl 已列出扬声器、耳机、麦克风。实际播放、笔电量更新和重启持久化待验收。
 
 Zed 日志报告无法创建 surface。指定当前 Mesa 的 Freedreno Vulkan ICD 后，niri 窗口列表出现 `dev.zed.Zed`。实机增加用户 desktop 覆盖，仓库为 Zed editor 封装驱动路径。Niri 登录入口统一使用 dbus-run-session，默认配置加载后按顺序启动音频服务与外设程序。参考 NixOS-sheng 仍固定 `2be57fe7da35b0b98963cc5da233ad6765d5c134`。
+
+## 2026-11-22 配置并入镜像与充电复核
+
+按用户要求只修改配置，没有启动新的构建。niri 采用 `config/niri/config.kdl`（个人配置副本），默认内屏 120Hz，纳入 xwayland-satellite、锁屏/亮度/无障碍工具和字体，首次激活初始化 Noctalia 配置及资源。MiPPS 改为 udev 请求文件加 Shepherd 监视，避开原规则的 systemd 调用；libcamera 加入 GStreamer 搜索路径。仅完成源文件语法与 diff 检查，求值、构建及实机验证待用户执行。完整差异见 debian-alignment.md。

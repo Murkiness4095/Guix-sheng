@@ -1,6 +1,7 @@
 (define-module (services accessories)
   #:use-module ((gnu packages base) #:select (coreutils))
   #:use-module ((gnu packages python) #:select (python))
+  #:use-module (gnu packages linux)
   #:use-module (gnu services)
   #:use-module (gnu services base)
   #:use-module (gnu services shepherd)
@@ -8,6 +9,7 @@
   #:use-module (packages peripherals)
   #:export (sheng-keyboard-angle-service
             sheng-mipps-service
+            sheng-mipps-udev-service
             sheng-keyboard-led-service
             sheng-keyboard-micmute-service
             sheng-charger-mode-service
@@ -29,7 +31,41 @@
      (respawn? #t)))))
 
 (define (sheng-mipps-service)
-  (udev-rules-service 'sheng-mipps sheng-mipps-auth))
+  (simple-service
+   'sheng-mipps shepherd-root-service-type
+   (list
+    (shepherd-service
+     (provision '(sheng-mipps))
+     (requirement '(udev))
+     (documentation "Process charger authentication requests from udev.")
+     (start #~(make-forkexec-constructor
+               (list #$(program-file
+                        "sheng-mipps-monitor"
+                        #~(let loop ((previous #f))
+                            (let* ((request "/run/sheng-mipps-request")
+                                   (current (and (file-exists? request)
+                                                 (stat:mtime (stat request)))))
+                              (unless (equal? current previous)
+                                (system* #$(file-append util-linux "/bin/flock")
+                                         "-n" "-E" "0" "/run/xiaomi-mipps-auth.lock"
+                                         #$(file-append sheng-mipps-auth "/libexec/xiaomi-mipps-auth")
+                                         "--timeout" "4"))
+                              (sleep 1)
+                              (loop current)))))))
+     (stop #~(make-kill-destructor))
+     (respawn? #t)))))
+
+(define (sheng-mipps-udev-service)
+  (udev-rules-service
+   'sheng-mipps-trigger
+   (file->udev-rule
+    "90-sheng-mipps.rules"
+    (mixed-text-file
+     "90-sheng-mipps.rules"
+     "ACTION==\"add\", SUBSYSTEM==\"typec\", KERNEL==\"port*-partner\", RUN+=\""
+     (file-append coreutils "/bin/touch") " /run/sheng-mipps-request\"\n"
+     "ACTION==\"change\", SUBSYSTEM==\"power_supply\", KERNEL==\"qcom-battmgr-usb\", ENV{POWER_SUPPLY_ONLINE}==\"1\", RUN+=\""
+     (file-append coreutils "/bin/touch") " /run/sheng-mipps-request\"\n"))))
 
 (define (sheng-pen-autostart-service)
   (simple-service

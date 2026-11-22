@@ -21,4 +21,4 @@
        . ,(directory-union "sheng-gstreamer-plugins"
                             (map (lambda (package)
                                    (file-append package "/lib/gstreamer-1.0"))
-                                 (list gst-plugins-base gst-plugins-good pipewire))))))))
+                                 (list gst-plugins-base gst-plugins-good pipewire libcamera))))))))

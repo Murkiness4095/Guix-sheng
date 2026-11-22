@@ -88,3 +88,14 @@ Niri 会话显式 include 外设启动配置，在启用 `vendor_services` 时�
 Niri 的自动登录与 greeter 入口统一通过 `dbus-run-session` 启动；启动程序等待 PipeWire socket 后启动 Pulse 兼容服务和 WirePlumber，再启动 noctalia 与可选外设程序。实机确认原镜像没有用户 D-Bus 和音频进程。Zed 包显式提供 Mesa Freedreno ICD，实机指定该驱动后创建窗口成功。上述改动待新 CI 镜像和重启验收。
 
 桌面镜像增加微软官方 ARM64 VS Code 1.147.0，固定发布提交 `8a14f0cc1b08d531eb83255ea3764ae22aa932b5` 与 SHA-256 `b137f53a29a1debf9fc30027823556863202f94c10d924dd70f2d2370795412d`。通过原生 Wayland 启动并启用 Wayland IME。Zed 的 Wayland 触屏支持由上游 issue #13698 跟踪，当前未将 Zed 宣称为已通过触屏验收。
+
+## 2026-11-22 对齐复核
+
+基准仍为 NixOS-sheng `2be57fe7da35b0b98963cc5da233ad6765d5c134`。
+
+- MiPPS 原规则使用 `SYSTEMD_WANTS`，`--usb-online-trigger` 也调用 systemctl。Guix 改由 udev 写入请求文件、Shepherd 监视请求并通过 flock 调用固定版本认证程序。尚待原装充电器下确认协商结果和实际功率。
+- Niri 根镜像纳入个人 niri 配置的 120Hz、快捷键、Fcitx5 启动及 Noctalia 默认配置、壁纸、logo。用户已有 Noctalia 配置保留。xwayland-satellite 加入会话 PATH，由 niri 管理。个人配置中的外接显示器条目一并保留，匹配设备连接时生效。
+- 个人配置的 niri 辅助包纳入 niri 镜像。KDE/GNOME 使用自己的桌面配置；中文字体与编辑器供所有桌面镜像使用。
+- 未对齐：`modules/boot-slot.scm` 仍为空实现，没有 NixOS 的 qbootctl 成功标记。SDDM 虚拟键盘接线仍缺少 NixOS 的 kwin input-method 配置。可选 tmpfs-root/preservation 与 Nix bootstrap 属于不同系统机制，未移植。
+- 相机 Guix 的 GStreamer plugin union 缺少 NixOS 使用的 libcamera 项，补入。实际相机画面、指纹识别、传感器旋转、充电功率、长期休眠和键盘稳定性仍未完成验收。
+- “已打包”“已接线”“实机功能通过”分别记录，当前不能宣称完全对齐。
