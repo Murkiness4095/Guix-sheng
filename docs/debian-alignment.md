@@ -86,3 +86,5 @@ Niri 会话显式 include 外设启动配置，在启用 `vendor_services` 时�
 外设扩展继续参考 NixOS-sheng `2be57fe`。`vendor_services` 启用 HiFi UCM 初始化、WirePlumber 音频规则、键盘灯权限和按内核参数启动的充电界面。桌面同时启用键盘静音灯辅助程序、摄像头配置和板级 fprintd 服务。接线待 CI 构建和实机验收。
 
 Niri 的自动登录与 greeter 入口统一通过 `dbus-run-session` 启动；启动程序等待 PipeWire socket 后启动 Pulse 兼容服务和 WirePlumber，再启动 noctalia 与可选外设程序。实机确认原镜像没有用户 D-Bus 和音频进程。Zed 包显式提供 Mesa Freedreno ICD，实机指定该驱动后创建窗口成功。上述改动待新 CI 镜像和重启验收。
+
+桌面镜像增加微软官方 ARM64 VS Code 1.147.0，固定发布提交 `8a14f0cc1b08d531eb83255ea3764ae22aa932b5` 与 SHA-256 `b137f53a29a1debf9fc30027823556863202f94c10d924dd70f2d2370795412d`。通过原生 Wayland 启动并启用 Wayland IME。Zed 的 Wayland 触屏支持由上游 issue #13698 跟踪，当前未将 Zed 宣称为已通过触屏验收。

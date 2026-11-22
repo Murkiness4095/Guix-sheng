@@ -41,6 +41,7 @@
   #:use-module (packages peripherals)
   #:use-module (packages thunar)
   #:use-module (packages zed)
+  #:use-module (packages vscode)
   #:use-module (services accessories)
   #:use-module (services audio)
   #:use-module (services fingerprint)
@@ -232,7 +233,7 @@ The tty image keeps a text getty from %base-services."
       (packages (append (list ncurses fish starship git)
                         (if (eq? desktop 'tty)
                             '()
-                            (list alacritty kitty sheng-zed fcitx5 fcitx5-chinese-addons
+                            (list alacritty kitty sheng-zed sheng-vscode fcitx5 fcitx5-chinese-addons
                                   fcitx5-configtool fcitx5-gtk fcitx5-gtk4 fcitx5-qt))
                         (if (memq desktop '(tty niri kde gnome))
                             (list fastfetch-minimal)
