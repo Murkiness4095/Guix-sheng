@@ -1,7 +1,7 @@
 (define-module (modules camera)
   #:use-module (gnu packages gstreamer)
   #:use-module (gnu packages linux)
-  #:use-module ((gnu packages video) #:select (libcamera))
+  #:use-module ((gnu packages photo) #:select (libcamera))
   #:use-module (gnu services)
   #:use-module (gnu services base)
   #:use-module (gnu system pam)

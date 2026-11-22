@@ -47,3 +47,7 @@ Zed 日志报告无法创建 surface。指定当前 Mesa 的 Freedreno Vulkan IC
 ## 2026-11-22 构建期间桌面失去响应
 
 USB 仍可执行命令。观测 load 约 23、15GiB 内存已用 14GiB，可用约 341–361MiB，无 swap，至少 8 个 cc1plus 同时运行并处于 D 状态。发送中断 Home reconfigure 请求后，后续 ps 未再列出编译进程。检查中还存在 shutdown 进程，随后 USB 断开，未确认桌面恢复。未由 agent 发起关机。Guix daemon 默认追加 --cores=2 --max-jobs=1，限制默认构建并行，待应用配置后生效。
+
+## Niri 闭包 #45039183456
+
+https://github.com/Murkiness4095/Guix-sheng/actions/runs/45039183456 在 Evaluate all images 阶段失败，未生成 niri rootfs 或闭包。相机模块错误地从 (gnu packages video) 选择 libcamera，固定 Guix 3c50593 的定义位于 (gnu packages photo)，修正导入。U-Boot 步骤已通过，不能视作根系统构建通过。
