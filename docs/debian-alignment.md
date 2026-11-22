@@ -71,6 +71,8 @@ QMI 重试补丁在解包后应用。
 
 ## NixOS 板级服务核对
 
+Niri 会话显式 include 外设启动配置，在启用 `vendor_services` 时启动手写笔状态托盘和键盘麦克风静音辅助程序。此前仅安装 XDG autostart 条目，当前 niri 启动接线没有运行这些条目。此修复待 CI 和实机验证，参考版本仍为 `2be57fe`。
+
 | 功能 | 当前 Guix 状态 |
 | --- | --- |
 | 键盘盖 | 认证接线在 `codex/keyboard-auth` 验证中。折叠角度策略接入 `vendor_services`。麦克风静音灯同步和背光权限规则还未接线。 |
@@ -82,3 +84,5 @@ QMI 重试补丁在解包后应用。
 | 双系统与更新 | extlinux 和根分区扩容已接线。启动槽成功标记仍是骨架。旧 CI 镜像的 store 数据库注册阻碍现有世代的可靠滚动更新。EFI 在单独分支。 |
 
 外设扩展继续参考 NixOS-sheng `2be57fe`。`vendor_services` 启用 HiFi UCM 初始化、WirePlumber 音频规则、键盘灯权限和按内核参数启动的充电界面。桌面同时启用键盘静音灯辅助程序、摄像头配置和板级 fprintd 服务。接线待 CI 构建和实机验收。
+
+Niri 的自动登录与 greeter 入口统一通过 `dbus-run-session` 启动；启动程序等待 PipeWire socket 后启动 Pulse 兼容服务和 WirePlumber，再启动 noctalia 与可选外设程序。实机确认原镜像没有用户 D-Bus 和音频进程。Zed 包显式提供 Mesa Freedreno ICD，实机指定该驱动后创建窗口成功。上述改动待新 CI 镜像和重启验收。

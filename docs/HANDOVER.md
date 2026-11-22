@@ -28,3 +28,9 @@
 1. 用包含去重补丁的分支触发 `build-single`，输入 `image=tty`。
 2. 跟踪到构建结束。同一个 run 应产出 `sheng-boot.img` 和 `single-tty.sparse.img`。将 run 链接和产物状态更新到本页。
 3. 按[启动链](boot-chain.md)进行实机验收，记录是否到达 `login:`、能否登录以及对应镜像的 run。后续工作见 [TODO](../TODO.md)。
+
+## 2026-11-22 Niri 实机会话修复
+
+Guix 实机 192.168.1.122 的 niri 配置只有 noctalia 启动行，缺少默认快捷键、用户 D-Bus 和音频会话。通过 SSH 补起共享用户总线、PipeWire、pipewire-pulse、WirePlumber、手写笔托盘和麦克风静音辅助程序。D-Bus 已返回注册的 StatusNotifierItem，wpctl 已列出扬声器、耳机、麦克风。实际播放、笔电量更新和重启持久化待验收。
+
+Zed 日志报告无法创建 surface。指定当前 Mesa 的 Freedreno Vulkan ICD 后，niri 窗口列表出现 `dev.zed.Zed`。实机增加用户 desktop 覆盖，仓库为 Zed editor 封装驱动路径。Niri 登录入口统一使用 dbus-run-session，默认配置加载后按顺序启动音频服务与外设程序。参考 NixOS-sheng 仍固定 `2be57fe7da35b0b98963cc5da233ad6765d5c134`。

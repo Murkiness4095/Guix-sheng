@@ -16,6 +16,7 @@
               #:select (fcitx5 fcitx5-chinese-addons fcitx5-configtool
                         fcitx5-gtk fcitx5-gtk4 fcitx5-qt))
   #:use-module (gnu packages linux)
+  #:use-module ((gnu packages glib) #:select (dbus))
   #:use-module ((gnu packages ncurses) #:select (ncurses))
   #:use-module (gnu packages librewolf)
   #:use-module (gnu packages window-management)
@@ -37,6 +38,7 @@
   #:use-module (packages kernel)
   #:use-module (packages sheng-niri)
   #:use-module (packages firmware)
+  #:use-module (packages peripherals)
   #:use-module (packages thunar)
   #:use-module (packages zed)
   #:use-module (services accessories)
@@ -90,6 +92,14 @@
         (service network-manager-service-type)
         (service bluetooth-service-type)))
 
+(define sheng-niri-session
+  (program-file
+   "sheng-niri-session"
+   #~(execl #$(file-append dbus "/bin/dbus-run-session")
+            "dbus-run-session" "--"
+            #$(file-append niri "/bin/niri")
+            "-c" "/etc/sheng/niri-noctalia.kdl")))
+
 (define (sheng-greetd-config desktop auto-login? username)
   (greetd-configuration
    (greeter-supplementary-groups '("video" "input"))
@@ -101,8 +111,7 @@
            (initial-session-user (and auto-login? username))
            (initial-session-command
             (greetd-user-session
-             (command (file-append niri "/bin/niri"))
-             (command-args '("-c" "/etc/sheng/niri-noctalia.kdl"))
+             (command sheng-niri-session)
              (xdg-session-type "wayland")))
            (default-session-command
             (greetd-noctalia-greeter-session
@@ -147,7 +156,7 @@ The tty image keeps a text getty from %base-services."
           (case desktop
             ((niri) (list niri noctalia fuzzel sheng-thunar
                           (sheng-niri-desktop "niri"
-                                              "niri -c /etc/sheng/niri-noctalia.kdl")))
+                                              sheng-niri-session)))
             (else '())))
          (noctalia-config
           (if (eq? desktop 'niri)
@@ -158,7 +167,32 @@ The tty image keeps a text getty from %base-services."
                       "include \""
                       (file-append niri-default-config
                                    "/share/niri/default-config.kdl")
-                      "\"\nspawn-at-startup \"noctalia\"\n")))
+                      "\"\nspawn-at-startup \""
+                      (program-file
+                       "sheng-niri-startup"
+                       #~(begin
+                           (define (spawn program . arguments)
+                             (when (zero? (primitive-fork))
+                               (apply execl program program arguments)))
+                           (spawn #$(file-append pipewire "/bin/pipewire"))
+                           (let wait ((attempts 50))
+                             (unless (or (zero? attempts)
+                                         (file-exists?
+                                          (string-append (getenv "XDG_RUNTIME_DIR")
+                                                         "/pipewire-0")))
+                               (usleep 100000)
+                               (wait (- attempts 1))))
+                           (spawn #$(file-append pipewire "/bin/pipewire-pulse"))
+                           (spawn #$(file-append wireplumber "/bin/wireplumber"))
+                           (spawn #$(file-append noctalia "/bin/noctalia"))
+                           #$(if vendor-services?
+                                 #~(begin
+                                     (spawn #$(file-append sheng-pen-status "/bin/xiaomi-pen-status"))
+                                     (spawn #$(file-append sheng-keyboard-helper
+                                                          "/libexec/xiaomi-sheng-keyboard-helper")
+                                            "--micmute"))
+                                 #~#t)))
+                      "\"\n")))
               '()))
          (browser (if (eq? desktop 'tty) '() (list librewolf))))
     (operating-system

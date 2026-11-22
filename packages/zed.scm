@@ -4,6 +4,7 @@
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages glib)
+  #:use-module (gnu packages gl)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages vulkan)
   #:use-module (gnu packages xdisorg)
@@ -52,7 +53,10 @@
                  (lambda (program)
                    (invoke "patchelf" "--set-interpreter" loader "--set-rpath" rpath
                            (string-append #$output program)))
-                 '("/bin/zed" "/libexec/zed-editor"))))))))
+                 '("/bin/zed" "/libexec/zed-editor"))
+                (wrap-program (string-append #$output "/libexec/zed-editor")
+                  `("VK_DRIVER_FILES" ":" prefix
+                    (,#$(file-append mesa "/share/vulkan/icd.d/freedreno_icd.aarch64.json"))))))))))
     (native-inputs (list patchelf))
     (inputs (list glibc (list gcc-14 "lib") glib alsa-lib libxcb libx11
                   libxkbcommon wayland vulkan-loader))
