@@ -246,7 +246,7 @@ The tty image keeps a text getty from %base-services."
       (packages (append (list ncurses fish starship git)
                         (if (eq? desktop 'tty)
                             '()
-                            (list alacritty kitty sheng-zed sheng-vscode fcitx5 fcitx5-chinese-addons
+                            (list alacritty kitty sheng-zed sheng-vscode brightnessctl fcitx5 fcitx5-chinese-addons
                                   fcitx5-configtool fcitx5-gtk fcitx5-gtk4 fcitx5-qt))
                         (if (memq desktop '(tty niri kde gnome))
                             (list fastfetch-minimal)
@@ -275,6 +275,9 @@ The tty image keeps a text getty from %base-services."
               (sheng-internal-storage)
               (sheng-keyboard-auth-service))
         desktop-service
+        (if (eq? desktop 'tty)
+            '()
+            (list (udev-rules-service 'sheng-backlight brightnessctl)))
         (if (eq? desktop 'kde)
             (list (extra-special-file
                    "/etc/sddm.conf.d/20-sheng-keyboard.conf"
