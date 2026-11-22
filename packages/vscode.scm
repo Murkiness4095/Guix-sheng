@@ -54,10 +54,10 @@
                                         inputs)) ":")))
                 (for-each
                  (lambda (file)
-                   (when (elf-file? file)
-                     (unless (zero? (system* "patchelf" "--set-interpreter" loader file))
-                       ;; Shared objects have no ELF interpreter.
-                       #t)
+                   (when (and (elf-file? file)
+                              (zero? (system* "patchelf" "--print-rpath" file)))
+                     (when (zero? (system* "patchelf" "--print-interpreter" file))
+                       (invoke "patchelf" "--set-interpreter" loader file))
                      (invoke "patchelf" "--set-rpath" rpath file)))
                  (find-files directory ".*"))
                 (mkdir-p (string-append #$output "/bin"))
