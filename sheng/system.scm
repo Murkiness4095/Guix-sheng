@@ -16,9 +16,6 @@
               #:select (fcitx5 fcitx5-chinese-addons fcitx5-configtool
                         fcitx5-gtk fcitx5-gtk4 fcitx5-qt))
   #:use-module (gnu packages linux)
-  #:use-module (gnu packages fonts)
-  #:use-module (gnu packages gnome)
-  #:use-module (gnu packages accessibility)
   #:use-module ((gnu packages glib) #:select (dbus))
   #:use-module ((gnu packages ncurses) #:select (ncurses))
   #:use-module (gnu packages librewolf)
@@ -46,7 +43,6 @@
   #:use-module (packages zed)
   #:use-module (packages vscode)
   #:use-module (services accessories)
-  #:use-module (services desktop-config)
   #:use-module (services audio)
   #:use-module (services fingerprint)
   #:use-module (services adsprpcd)
@@ -160,7 +156,6 @@ The tty image keeps a text getty from %base-services."
          (session-pkgs
           (case desktop
             ((niri) (list niri noctalia fuzzel sheng-thunar xwayland-satellite
-                          swaylock brightnessctl orca procps adwaita-icon-theme font-lxgw-wenkai
                           (sheng-niri-desktop "niri"
                                               sheng-niri-session)))
             (else '())))
@@ -171,8 +166,8 @@ The tty image keeps a text getty from %base-services."
                      (mixed-text-file
                       "niri-noctalia.kdl"
                       "include \""
-                      (local-file "../config/niri/config.kdl")
-                      "\"\nspawn-at-startup \""
+                      (file-append niri-default-config "/share/niri/default-config.kdl")
+                      "\"\noutput \"DSI-1\" { mode \"3048x2032@120\"; }\nspawn-at-startup \""
                       (program-file
                        "sheng-niri-startup"
                        #~(begin
@@ -237,7 +232,7 @@ The tty image keeps a text getty from %base-services."
       (packages (append (list ncurses fish starship git)
                         (if (eq? desktop 'tty)
                             '()
-                            (list alacritty kitty sheng-zed sheng-vscode font-google-noto-sans-cjk fcitx5 fcitx5-chinese-addons
+                            (list alacritty kitty sheng-zed sheng-vscode fcitx5 fcitx5-chinese-addons
                                   fcitx5-configtool fcitx5-gtk fcitx5-gtk4 fcitx5-qt))
                         (if (memq desktop '(tty niri kde gnome))
                             (list fastfetch-minimal)
@@ -282,7 +277,6 @@ The tty image keeps a text getty from %base-services."
                          (sheng-camera)
                          (sheng-fingerprint-services))))
             '())
-        (if (eq? desktop 'niri) (list (sheng-desktop-config-service username)) '())
         noctalia-config
         (append (sheng-login-services desktop auto-login? username)
                 (list (service ntp-service-type)

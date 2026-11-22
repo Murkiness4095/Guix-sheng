@@ -37,4 +37,5 @@ Zed 日志报告无法创建 surface。指定当前 Mesa 的 Freedreno Vulkan IC
 
 ## 2026-11-22 配置并入镜像与充电复核
 
-按用户要求只修改配置，没有启动新的构建。niri 采用 `config/niri/config.kdl`（个人配置副本），默认内屏 120Hz，纳入 xwayland-satellite、锁屏/亮度/无障碍工具和字体，首次激活初始化 Noctalia 配置及资源。MiPPS 改为 udev 请求文件加 Shepherd 监视，避开原规则的 systemd 调用；libcamera 加入 GStreamer 搜索路径。仅完成源文件语法与 diff 检查，求值、构建及实机验证待用户执行。完整差异见 debian-alignment.md。
+
+撤销个人桌面资源并入：删除壁纸、logo、Noctalia 个人配置与整份个人 niri 配置，移除首次激活复制服务。设备仓库恢复上游 niri 默认配置，仅追加 DSI-1 120Hz 和设备会话接线。个人配置继续由独立 Guix-config 管理。

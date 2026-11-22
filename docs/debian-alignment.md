@@ -94,8 +94,8 @@ Niri 的自动登录与 greeter 入口统一通过 `dbus-run-session` 启动；�
 基准仍为 NixOS-sheng `2be57fe7da35b0b98963cc5da233ad6765d5c134`。
 
 - MiPPS 原规则使用 `SYSTEMD_WANTS`，`--usb-online-trigger` 也调用 systemctl。Guix 改由 udev 写入请求文件、Shepherd 监视请求并通过 flock 调用固定版本认证程序。尚待原装充电器下确认协商结果和实际功率。
-- Niri 根镜像纳入个人 niri 配置的 120Hz、快捷键、Fcitx5 启动及 Noctalia 默认配置、壁纸、logo。用户已有 Noctalia 配置保留。xwayland-satellite 加入会话 PATH，由 niri 管理。个人配置中的外接显示器条目一并保留，匹配设备连接时生效。
-- 个人配置的 niri 辅助包纳入 niri 镜像。KDE/GNOME 使用自己的桌面配置；中文字体与编辑器供所有桌面镜像使用。
 - 未对齐：`modules/boot-slot.scm` 仍为空实现，没有 NixOS 的 qbootctl 成功标记。SDDM 虚拟键盘接线仍缺少 NixOS 的 kwin input-method 配置。可选 tmpfs-root/preservation 与 Nix bootstrap 属于不同系统机制，未移植。
 - 相机 Guix 的 GStreamer plugin union 缺少 NixOS 使用的 libcamera 项，补入。实际相机画面、指纹识别、传感器旋转、充电功率、长期休眠和键盘稳定性仍未完成验收。
 - “已打包”“已接线”“实机功能通过”分别记录，当前不能宣称完全对齐。
+
+设备仓库使用上游 niri 默认配置并追加内屏 120Hz、Xwayland 和外设启动接线。个人主题、壁纸、logo、快捷键与辅助包由独立 Guix-config 管理。
