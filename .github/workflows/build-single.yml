@@ -2,16 +2,16 @@ name: build-single
 on:
   push:
     branches: [main]
-    paths: ["images/**", "sheng/**", "packages/**", "modules/**", "services/**", ".guix-channel", "scripts/**", "channels.scm", ".github/actions/guix-store-cache/**", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-single.yml"]
+    paths: ["examples/minimal/**", "images/**", "sheng/**", "packages/**", "modules/**", "services/**", ".guix-channel", "scripts/**", "channels.scm", ".github/actions/guix-store-cache/**", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-single.yml"]
   pull_request:
-    paths: ["images/**", "sheng/**", "packages/**", "modules/**", "services/**", ".guix-channel", "scripts/**", "channels.scm", ".github/actions/guix-store-cache/**", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-single.yml"]
+    paths: ["examples/minimal/**", "images/**", "sheng/**", "packages/**", "modules/**", "services/**", ".guix-channel", "scripts/**", "channels.scm", ".github/actions/guix-store-cache/**", ".github/actions/guix-pull/**", ".github/actions/sheng-kernel/**", ".github/workflows/build-single.yml"]
   workflow_dispatch:
     inputs:
       image:
-        description: Image variant
+        description: Build an install image, or export only the TTY system closure
         type: choice
-        default: tty
-        options: [tty, niri, kde, gnome]
+        default: none
+        options: [none, tty, niri, kde, gnome]
       auto_login:
         description: Log in automatically at boot
         type: boolean
@@ -27,7 +27,7 @@ on:
         description: Login password for the selected root image (visible in run metadata)
         default: sheng
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 jobs:
   images:
@@ -90,7 +90,6 @@ jobs:
           bash scripts/seed-noctalia-greeter.sh
           "$GUIX" build -e '(@ (midnight packages noctalia-greeter) noctalia-greeter)'
       - name: Check store registration with the pinned Guix
-        if: ${{ inputs.image != 'none' }}
         run: |
           fixture=$(mktemp -d)
           item=/gnu/store/00000000000000000000000000000000-sheng-registration-check
@@ -108,11 +107,13 @@ jobs:
               if not conn.execute("SELECT 1 FROM ValidPaths WHERE path = ?", (item,)).fetchone():
                   sys.exit("Fixture was not registered")
           PY
+      - name: Evaluate the standalone sheng sample
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        run: '"$GUIX" system build -L . --dry-run examples/minimal/system.scm'
       - name: Build U-Boot boot.img
         run: |
           scripts/build-uboot.sh single
       - name: Evaluate all images
-        if: ${{ inputs.image != 'none' }}
         run: |
           set -o pipefail
           for img in $(echo "$IMAGES"); do
@@ -120,19 +121,45 @@ jobs:
             "$GUIX" system image -L . --dry-run "images/$img.scm" 2>&1 | tail -20 || exit 1
           done
         env:
-          IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty single-niri single-kde single-gnome' }}
+          IMAGES: ${{ inputs.image && inputs.image != 'none' && format('single-{0}', inputs.image) || 'single-tty single-niri single-kde single-gnome' }}
       - name: Build sheng firmware before the kernel
-        if: ${{ inputs.image != 'none' }}
         run: '"$GUIX" build -L . -e "(@ (packages firmware) sheng-firmware)"'
       - uses: ./.github/actions/sheng-kernel
-        if: ${{ inputs.image != 'none' }}
       - uses: ./.github/actions/guix-store-cache
         id: store
         with:
           layout: single
-          variant: ${{ inputs.image || 'tty' }}
+          variant: ${{ inputs.image != 'none' && inputs.image || 'tty' }}
+      - name: Build peripheral packages
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        run: |
+          "$GUIX" build -L . --keep-going \
+            -e '(@ (packages peripherals) alsa-ucm-sheng)' \
+            -e '(@ (packages peripherals) sheng-fastrpc)' \
+            -e '(@ (packages peripherals) sheng-libssc)' \
+            -e '(@ (packages peripherals) sheng-iio-sensor-proxy)' \
+            -e '(@ (packages peripherals) sheng-charger-mode)' \
+            -e '(@ (packages peripherals) sheng-devauth)' \
+            -e '(@ (packages peripherals) sheng-fingerprint)' \
+            -e '(@ (packages firmware) sheng-firmware)' \
+            -e '(@ (packages peripherals) sheng-keyboard-helper)' \
+            -e '(@ (packages peripherals) sheng-mipps-auth)' \
+            -e '(@ (packages peripherals) sheng-pen-status)' \
+            -e '(@ (packages peripherals) sheng-sensors)' \
+            -e '(@ (packages peripherals) sheng-thp)' \
+            -e '(@ (packages peripherals) sheng-mdss-test-module)'
+      - name: Build system closure
+        id: system-closure
+        env:
+          DESKTOP: ${{ inputs.image != 'none' && inputs.image || 'tty' }}
+        run: |
+          cat > images/ci-system.scm <<EOF
+          (load "$GITHUB_WORKSPACE/images/base.scm")
+          (sheng-os #:desktop '$DESKTOP #:root-label "userdata")
+          EOF
+          "$GUIX" system build -L . images/ci-system.scm > ci-system.path
       - name: Build all single-system images
-        if: ${{ inputs.image != 'none' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.image != 'none' }}
         run: |
           set -e
           for img in $IMAGES; do
@@ -144,31 +171,33 @@ jobs:
           IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty' }}
       - name: Export built store closure
         id: store-export
-        if: ${{ success() && steps.store.outputs.cache-hit != 'true' && github.event_name != 'pull_request' }}
+        if: ${{ !cancelled() && steps.system-closure.outcome == 'success' && steps.store.outputs.cache-hit != 'true' && github.event_name != 'pull_request' }}
         continue-on-error: true
         run: |
           set -euo pipefail
-          systems=()
-          for img in $IMAGES; do systems+=("$(cat "$img.system")"); done
+          systems=("$(tail -n 1 ci-system.path)")
+          for img in $IMAGES; do
+            if [[ -s "$img.system" ]]; then systems+=("$(cat "$img.system")"); fi
+          done
           scripts/store-cache-export.sh "$RUNNER_TEMP/sheng-store" "${systems[@]}"
         env:
           IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty' }}
       - name: Save built store closure
-        if: ${{ steps.store-export.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.store-export.outcome == 'success' }}
         continue-on-error: true
         uses: actions/cache/save@v4
         with:
           path: ${{ runner.temp }}/sheng-store
           key: ${{ steps.store.outputs.cache-primary-key }}
       - name: Export store closures
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.image != 'none' }}
         run: |
           set -euo pipefail
           sudo test -f /etc/guix/signing-key.sec || sudo "$GUIX" archive --generate-key
           mkdir -p closures
           for img in $IMAGES; do
-            scripts/export-closure.sh "$img.ext4" "closures/$img.nar.zst"
-            cp "$img.system" "closures/$img.system"
+            system=$(tail -n 1 ci-system.path)
+            if [[ -s "$img.system" ]]; then system=$(cat "$img.system"); fi
+            scripts/export-closure.sh "$system" "closures/$img.nar.zst" > "closures/$img.system"
           done
           profile=$(dirname "$(dirname "$GUIX")")
           test -d "$profile" || { echo "no Guix profile at $profile" >&2; exit 1; }
@@ -179,13 +208,13 @@ jobs:
         env:
           IMAGES: ${{ inputs.image && format('single-{0}', inputs.image) || 'single-tty' }}
       - uses: actions/upload-artifact@v4
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.image != 'none' }}
+        if: ${{ success() }}
         with:
           name: sheng-single-closures
           path: closures/
           retention-days: 30
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.image != 'none' }}
         with:
           name: sheng-single-images
           path: |

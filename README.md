@@ -27,7 +27,7 @@
    根镜像的登录生效，包括 TTY。下载同一个 run 的开机镜像和 sparse 根镜像。
    `auto_login` 默认开启。TTY 会直接进入 tty1 的用户 shell，桌面会启动对应会话。
    取消勾选可恢复登录界面，已有系统可在 `sheng-os` 调用中设置 `#:auto-login? #f`。
-   手动运行会在构建后导出所选变体的签名闭包，见[离线闭包更新](docs/offline-updates.md)。
+   手动运行默认 `image=none`，仅导出 TTY 签名闭包。选择具体变体会同时生成可刷镜像和签名闭包，见[离线闭包更新](docs/offline-updates.md)。
 
 | 工作流 | 开机镜像 | 根镜像示例 |
 | --- | --- | --- |
