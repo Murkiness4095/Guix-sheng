@@ -57,3 +57,5 @@ https://github.com/Murkiness4095/Guix-sheng/actions/runs/45039183456 在 Evaluat
 [单系统 niri #45041217603](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45041217603) 的镜像步骤耗时约 3 小时 16 分钟，`niri-default-config` 的单文件来源触发 Guix `install-license-files` 阶段的匹配错误，rootfs 与签名闭包未生成。Guix profile 和内核缓存命中，niri store 闭包因完整键变化未命中。跳过该单文件包的许可证扫描，并允许回退导入同架构同变体的旧闭包，镜像成功后仍按当前键保存。
 
 2026-11-23 的 [单系统 #45114902584](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45114902584) 与 [双系统 #45114749614](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45114749614) 均在镜像步骤失败。公开日志最后停在 WebKitGTK 2.50.3 的 libwebkitgtk-6.0 链接命令，未记录具体报错。单系统已恢复旧 niri store 缓存，但仍从源码编译 WebKitGTK。两轮运行旧版工作流 be78748，均无 niri rootfs 或闭包。降低实时日志详细度并保留镜像诊断文件。
+
+[单系统 niri #45135895981](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45135895981) 在前置系统闭包构建耗时约 3 小时 7 分钟后失败。CI 日志再次止于 WebKitGTK 2.50.3 的 libwebkitgtk-6.0 链接，未取得最终错误。上一轮的日志修复只覆盖镜像封装步骤，本轮尚未进入该步骤，产物只有开机镜像。两种布局补充系统闭包日志、WebKitGTK 构建日志及 runner 内核与资源快照。

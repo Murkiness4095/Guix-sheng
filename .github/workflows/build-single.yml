@@ -157,7 +157,25 @@ jobs:
           (load "$GITHUB_WORKSPACE/images/base.scm")
           (sheng-os #:desktop '$DESKTOP #:root-label "userdata")
           EOF
-          "$GUIX" system build -L . images/ci-system.scm > ci-system.path
+          set -o pipefail
+          "$GUIX" system build --verbosity=2 -L . images/ci-system.scm \
+            2>&1 > ci-system.path | tee system-build.err >&2
+      - name: Collect system build diagnostics
+        if: ${{ failure() && steps.system-closure.outcome == 'failure' }}
+        run: |
+          mkdir -p diagnostics
+          cp system-build.err diagnostics/
+          df -h > diagnostics/disk.txt
+          free -h > diagnostics/memory.txt
+          sudo dmesg > diagnostics/kernel.txt 2>&1 || true
+          sudo find /var/log/guix/drvs -name '*webkitgtk*.drv.gz' \
+            -exec cp {} diagnostics/ \;
+      - uses: actions/upload-artifact@v4
+        if: ${{ failure() && steps.system-closure.outcome == 'failure' }}
+        with:
+          name: sheng-single-system-build-diagnostics
+          path: diagnostics/
+          retention-days: 7
       - name: Build all single-system images
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.image != 'none' }}
         run: |
