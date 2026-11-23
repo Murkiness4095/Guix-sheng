@@ -129,7 +129,7 @@ jobs:
           df -h > diagnostics/disk.txt
           free -h > diagnostics/memory.txt
           sudo dmesg > diagnostics/kernel.txt 2>&1 || true
-          sudo find /var/log/guix/drvs -name '*webkitgtk*.drv.gz' \
+          sudo find /var/log/guix/drvs \( -name '*webkitgtk*.drv.gz' -o -name '*sheng-gstreamer-plugins*.drv.gz' \) \
             -exec cp {} diagnostics/ \;
       - uses: actions/upload-artifact@v4
         if: ${{ failure() && steps.system-closure.outcome == 'failure' }}

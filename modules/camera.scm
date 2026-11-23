@@ -20,6 +20,9 @@
     `(("QT_MEDIA_BACKEND" . "gstreamer")
       ("GST_PLUGIN_SYSTEM_PATH_1_0"
        . ,(directory-union "sheng-gstreamer-plugins"
-                            (map (lambda (package)
-                                   (file-append package "/lib/gstreamer-1.0"))
-                                 (list gst-plugins-base gst-plugins-good pipewire libcamera))))))))
+                            (cons (computed-file "libcamera-gst-plugins"
+                                   #~(symlink (string-append #$libcamera:gst "/lib/gstreamer-1.0")
+                                              #$output))
+                                  (map (lambda (package)
+                                         (file-append package "/lib/gstreamer-1.0"))
+                                       (list gst-plugins-base gst-plugins-good pipewire)))))))))

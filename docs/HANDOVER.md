@@ -59,3 +59,5 @@ https://github.com/Murkiness4095/Guix-sheng/actions/runs/45039183456 在 Evaluat
 2026-11-23 的 [单系统 #45114902584](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45114902584) 与 [双系统 #45114749614](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45114749614) 均在镜像步骤失败。公开日志最后停在 WebKitGTK 2.50.3 的 libwebkitgtk-6.0 链接命令，未记录具体报错。单系统已恢复旧 niri store 缓存，但仍从源码编译 WebKitGTK。两轮运行旧版工作流 be78748，均无 niri rootfs 或闭包。降低实时日志详细度并保留镜像诊断文件。
 
 [单系统 niri #45135895981](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45135895981) 在前置系统闭包构建耗时约 3 小时 7 分钟后失败。CI 日志再次止于 WebKitGTK 2.50.3 的 libwebkitgtk-6.0 链接，未取得最终错误。上一轮的日志修复只覆盖镜像封装步骤，本轮尚未进入该步骤，产物只有开机镜像。两种布局补充系统闭包日志、WebKitGTK 构建日志及 runner 内核与资源快照。
+
+[单系统 niri #45165144398](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45165144398) 的 WebKitGTK 已完成编译及后处理，闭包失败在 sheng-gstreamer-plugins。固定 Guix 将 libcamera 的 GStreamer 插件移至 gst 输出，修正插件目录引用。
