@@ -1,6 +1,9 @@
 name: Restore built Guix store
 description: Import the cached store closure for one image variant
 inputs:
+  layout:
+    description: Image layout (single or dual)
+    required: true
   variant:
     description: Image variant name (tty, niri, kde, gnome)
     required: true
@@ -16,8 +19,10 @@ runs:
       id: cache
       with:
         path: ${{ runner.temp }}/sheng-store
-        key: sheng-store-v1-${{ runner.os }}-${{ runner.arch }}-${{ inputs.variant }}-${{ hashFiles('channels.scm', 'packages/**', 'modules/**', 'services/**', 'sheng/**', 'scripts/**') }}
+        key: sheng-store-v2-${{ runner.os }}-${{ runner.arch }}-${{ inputs.variant }}-${{ inputs.layout }}-${{ hashFiles('channels.scm', 'images/base.scm', format('images/{0}-{1}.scm', inputs.layout, inputs.variant), 'packages/**', 'modules/**', 'services/**', 'sheng/**', 'scripts/**') }}
         restore-keys: |
+          sheng-store-v2-${{ runner.os }}-${{ runner.arch }}-${{ inputs.variant }}-${{ inputs.layout }}-
+          sheng-store-v2-${{ runner.os }}-${{ runner.arch }}-${{ inputs.variant }}-
           sheng-store-v1-${{ runner.os }}-${{ runner.arch }}-${{ inputs.variant }}-
     - name: Import cached store closure
       if: steps.cache.outputs.cache-matched-key != ''
