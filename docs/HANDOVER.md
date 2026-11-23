@@ -55,3 +55,5 @@ https://github.com/Murkiness4095/Guix-sheng/actions/runs/45039183456 在 Evaluat
 #45039916915（双系统 push）已通过求值，qbootctl configure 失败：codeload URL 的下载名称为 0.2.2，没有归档后缀，Guix unpack 未展开源码。给 origin 显式设置 qbootctl-0.2.2.tar.gz，源码与哈希保持不变。
 
 [单系统 niri #45041217603](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45041217603) 的镜像步骤耗时约 3 小时 16 分钟，`niri-default-config` 的单文件来源触发 Guix `install-license-files` 阶段的匹配错误，rootfs 与签名闭包未生成。Guix profile 和内核缓存命中，niri store 闭包因完整键变化未命中。跳过该单文件包的许可证扫描，并允许回退导入同架构同变体的旧闭包，镜像成功后仍按当前键保存。
+
+2026-11-23 的 [单系统 #45114902584](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45114902584) 与 [双系统 #45114749614](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45114749614) 均在镜像步骤失败。公开日志最后停在 WebKitGTK 2.50.3 的 libwebkitgtk-6.0 链接命令，未记录具体报错。单系统已恢复旧 niri store 缓存，但仍从源码编译 WebKitGTK。两轮运行旧版工作流 be78748，均无 niri rootfs 或闭包。降低实时日志详细度并保留镜像诊断文件。

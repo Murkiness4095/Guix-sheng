@@ -7,8 +7,10 @@ repo=$(cd "$(dirname "$0")/.." && pwd)
 src=$1
 prefix=${2:-$(basename "$src" .scm)}
 # -L lets the image files use the repo's (packages ...) and (modules ...).
-if ! out=$("$GUIX" system image --fallback --verbosity=3 -L "$repo" "$src" \
-           2> >(tee "$prefix.err" >&2)); then
+stdout=$(mktemp)
+trap 'rm -f -- "$stdout"' EXIT
+if ! "$GUIX" system image --fallback --verbosity=2 -L "$repo" "$src" \
+       2>&1 >"$stdout" | tee "$prefix.err" >&2; then
   echo "guix system image failed: $src" >&2
   tail -60 "$prefix.err" >&2
   while IFS= read -r logfile; do
@@ -21,7 +23,7 @@ if ! out=$("$GUIX" system image --fallback --verbosity=3 -L "$repo" "$src" \
   done < <(grep "View build log at" "$prefix.err" | grep -oE "/var/log/guix/drvs/[[:alnum:]/_.-]+\.drv\.gz" | sort -u)
   exit 1
 fi
-disk=$(printf '%s\n' "$out" | tail -1)
+disk=$(tail -n 1 "$stdout")
 test -f "$disk" || { echo "no disk image from guix: $disk" >&2; exit 1; }
 echo "disk image: $disk"
 # Read the actual partition layout. genimage may align it differently.
@@ -45,7 +47,7 @@ system=$(sed -nE 's/.*gnu\.system=(\/gnu\/store\/[^[:space:]]+).*/\1/p' <<< "$co
 test -n "$system" || { echo "Missing Guix system path in extlinux" >&2; exit 1; }
 printf '%s\n' "$system" > "$prefix.system"
 database_dir=$(mktemp -d)
-trap 'rm -r -- "$database_dir"' EXIT
+trap 'rm -f -- "$stdout"; rm -r -- "$database_dir"' EXIT
 graph_dir=/var/guix/sheng-reference-graphs
 graph_entries=$(debugfs -R "ls -p $graph_dir" "$prefix.ext4")
 graphs=()

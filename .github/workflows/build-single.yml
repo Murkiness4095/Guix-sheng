@@ -221,3 +221,4 @@ jobs:
             sheng-boot.img
             *.sparse.img
             failures.txt
+            *.err

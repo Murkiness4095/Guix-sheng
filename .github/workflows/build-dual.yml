@@ -182,3 +182,4 @@ jobs:
             sheng-boot-dual.img
             *.sparse.img
             failures.txt
+            *.err
