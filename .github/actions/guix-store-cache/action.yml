@@ -17,7 +17,9 @@ runs:
       with:
         path: ${{ runner.temp }}/sheng-store
         key: sheng-store-v1-${{ runner.os }}-${{ runner.arch }}-${{ inputs.variant }}-${{ hashFiles('channels.scm', 'packages/**', 'modules/**', 'services/**', 'sheng/**', 'scripts/**') }}
+        restore-keys: |
+          sheng-store-v1-${{ runner.os }}-${{ runner.arch }}-${{ inputs.variant }}-
     - name: Import cached store closure
-      if: steps.cache.outputs.cache-hit == 'true'
+      if: steps.cache.outputs.cache-matched-key != ''
       shell: bash
       run: scripts/store-cache-import.sh "$RUNNER_TEMP/sheng-store"

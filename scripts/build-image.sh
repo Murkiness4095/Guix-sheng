@@ -7,7 +7,8 @@ repo=$(cd "$(dirname "$0")/.." && pwd)
 src=$1
 prefix=${2:-$(basename "$src" .scm)}
 # -L lets the image files use the repo's (packages ...) and (modules ...).
-if ! out=$("$GUIX" system image --fallback --verbosity=2 -L "$repo" "$src" 2>"$prefix.err"); then
+if ! out=$("$GUIX" system image --fallback --verbosity=3 -L "$repo" "$src" \
+           2> >(tee "$prefix.err" >&2)); then
   echo "guix system image failed: $src" >&2
   tail -60 "$prefix.err" >&2
   while IFS= read -r logfile; do

@@ -21,7 +21,9 @@
         (base32 "106hd8ldshqr2902h64xdk2q055kqzaai1gdn0cdmsj7xl2s4flr"))))
     (build-system copy-build-system)
     (arguments
-     '(#:install-plan '(("default-config.kdl" "share/niri/"))))
+     '(#:install-plan '(("default-config.kdl" "share/niri/"))
+       #:phases (modify-phases %standard-phases
+                  (delete 'install-license-files))))
     (synopsis "Default niri configuration with key bindings")
     (description
      "Installs niri's resources/default-config.kdl so a session config can

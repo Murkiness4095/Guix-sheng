@@ -53,3 +53,5 @@ USB 仍可执行命令。观测 load 约 23、15GiB 内存已用 14GiB，可用�
 https://github.com/Murkiness4095/Guix-sheng/actions/runs/45039183456 在 Evaluate all images 阶段失败，未生成 niri rootfs 或闭包。相机模块错误地从 (gnu packages video) 选择 libcamera，固定 Guix 3c50593 的定义位于 (gnu packages photo)，修正导入。U-Boot 步骤已通过，不能视作根系统构建通过。
 
 #45039916915（双系统 push）已通过求值，qbootctl configure 失败：codeload URL 的下载名称为 0.2.2，没有归档后缀，Guix unpack 未展开源码。给 origin 显式设置 qbootctl-0.2.2.tar.gz，源码与哈希保持不变。
+
+[单系统 niri #45041217603](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45041217603) 的镜像步骤耗时约 3 小时 16 分钟，`niri-default-config` 的单文件来源触发 Guix `install-license-files` 阶段的匹配错误，rootfs 与签名闭包未生成。Guix profile 和内核缓存命中，niri store 闭包因完整键变化未命中。跳过该单文件包的许可证扫描，并允许回退导入同架构同变体的旧闭包，镜像成功后仍按当前键保存。
