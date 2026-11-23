@@ -119,7 +119,7 @@ jobs:
           (sheng-os #:desktop '$DESKTOP #:root-label "linux")
           EOF
           set -o pipefail
-          "$GUIX" system build --verbosity=2 -L . images/ci-system.scm \
+          scripts/ci-guix-build.sh system build --verbosity=2 -L . images/ci-system.scm \
             2>&1 > ci-system.path | tee system-build.err >&2
       - name: Collect system build diagnostics
         if: ${{ failure() && steps.system-closure.outcome == 'failure' }}
