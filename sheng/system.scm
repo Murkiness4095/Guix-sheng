@@ -109,6 +109,18 @@
         (service network-manager-service-type)
         (service bluetooth-service-type)))
 
+(define sheng-niri-dbus-daemon
+  (program-file
+   "sheng-niri-dbus-daemon"
+   #~(let* ((daemon #$(file-append dbus "/bin/dbus-daemon"))
+            (runtime (getenv "XDG_RUNTIME_DIR"))
+            (bus (and runtime (string-append runtime "/bus")))
+            (arguments (cdr (command-line))))
+       (apply execl daemon "dbus-daemon"
+              (if (and bus (not (file-exists? bus)))
+                  (cons (string-append "--address=unix:path=" bus) arguments)
+                  arguments)))))
+
 (define sheng-niri-session
   (program-file
    "sheng-niri-session"
@@ -125,9 +137,13 @@
               (dbus-run #$(file-append dbus "/bin/dbus-run-session"))
               (niri-bin #$(file-append niri "/bin/niri")))
          (if use-home?
-             (execl dbus-run "dbus-run-session" "--" niri-bin "-c" config
+             (execl dbus-run "dbus-run-session"
+                    (string-append "--dbus-daemon=" #$sheng-niri-dbus-daemon)
+                    "--" niri-bin "-c" config
                     "--" "/etc/sheng/niri-startup" "--home")
-             (execl dbus-run "dbus-run-session" "--" niri-bin
+             (execl dbus-run "dbus-run-session"
+                    (string-append "--dbus-daemon=" #$sheng-niri-dbus-daemon)
+                    "--" niri-bin
                     "-c" "/etc/sheng/niri-noctalia.kdl"))))))
 
 

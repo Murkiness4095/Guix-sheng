@@ -330,7 +330,7 @@
                      (wrap-program program
                        `("PATH" ":" prefix
                          (,#$(file-append python "/bin")
-                          ,#$(file-append glib "/bin"))))
+                          ,(string-append #$glib:bin "/bin"))))
                      (substitute* (string-append #$output "/lib/udev/rules.d/90-xiaomi-mipps-auth.rules")
                        (("/usr/libexec/xiaomi-mipps-auth") program))))))))
     (inputs (list glib python))
