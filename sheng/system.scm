@@ -16,6 +16,7 @@
               #:select (fcitx5 fcitx5-chinese-addons fcitx5-configtool
                         fcitx5-gtk fcitx5-gtk4 fcitx5-qt fcitx5-rime))
   #:use-module ((gnu packages fonts) #:select (font-google-noto-sans-cjk))
+  #:use-module ((gnu packages gnome) #:select (adwaita-icon-theme))
   #:use-module (gnu packages linux)
   #:use-module ((gnu packages lxqt) #:select (pcmanfm-qt))
   #:use-module ((gnu packages qt) #:select (qtwayland))
@@ -184,7 +185,8 @@ The tty image keeps a text getty from %base-services."
             (else '())))
          (session-pkgs
           (case desktop
-            ((niri) (list niri noctalia fuzzel pcmanfm-qt qtwayland xwayland-satellite
+            ((niri) (list niri noctalia fuzzel pcmanfm-qt adwaita-icon-theme
+                          qtwayland xwayland-satellite
                           (sheng-niri-desktop "niri-sheng"
                                               sheng-niri-session)))
             (else '())))
@@ -298,6 +300,12 @@ The tty image keeps a text getty from %base-services."
               (sheng-internal-storage)
               (sheng-keyboard-auth-service))
         desktop-service
+        (if (eq? desktop 'niri)
+            (list (extra-special-file
+                   "/etc/xdg/pcmanfm-qt/default/settings.conf"
+                   (plain-file "pcmanfm-qt-settings.conf"
+                               "[System]\nFallbackIconThemeName=Adwaita\n")))
+            '())
         (if (eq? desktop 'tty)
             '()
             (list (udev-rules-service 'sheng-backlight brightnessctl)))
