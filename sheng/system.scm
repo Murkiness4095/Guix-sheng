@@ -109,10 +109,13 @@
 (define sheng-niri-session
   (program-file
    "sheng-niri-session"
-   #~(execl #$(file-append dbus "/bin/dbus-run-session")
-            "dbus-run-session" "--"
-            #$(file-append niri "/bin/niri")
-            "-c" "/etc/sheng/niri-noctalia.kdl")))
+   #~(begin
+       (setenv "PATH" (string-append #$(file-append dbus "/bin")
+                                    ":" (or (getenv "PATH") "")))
+       (execl #$(file-append dbus "/bin/dbus-run-session")
+              "dbus-run-session" "--"
+              #$(file-append niri "/bin/niri")
+              "-c" "/etc/sheng/niri-noctalia.kdl"))))
 
 (define (sheng-greetd-config desktop auto-login? username)
   (greetd-configuration
@@ -169,7 +172,7 @@ The tty image keeps a text getty from %base-services."
          (session-pkgs
           (case desktop
             ((niri) (list niri noctalia fuzzel sheng-thunar xwayland-satellite
-                          (sheng-niri-desktop "niri"
+                          (sheng-niri-desktop "niri-sheng"
                                               sheng-niri-session)))
             (else '())))
          (noctalia-config

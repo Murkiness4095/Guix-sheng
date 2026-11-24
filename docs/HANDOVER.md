@@ -63,3 +63,5 @@ https://github.com/Murkiness4095/Guix-sheng/actions/runs/45039183456 在 Evaluat
 [单系统 niri #45165144398](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45165144398) 的 WebKitGTK 已完成编译及后处理，闭包失败在 sheng-gstreamer-plugins。固定 Guix 将 libcamera 的 GStreamer 插件移至 gst 输出，修正插件目录引用。
 
 [单系统 niri #45203124057](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45203124057) 在恢复 QtBase 6.12.0 debug substitute 时失败。下载重试前清理半成品失败，随后报 mkdir File exists。CI 仅在检测到该错误且路径未注册时清理对应 Qt debug 目录并重试一次。
+
+2026-11-24 实机从 #45212805755 的 niri 闭包启动到第 2 世代，extlinux 同时保留第 1 世代。设备会话的 dbus-run-session 因 PATH 缺少 dbus-daemon 退出，登录入口回退到通用 niri --session，其环境导入命令在实机阻塞。源码修复设备会话 PATH，并给设备桌面条目使用独立文件名。实机通过串口恢复会话、120Hz 和手写笔托盘。第 2 世代的 store 运行闭包含 Thunar、GVfs 和 GNOME Online Accounts，但不含 WebKitGTK 构建输入。
