@@ -10,6 +10,7 @@
   #:use-module (gnu bootloader)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages base)
+  #:use-module ((gnu packages gawk) #:select (gawk))
   #:use-module (guix gexp)
   #:use-module (guix licenses)
   #:use-module (guix packages)
