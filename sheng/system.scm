@@ -14,7 +14,8 @@
   #:use-module (gnu packages display-managers)
   #:use-module ((gnu packages fcitx5)
               #:select (fcitx5 fcitx5-chinese-addons fcitx5-configtool
-                        fcitx5-gtk fcitx5-gtk4 fcitx5-qt))
+                        fcitx5-gtk fcitx5-gtk4 fcitx5-qt fcitx5-rime))
+  #:use-module ((gnu packages fonts) #:select (font-google-noto-sans-cjk))
   #:use-module (gnu packages linux)
   #:use-module ((gnu packages glib) #:select (dbus))
   #:use-module ((gnu packages ncurses) #:select (ncurses))
@@ -201,6 +202,7 @@ The tty image keeps a text getty from %base-services."
                            (spawn #$(file-append pipewire "/bin/pipewire-pulse"))
                            (spawn #$(file-append wireplumber "/bin/wireplumber"))
                            (spawn #$(file-append noctalia "/bin/noctalia"))
+                           (spawn #$(file-append fcitx5 "/bin/fcitx5"))
                            #$(if vendor-services?
                                  #~(begin
                                      (spawn #$(file-append sheng-pen-status "/bin/xiaomi-pen-status"))
@@ -249,10 +251,14 @@ The tty image keeps a text getty from %base-services."
       (packages (append (list ncurses fish starship git)
                         (if (eq? desktop 'tty)
                             '()
-                            (list alacritty kitty sheng-zed sheng-vscode brightnessctl fcitx5 fcitx5-chinese-addons
+                            (list alacritty kitty sheng-zed sheng-vscode brightnessctl font-google-noto-sans-cjk
+                                  fcitx5 fcitx5-chinese-addons fcitx5-rime
                                   fcitx5-configtool fcitx5-gtk fcitx5-gtk4 fcitx5-qt))
                         (if (memq desktop '(tty niri kde gnome))
                             (list fastfetch-minimal)
+                            '())
+                        (if (and vendor-services? (not (eq? desktop 'tty)))
+                            (list sheng-pen-status)
                             '())
                         browser session-pkgs %base-packages))
       (services

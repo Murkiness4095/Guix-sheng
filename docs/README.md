@@ -23,3 +23,5 @@ KDE 用 SDDM，GNOME 用 GDM，niri 用 noctalia greeter，tty 变体保留
 
 启动链（U-Boot → extlinux → tty）与刷机步骤见
 [boot-chain.md](boot-chain.md)。
+
+桌面变体包含 Noto CJK 字体、Fcitx 5 和 Rime。用 `fcitx5-configtool` 添加 Rime，输入法列表可取消“仅显示当前语言”。Noctalia 的界面语言在设置中选择，简体中文也可通过 `noctalia msg config-set shell.lang "'zh-Hans'"` 设置。启用 `vendor_services` 的桌面镜像会把手写笔状态程序同时安装到应用菜单与托盘。
