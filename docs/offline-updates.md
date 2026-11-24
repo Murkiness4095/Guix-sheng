@@ -36,4 +36,4 @@ sudo -i guix time-machine -C /绝对路径/Guix-config/channels.scm -- \
   system reconfigure /绝对路径/Guix-config/system.scm
 ```
 
-个人 Home 使用 `guix time-machine -C channels-home.scm -- home reconfigure home.scm`。系统闭包包含运行所需的 store 项，个人 Home 重新求值时仍可能需要构建输入。如果直接使用系统预装的 Thunar，Home 的包列表可以省去重复的 `sheng-thunar` 声明和模块导入，避免通过它拉入 GVfs、GNOME Online Accounts 与 WebKitGTK。
+个人 Home 使用 `guix time-machine -C channels-home.scm -- home reconfigure home.scm`。系统闭包包含运行所需的 store 项，个人 Home 重新求值时仍可能需要构建输入。niri 系统预装 PCManFM-Qt 和 Qt Wayland 后端。个人 Home 配置可直接使用系统提供的文件管理器。

@@ -17,6 +17,8 @@
                         fcitx5-gtk fcitx5-gtk4 fcitx5-qt fcitx5-rime))
   #:use-module ((gnu packages fonts) #:select (font-google-noto-sans-cjk))
   #:use-module (gnu packages linux)
+  #:use-module ((gnu packages lxqt) #:select (pcmanfm-qt))
+  #:use-module ((gnu packages qt) #:select (qtwayland))
   #:use-module ((gnu packages glib) #:select (dbus))
   #:use-module ((gnu packages ncurses) #:select (ncurses))
   #:use-module (gnu packages librewolf)
@@ -43,7 +45,6 @@
   #:use-module (packages sheng-sddm)
   #:use-module (packages firmware)
   #:use-module (packages peripherals)
-  #:use-module (packages thunar)
   #:use-module (packages zed)
   #:use-module (packages vscode)
   #:use-module (services accessories)
@@ -183,7 +184,7 @@ The tty image keeps a text getty from %base-services."
             (else '())))
          (session-pkgs
           (case desktop
-            ((niri) (list niri noctalia fuzzel sheng-thunar xwayland-satellite
+            ((niri) (list niri noctalia fuzzel pcmanfm-qt qtwayland xwayland-satellite
                           (sheng-niri-desktop "niri-sheng"
                                               sheng-niri-session)))
             (else '())))

@@ -125,3 +125,5 @@ Niri 的自动登录与 greeter 入口统一通过 `dbus-run-session` 启动；�
 ## CI 工作流
 
 参考 nixos-sheng `2be57fe7da35b0b98963cc5da233ad6765d5c134` 的单系统、双系统与独立 EFI 实验结构。Guix 保留 `build-single` 和 `build-dual`，将外设包编译和个人配置样板求值合入 `build-single` 的 push/PR 检查。样板现在使用当前 checkout 和 CI 固定的 Guix、midnight，原手动工作流对已发布固定 Guix-sheng 频道的集成检查退役。push 和 PR 验证镜像声明并构建、导出 TTY 系统闭包。手动默认 none，仅导出 TTY 闭包；显式选择变体才生成可刷镜像。镜像封装失败时，仍可保存已经构建的系统闭包缓存。自动检查与手动构建使用不同并发组。旧 Guix EFI bundle 在当前分支无工作流文件，GitHub 上保留的是禁用的历史入口。
+
+niri 系统默认文件管理器改为固定 Guix 频道的 PCManFM-Qt 2.4.0，随系统提供 Qt Wayland 后端。平板的 ARM64 dry-run 确认该包可从 substitute 下载。此变更移除了 niri 通过 Thunar 引入 GVfs、GNOME Online Accounts 与 WebKitGTK 的依赖路径。
