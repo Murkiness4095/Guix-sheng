@@ -107,7 +107,8 @@
         ;; which wpa-supplicant provides.
         (service wpa-supplicant-service-type)
         (service network-manager-service-type)
-        (service bluetooth-service-type)))
+        (service bluetooth-service-type
+                 (bluetooth-configuration (auto-enable? #t)))))
 
 (define sheng-niri-dbus-daemon
   (program-file

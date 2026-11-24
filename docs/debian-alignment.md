@@ -111,6 +111,7 @@ Niri 的自动登录与 greeter 入口统一通过 `dbus-run-session` 启动；�
 | serial-console | services/serial-console.scm，USB agetty 登录与 g_serial.use_acm=1 | 尚未实机验证 |
 | firmware | 现有 FastRPC、SSC、THP、QTEE、键盘认证、指纹、充电、LED/折叠服务 | 已有接线不等于完整功能验收 |
 | firmware/MiPPS | 保留上游 online debounce 与通知处理，Python 调度入口改为 Shepherd 请求文件；Type-C attach 直接请求认证，flock 排他执行 | 补丁 dry-run 通过，快充功率待验证 |
+| Bluetooth | nixos-sheng 默认启用蓝牙；Guix 显式启用 BlueZ 的 `AutoEnable`，使控制器开机自动上电 | 手写笔已配对后重启自动重连待实机验证 |
 | audio | UCM union、HiFi verb、Speaker/Mic3、WirePlumber 节点规则 | niri 热修复已枚举音频节点，实际播放待验收 |
 | camera | WirePlumber libcamera monitor 与 GStreamer 插件搜索路径 | 已补 libcamera，画面待验收 |
 | internal-storage | 维护分区 UFS+GPT 过滤规则一致 | 源码核对 |
