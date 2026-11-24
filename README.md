@@ -1,53 +1,25 @@
 # Guix-sheng
 
-适用于小米平板 6S Pro 12.4（sheng）的 GNU Guix System 移植。
-板级实现以 [NixOS-sheng](https://github.com/Murkiness4095/nixos-sheng)
-为参考，使用 sheng 内核、设备树和固件。
+小米平板 6S Pro 12.4（sheng）的 GNU Guix System 移植，使用板级 Linux 7.3.4、U-Boot 和 extlinux。板级实现参考 [nixos-sheng](https://github.com/Murkiness4095/nixos-sheng)，以 [debian-sheng](https://github.com/ianchb/debian-sheng) 补缺并交叉核对。
 
-## 选安装布局
+单系统 TTY 已验证启动并自动登录。niri 签名闭包已在实机导入并启动新世代，登录修复和旧世代菜单仍待复验。外设状态按功能记录在[外设验证](docs/peripheral-validation.md)。
 
-| 场景 | CI 工作流 | Guix 根分区 | 启动方式 |
+| 你要做什么 | 从这里开始 |
+| --- | --- |
+| 首次安装、核对启动链 | [项目说明](docs/README.md)、[单系统安装](docs/boot-chain.md) |
+| 保留现有 Android 或 NixOS | [双系统指南](docs/dual-boot.md) |
+| 更新现有系统、切换世代 | [闭包更新与回退](docs/offline-updates.md) |
+| 编写个人配置 | [最小样板](examples/minimal/README.md) |
+| 开发、调试或接手维护 | [开发指南](docs/DEVELOPMENT.md)、[CI](docs/CI.md)、[维护交接](docs/HANDOVER.md) |
+| 核对移植差异和待验收项 | [上游对照](docs/debian-alignment.md)、[待办](TODO.md) |
+
+| Guix 根分区 | 工作流 | 配套开机镜像 | 根镜像示例 |
 | --- | --- | --- | --- |
-| Guix 使用整个或已缩小的 `userdata` | `build-single` | `userdata` | U-Boot → extlinux |
-| 保留 `userdata` 上的 Android 或 NixOS | `build-dual` | `linux` | 独立 ABL 槽 → U-Boot → extlinux |
-| 保留 `linux` 上的 NixOS | `build-single` | `userdata` | 独立 ABL 槽 → U-Boot → extlinux |
+| `userdata` | `build-single` | `sheng-boot.img` | `single-tty.sparse.img` |
+| `linux` | `build-dual` | `sheng-boot-dual.img` | `dual-tty.sparse.img` |
 
-保留现有系统时，先按它占用的根分区选择 Guix 产物，再按 A/B 槽刷写。
-见[双系统安装与切换](docs/dual-boot.md)。
+在 [GitHub Actions](https://github.com/Murkiness4095/Guix-sheng/actions) 选择工作流和 `main`。手动运行默认 `image=none`，导出 TTY 更新闭包。选择 `tty`、`niri`、`kde` 或 `gnome` 才生成可刷镜像，首次验收选 `tty`。push 和 PR 检查系统配置并导出闭包。手动构建默认账号和初始密码均为 `sheng`，自动登录和外设服务默认开启。
 
-## 构建并下载
+首次安装使用同一轮的开机镜像和根镜像。根镜像会覆盖目标分区。保留其他系统时，按双系统指南核对根分区和 A/B 槽。已有 Guix 系统可导入同布局的签名闭包原地更新。
 
-1. 在 GitHub Actions 打开对应工作流，再选择 `main` 分支。
-2. 用 `image` 选择 `tty`、`niri`、`kde` 或 `gnome`。首次启动验证用
-   `tty`。四种根镜像均包含 `fastfetch`（Guix 的 `fastfetch-minimal` 包）。
-   默认主机名为 `guix`。
-   所有镜像预装 Fish、Starship 和 Git，登录账号默认使用 Fish。桌面镜像预装 Kitty 和 Zed，niri 镜像额外预装 Fuzzel 和 noctalia 状态栏。
-   桌面镜像还预装 Fcitx 5、中文拼音、配置工具及 GTK 和 Qt 输入模块。
-3. `desktop_username` 和 `desktop_password` 默认都是 `sheng`，对本次
-   根镜像的登录生效，包括 TTY。下载同一个 run 的开机镜像和 sparse 根镜像。
-   `auto_login` 默认开启。TTY 会直接进入 tty1 的用户 shell，桌面会启动对应会话。
-   取消勾选可恢复登录界面，已有系统可在 `sheng-os` 调用中设置 `#:auto-login? #f`。
-   手动运行默认 `image=none`，仅导出 TTY 签名闭包。选择具体变体会同时生成可刷镜像和签名闭包，见[离线闭包更新](docs/offline-updates.md)。
-
-| 工作流 | 开机镜像 | 根镜像示例 |
-| --- | --- | --- |
-| `build-single` | `sheng-boot.img` | `single-tty.sparse.img` |
-| `build-dual` | `sheng-boot-dual.img` | `dual-tty.sparse.img` |
-
-[单系统 TTY 修正版](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44065603032)
-已在实机从 `userdata` 启动并自动登录到 TTY。
-`vendor_services` 默认开启，接入试验性的板级 UCM、触控、音频、传感器和充电服务；
-取消勾选可构建精简闭包。push 构建同样开启。
-
-## 文档
-个人系统配置可通过 Guix channel 导入 `(sheng system)`。见[最小样板](examples/minimal/README.md)。
-Guix EFI 实验已并入 `main` 历史。
-
-- [单系统首启与 extlinux 验收](docs/boot-chain.md)
-- [双系统安装与 NixOS 共存](docs/dual-boot.md)
-- [最小 Guix 系统声明](examples/minimal/README.md)
-- [CI、固定频道与缓存](docs/CI.md)
-- [离线闭包更新与世代切换](docs/offline-updates.md)
-- [维护交接](docs/HANDOVER.md)与[上游实现差异](docs/debian-alignment.md)
-
-许可证为 MIT。
+许可证见 [LICENSE](LICENSE)。

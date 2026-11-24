@@ -1,6 +1,6 @@
 # 与 debian-sheng 的功能对齐
 
-第一参考是 [NixOS-sheng](https://github.com/Murkiness4095/nixos-sheng) 的
+第一参考是 [nixos-sheng](https://github.com/Murkiness4095/nixos-sheng) 的
 `2be57fe7da35b0b98963cc5da233ad6765d5c134`。
 [debian-sheng](https://github.com/ianchb/debian-sheng) 的 `a93aaa1`
 用于补缺和交叉核对。系统集成按 Guix 和 Shepherd 接口实现。
@@ -12,7 +12,7 @@
 
 | 项 | debian-sheng | 本仓库 |
 | --- | --- | --- |
-| 内核 | 默认使用 `ianchb/sm8550-mainline` 的预编译 release | 按 NixOS-sheng `2be57fe` 从 `87ac0f2` 编译，复用 Debian 全量配置及 NixOS 配置片段和源码修改 |
+| 内核 | 默认使用 `ianchb/sm8550-mainline` 的预编译 release | 按 nixos-sheng `2be57fe` 从 `87ac0f2` 编译，复用 Debian 全量配置及 NixOS 配置片段和源码修改 |
 | 内核 ARM64 头文件生成 | NixOS 构建环境能访问 `/bin/sh` | Guix 沙箱改用 Kbuild 的 `$(CONFIG_SHELL)`（CI #44020864761） |
 | 固件 | `ianchb/sheng-firmware` | 同源，`packages/firmware.scm` 固定提交 |
 | boot.img | `mkbootimg`（header v2） | `packages/mkbootimg-v2.py`，输出与 AOSP 逐字节一致 |
@@ -49,17 +49,17 @@
 `sheng-os` 可用 `#:vendor-services? #t` 接入首批外设配置。当前包括
 合并板级和通用 UCM2 配置后的 `ALSA_CONFIG_UCM2`，以及等待触控驱动
 节点后启动 THP 的 Shepherd 服务，以及 FastRPC 的可写 SSC 注册表、
-传感器代理及其 udev、D-Bus、Polkit 接线。参考 NixOS-sheng 的
+传感器代理及其 udev、D-Bus、Polkit 接线。参考 nixos-sheng 的
 `modules/audio.nix`、`modules/firmware.nix` 和 THP systemd 单元。
 默认 TTY 首启镜像仍可单独验证。WirePlumber、HiFi 启动应用、
 指纹、充电和其余设备服务待接线，实机触控和音频待验证。
 
-根分区扩容参照 NixOS-sheng `2be57fe` 的 `modules/hardware.nix` 中
+根分区扩容参照 nixos-sheng `2be57fe` 的 `modules/hardware.nix` 中
 `fileSystems."/".autoResize`。Guix 由 Shepherd 在根分区挂载和 udev 就绪后
 运行 `resize2fs`。只有当前可写的 ext4 根挂载与工作流对应的
 `userdata` 或 `linux` 指向同一设备时才扩容。每次启动均可安全重试。
 
-`libssc` 仍固定到 NixOS-sheng 使用的 `033e2a32095c024d6dbdfb1d4ae1db4a94be32f1`。
+`libssc` 仍固定到 nixos-sheng 使用的 `033e2a32095c024d6dbdfb1d4ae1db4a94be32f1`。
 由于 GitHub runner 多次从 Codeberg 下载返回 504（如 #44161062321），
 仓库保存原始归档，SHA-256 为
 `80eb911009fccea52ab0ea0dcc78572a00757abd840e8dc81e9b72cd230526b8`。
@@ -67,7 +67,7 @@ QMI 重试补丁在解包后应用。
 
 ## 键盘盖认证
 
-参考 NixOS-sheng `2be57fe7da35b0b98963cc5da233ad6765d5c134` 的固件模块。所有 Guix 镜像默认由 Shepherd 启动 QTEE 安全文件系统配置、QTEE 监听器和 `xiaomi_devauth`。认证程序沿用固定源码与 `devauth.mbn`，通过 `/dev/nanosic_auth` 与驱动通信。QTEE 运行时仍来自现有 sheng-fingerprint 软件包。待验证实机认证和键盘空闲后输入。
+参考 nixos-sheng `2be57fe7da35b0b98963cc5da233ad6765d5c134` 的固件模块。所有 Guix 镜像默认由 Shepherd 启动 QTEE 安全文件系统配置、QTEE 监听器和 `xiaomi_devauth`。认证程序沿用固定源码与 `devauth.mbn`，通过 `/dev/nanosic_auth` 与驱动通信。QTEE 运行时仍来自现有 sheng-fingerprint 软件包。待验证实机认证和键盘空闲后输入。
 
 ## NixOS 板级服务核对
 
@@ -83,7 +83,7 @@ Niri 会话显式 include 外设启动配置，在启用 `vendor_services` 时�
 | 桌面与存储 | 已接入内部 UFS 维护分区隐藏规则。KDE 登录界面的屏幕键盘尚未接入。 |
 | 双系统与更新 | extlinux 和根分区扩容已接线。启动槽成功标记仍是骨架。旧 CI 镜像的 store 数据库注册阻碍现有世代的可靠滚动更新。EFI 在单独分支。 |
 
-外设扩展继续参考 NixOS-sheng `2be57fe`。`vendor_services` 启用 HiFi UCM 初始化、WirePlumber 音频规则、键盘灯权限和按内核参数启动的充电界面。桌面同时启用键盘静音灯辅助程序、摄像头配置和板级 fprintd 服务。接线待 CI 构建和实机验收。
+外设扩展继续参考 nixos-sheng `2be57fe`。`vendor_services` 启用 HiFi UCM 初始化、WirePlumber 音频规则、键盘灯权限和按内核参数启动的充电界面。桌面同时启用键盘静音灯辅助程序、摄像头配置和板级 fprintd 服务。接线待 CI 构建和实机验收。
 
 Niri 的自动登录与 greeter 入口统一通过 `dbus-run-session` 启动；启动程序等待 PipeWire socket 后启动 Pulse 兼容服务和 WirePlumber，再启动 noctalia 与可选外设程序。实机确认原镜像没有用户 D-Bus 和音频进程。Zed 包显式提供 Mesa Freedreno ICD，实机指定该驱动后创建窗口成功。上述改动待新 CI 镜像和重启验收。
 
@@ -91,7 +91,7 @@ Niri 的自动登录与 greeter 入口统一通过 `dbus-run-session` 启动；�
 
 ## 2026-11-22 对齐复核
 
-基准仍为 NixOS-sheng `2be57fe7da35b0b98963cc5da233ad6765d5c134`。
+基准仍为 nixos-sheng `2be57fe7da35b0b98963cc5da233ad6765d5c134`。
 
 - MiPPS 原规则使用 `SYSTEMD_WANTS`，`--usb-online-trigger` 也调用 systemctl。Guix 改由 udev 写入请求文件、Shepherd 监视请求并通过 flock 调用固定版本认证程序。尚待原装充电器下确认协商结果和实际功率。
 - 未对齐：`modules/boot-slot.scm` 仍为空实现，没有 NixOS 的 qbootctl 成功标记。SDDM 虚拟键盘接线仍缺少 NixOS 的 kwin input-method 配置。可选 tmpfs-root/preservation 与 Nix bootstrap 属于不同系统机制，未移植。
@@ -124,4 +124,4 @@ Niri 的自动登录与 greeter 入口统一通过 `dbus-run-session` 启动；�
 
 ## CI 工作流
 
-参考 NixOS-sheng `2be57fe7da35b0b98963cc5da233ad6765d5c134` 的单系统、双系统与独立 EFI 实验结构。Guix 保留 `build-single` 和 `build-dual`，将外设包编译和个人配置样板求值合入 `build-single` 的 push/PR 检查。样板现在使用当前 checkout 和 CI 固定的 Guix、midnight，原手动工作流对已发布固定 Guix-sheng 频道的集成检查退役。push 和 PR 验证镜像声明并构建、导出 TTY 系统闭包。手动默认 none，仅导出 TTY 闭包；显式选择变体才生成可刷镜像。镜像封装失败时，仍可保存已经构建的系统闭包缓存。自动检查与手动构建使用不同并发组。旧 Guix EFI bundle 在当前分支无工作流文件，GitHub 上保留的是禁用的历史入口。
+参考 nixos-sheng `2be57fe7da35b0b98963cc5da233ad6765d5c134` 的单系统、双系统与独立 EFI 实验结构。Guix 保留 `build-single` 和 `build-dual`，将外设包编译和个人配置样板求值合入 `build-single` 的 push/PR 检查。样板现在使用当前 checkout 和 CI 固定的 Guix、midnight，原手动工作流对已发布固定 Guix-sheng 频道的集成检查退役。push 和 PR 验证镜像声明并构建、导出 TTY 系统闭包。手动默认 none，仅导出 TTY 闭包；显式选择变体才生成可刷镜像。镜像封装失败时，仍可保存已经构建的系统闭包缓存。自动检查与手动构建使用不同并发组。旧 Guix EFI bundle 在当前分支无工作流文件，GitHub 上保留的是禁用的历史入口。

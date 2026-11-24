@@ -1,96 +1,39 @@
-# 离线闭包更新与世代切换
+# 闭包更新与回退
 
-CI 可以导出已构建系统的签名 store 闭包；平板导入后原地生成新世代，
-不重刷 root 镜像，旧世代和数据保留。
+已有 Guix 系统可以导入 CI 的签名闭包原地更新。保留现有数据和世代时，应选择与当前根分区匹配的闭包。刷写 sparse rootfs 会覆盖目标 ext4，连同其中的 `/var/guix`、系统世代和用户数据。
 
-刷写任何 root/sparse 镜像都会覆盖整个 ext4，`/var/guix` 和全部世代随之
-丢失。可通过闭包导入或声明式 reconfigure 保留数据原地更新。
+## 导入闭包
 
-## CI 产出
+从同一次 CI 下载 `sheng-single-closures` 或 `sheng-dual-closures`。以下用 `single-niri` 举例。使用前核对 CI 和签名公钥的来源。
 
-`build-single` / `build-dual` 在系统构建后自动
-导出闭包 artifact：
-
-- `<variant>.nar.zst`：镜像启动系统的签名闭包
-- `guix-<store>.nar.zst`：固定频道 `guix pull` 的 Guix 闭包
-- `signing-key.pub`、`SHA256SUMS`
-
-签名由 CI 的 guix-daemon 密钥完成；`guix archive --import` 强制验签。
-要让平板只授权一次，在仓库 Secrets 配置固定的
-`GUIX_ARCHIVE_SIGNING_KEY` / `GUIX_ARCHIVE_SIGNING_KEY_PUB`。未配置时
-每个 runner 生成新密钥，公钥随之变化，平板需重新授权。
-
-## 平板端
-
-```sh
-sudo guix archive --authorize < signing-key.pub     # 每次更换 CI 密钥后一次
-zstd -dc sheng-tty.nar.zst | sudo guix archive --import
-zstd -dc guix-*.nar.zst | sudo guix archive --import
+```bash
+set -o pipefail
+sha256sum -c SHA256SUMS &&
+sudo guix archive --authorize < signing-key.pub &&
+zstd -dc single-niri.nar.zst | sudo guix archive --import
 ```
 
-分片下载时先拼接：`cat part* | zstd -dc | sudo guix archive --import`。
+如需 CI 使用的固定频道 Guix，可另外导入同包中的 `guix-*.nar.zst`。导入只把对象加入 store。切换命令由哪个 Guix profile 执行，仍取决于调用时使用的可执行文件。使用固定公钥时，在 CI 配置 `GUIX_ARCHIVE_SIGNING_KEY` 和 `GUIX_ARCHIVE_SIGNING_KEY_PUB`。
 
-## 直接注册并切换世代
+## 切换系统世代
 
-artifact 里的 `<variant>.system` 记录了系统 store 路径。导入闭包后直接注册为
-下一世代并切换，不重新求值配置：
+`single-niri.system` 记录目标 store 路径。使用已加载 `guix-sheng` 频道、能识别 `sheng-extlinux` 的 Guix 执行仓库的切换脚本：
 
-```sh
-sudo scripts/sheng-switch.sh "$(cat single-tty.system)"
+```bash
+sudo env GUIX=/绝对路径/guix bash /绝对路径/guix-sheng/scripts/sheng-switch.sh "$(cat single-niri.system)"
 ```
 
-脚本等价于 NixOS 的 `nix-env -p /nix/var/nix/profiles/system --set` 加
-`switch-to-configuration boot`：建 `system-N-link`、让
-`guix system switch-generation N` 重装 extlinux、运行 activate。旧世代和
-数据不动，重启后生效。
+脚本注册世代并调用 `guix system switch-generation`。Guix 会本地生成 extlinux 菜单。切换成功后，确认系统 profile 和默认启动项指向目标世代，再重启。遇到 `sheng-extlinux: no such bootloader` 时，检查实际使用的 Guix profile 是否包含 `gnu/bootloader/sheng.scm`。第 2 世代已通过手动更新 extlinux 启动，标准脚本路径仍待实机复验。
 
-前提：运行中的 Guix profile 里要有 `guix-sheng` channel，且提交包含
-`gnu/bootloader/sheng.scm`。Guix 的 `switch-generation` 按名字查
-bootloader 注册表，`sheng-extlinux` 原先不在注册表里，会报
-`sheng-extlinux: no such bootloader`；该模块把它注册进去。
+用 `guix system list-generations` 查看世代。回退可在 extlinux 世代菜单选择旧项，或在能够识别引导模块的 Guix 中运行 `sudo guix system roll-back`。U-Boot 顶层菜单只有 Guix 入口，世代由下一层 extlinux 菜单读取。
 
-## 重新求值配置
+## 更新个人配置
 
-要应用自己的配置变更，仍用 `guix system reconfigure`。必须与 CI 使用相同的
-`channels.scm` 和仓库提交，否则 store path 不同，缺失的包会本地编译：
+在个人 `channels.scm` 中更新 `guix-sheng` 的固定提交，再重新配置：
 
 ```sh
-sudo -i guix time-machine -C channels.scm -- \
-     system reconfigure -L . /path/to/system.scm
+sudo -i guix time-machine -C /绝对路径/Guix-config/channels.scm -- \
+  system reconfigure /绝对路径/Guix-config/system.scm
 ```
 
-闭包已导入且依赖与配置匹配时可复用对应项，再求值、激活并重写
-`/boot/extlinux/extlinux.conf`，随后重启。
-
-## 世代管理
-
-```sh
-guix system list-generations
-guix system switch-generation 3     # re-installs bootloader, keeps all generations
-guix system roll-back
-guix system delete-generations
-```
-
-旧世代是 GC root，`guix gc` 不会回收；只有删除世代才释放磁盘。
-
-## 限制
-
-- extlinux 现在生成 U-Boot 菜单：`MENU TITLE`、每个世代的 `MENU LABEL`（附
-  `gnu.system` 短哈希）、`PROMPT 1` 和默认超时；菜单可选择旧世代，
-  `DEFAULT` 仍指向 `guix-default`。
-- `desktop`、`vendor_services` 与 CI 不同时会引入闭包外的包，需本地编译。
-- 每代钉住一份闭包，先确认根分区空间。
-- channel 或配置变化可能引入新的 store 项；旧项仍然有效，可继续复用。
-- 只有 U-Boot / 分区布局变化才需要重刷 `sheng-boot.img`。
-
-## 像 flake inputs 一样更新 channel
-
-个人 `channels.scm` 中的 `guix-sheng` 使用 `main` 分支，并把 `commit` 改为希望应用的完整提交。Guix 和 midnight 保持与 CI 相同的固定提交。然后在平板的个人配置目录运行：
-
-```sh
-sudo -i guix time-machine -C /绝对路径/Guix-config/channels.scm -- system reconfigure /绝对路径/Guix-config/system.scm
-```
-
-这是用户手动执行的系统更新命令。它创建系统世代并更新 extlinux，内核变化后重启。仅修改 Home 配置时，运行 `guix time-machine -C channels-home.scm -- home reconfigure home.scm`。
-
-上述声明式 reconfigure 也能保留数据原地更新。前文“闭包导入是唯一不清盘的更新方式”应理解为使用 CI 预构建系统时的更新路径。闭包已导入只能减少相同 store 项的构建，配置或 channel 不同仍可能触发构建。新 channel 提交不会使旧 store 项失效，同一内容和依赖仍可复用。
+个人 Home 使用 `guix time-machine -C channels-home.scm -- home reconfigure home.scm`。系统闭包包含运行所需的 store 项，个人 Home 重新求值时仍可能需要构建输入。如果直接使用系统预装的 Thunar，Home 的包列表可以省去重复的 `sheng-thunar` 声明和模块导入，避免通过它拉入 GVfs、GNOME Online Accounts 与 WebKitGTK。

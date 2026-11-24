@@ -1,6 +1,6 @@
 # 双系统安装与切换
 
-参考 [NixOS-sheng 双系统指南](https://github.com/Murkiness4095/nixos-sheng/blob/2be57fe7da35b0b98963cc5da233ad6765d5c134/docs/dual-boot.md)。
+参考 [nixos-sheng 双系统指南](https://github.com/Murkiness4095/nixos-sheng/blob/2be57fe7da35b0b98963cc5da233ad6765d5c134/docs/dual-boot.md)。
 ABL 通过 A/B 槽选择系统。Guix 的 U-Boot 从对应根分区读取 extlinux。
 
 ## 构建产物
