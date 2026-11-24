@@ -39,6 +39,10 @@ size=${BASH_REMATCH[2]}
 dd if="$disk" of="$prefix.ext4" bs=4M skip="$start" count="$size" \
   iflag=skip_bytes,count_bytes status=progress
 config=$(debugfs -R 'cat /boot/extlinux/extlinux.conf' "$prefix.ext4")
+menu=$(debugfs -R 'cat /boot/sheng-bootmenu.env' "$prefix.ext4")
+grep -qx 'PROMPT 0' <<< "$config"
+grep -q '^bootmenu_0=.*=setenv pxe_label_override; run bootlinux$' <<< "$menu"
+grep -q '^bootmenu_[0-9]*=Reboot to fastboot (bootloader)=run rebootfastboot$' <<< "$menu"
 if ! grep -qiE '^[[:space:]]*LINUX[[:space:]]+' <<< "$config"; then
   echo "Missing extlinux kernel entry in $prefix.ext4" >&2
   exit 1

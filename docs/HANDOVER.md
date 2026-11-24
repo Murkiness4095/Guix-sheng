@@ -2,6 +2,7 @@
 
 ## 当前状态
 
+- 对齐 nixos-sheng `2be57fe` 的 U-Boot 主菜单。镜像初始化、系统重配和闭包切换生成 `/boot/sheng-bootmenu.env`，Extlinux 使用 `PROMPT 0`。已用三个系统条目演练旧配置修复。CI 产物和实机按键启动待验证。
 - [#44065603032](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44065603032) 已实机启动并自动登录 TTY。手动登录仍待验收。
 - [#45212805755](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45212805755) 已产出单系统 niri 镜像和闭包。实机已从闭包启动第 2 世代，标准切换脚本遇到引导模块查找问题，当次通过手动更新 extlinux 完成。
 - niri 会话的 D-Bus 路径修复已提交，待新产物实机复验。

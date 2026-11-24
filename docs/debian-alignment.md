@@ -33,7 +33,7 @@
 | 差异 | 原因 | 处理 |
 | --- | --- | --- |
 | U-Boot defconfig | Debian 直启没有此步骤；NixOS 用 `buildUBoot` | 固定的 U-Boot 提交 `7025b79` 中 `CONFIG_CLK_QCOM_SM8550=y` 重复两次，Guix 构建拒绝重复项（CI #43688501887）；源补丁删除一条，保留同一取值；配置阶段直接调用 make sm8550_defconfig，对齐 NixOS，避开 Guix 额外的一致性检查（CI #43945937332） |
-| U-Boot 菜单 | 默认入口显示 Boot NixOS | Guix 使用 Boot Guix 标签，extlinux 命令保持同一入口 |
+| U-Boot 菜单 | nixos-sheng `2be57fe` 生成 `sheng-bootmenu.env`，通过 `pxe_label_override` 选择世代 | Guix 从 Extlinux 条目生成同格式的主菜单，保留 Fastboot 入口。Extlinux 关闭数字输入提示。镜像、重配和闭包切换实机待验。 |
 | 启动方式 | 内核 `Image.gz` + 追加 dtb 的 boot.img，ABL 直接启动，无 initrd；cmdline 仅 `root=PARTLABEL=` | U-Boot → extlinux，内核 `Image` + 独立 `FDT` + Guix initrd | 首个 TTY 沿用 NixOS 的 U-Boot 路线；Debian 直启保留为参考 |
 | 根文件系统初始化 | Debian `/sbin/init` | Guix initrd + `gnu.system=` | 镜像构建注册 store 闭包并关闭 WAL，构建后检查 SQLite；旧镜像需单独处理 |
 | 用户态服务：systemd 单元 | Guix 用 shepherd | 按 `services/` 逐项等价实现 |

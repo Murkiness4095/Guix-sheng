@@ -10,6 +10,7 @@
 # the guix-sheng channel must be part of the profile running this script.
 set -euo pipefail
 GUIX=${GUIX:-guix}
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 profile=/var/guix/profiles/system
 candidate=${1:?usage: $0 /gnu/store/...-system}
 
@@ -28,7 +29,8 @@ for link in "$profile"-*-link; do
   if [[ $number =~ ^[0-9]+$ ]]; then
     (( number > last )) && last=$number
     if [[ $(readlink -f "$link") == "$candidate" ]]; then
-      exec "$GUIX" system switch-generation "$number"
+      "$GUIX" system switch-generation "$number"
+      exec bash "$script_dir/sheng-bootmenu.sh"
     fi
   fi
 done
@@ -36,3 +38,4 @@ done
 next=$((last + 1))
 ln -s "$candidate" "$profile-$next-link"
 "$GUIX" system switch-generation "$next"
+exec bash "$script_dir/sheng-bootmenu.sh"

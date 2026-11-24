@@ -25,7 +25,9 @@ sudo env GUIX=/绝对路径/guix bash /绝对路径/guix-sheng/scripts/sheng-swi
 
 脚本注册世代并调用 `guix system switch-generation`。Guix 会本地生成 extlinux 菜单。切换成功后，确认系统 profile 和默认启动项指向目标世代，再重启。遇到 `sheng-extlinux: no such bootloader` 时，检查实际使用的 Guix profile 是否包含 `gnu/bootloader/sheng.scm`。第 2 世代已通过手动更新 extlinux 启动，标准脚本路径仍待实机复验。
 
-用 `guix system list-generations` 查看世代。回退可在 extlinux 世代菜单选择旧项，或在能够识别引导模块的 Guix 中运行 `sudo guix system roll-back`。U-Boot 顶层菜单只有 Guix 入口，世代由下一层 extlinux 菜单读取。
+用 `guix system list-generations` 查看世代。新镜像、系统重配和仓库的闭包切换脚本都会生成 U-Boot 主菜单。用音量键选择世代，电源键启动。直接运行 Guix 的 `system roll-back` 或 `system switch-generation` 后，在重启前运行 `sudo bash scripts/sheng-bootmenu.sh` 刷新主菜单。
+
+已有安装可以从仓库目录运行 `sudo bash scripts/sheng-bootmenu.sh --repair`，用现有的 Extlinux 启动项生成主菜单并关闭旧版数字输入提示。
 
 ## 更新个人配置
 

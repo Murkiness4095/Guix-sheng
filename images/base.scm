@@ -1,11 +1,13 @@
 ;; Load this adapter only from CI image declarations.
 (use-modules (guix gexp)
+             (modules sheng-bootloader)
              ((sheng system) #:prefix channel:))
 
 (define sheng-root-initializer
   #~(lambda (root . arguments)
       (apply (@ (gnu build image) initialize-root-partition)
              root #:register-closures? #f arguments)
+      (#$sheng-bootmenu-writer root)
       ;; Retain the exact Guix reference graphs for registration by the
       ;; caller, outside the image builder's SQLite locking environment.
       (let* ((directory (string-append root "/var/guix/sheng-reference-graphs"))
