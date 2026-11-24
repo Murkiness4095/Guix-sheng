@@ -1,4 +1,6 @@
 ;; Fixed channels for a standalone sheng configuration.
+(use-modules (guix channels))
+
 (list (channel
         (name 'guix)
         (url "https://codeberg.org/guix/guix.git")

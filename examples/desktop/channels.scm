@@ -1,5 +1,7 @@
 ;; channels.scm — Guix channels for sheng (Xiaomi Pad 6S Pro, aarch64).
 ;; Pin commits deliberately; record evidence when updating.
+(use-modules (guix channels))
+
 (list (channel
         (name 'guix)
         (url "https://git.savannah.gnu.org/git/guix.git")

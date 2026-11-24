@@ -1,5 +1,7 @@
 ;; channels.scm — Guix channels for sheng (Xiaomi Pad 6S Pro, aarch64).
 ;; Pinned commits, GitHub mirror for guix (Savannah git is unreliable in CI).
+(use-modules (guix channels))
+
 (list (channel
         (name 'guix)
         (url "https://codeberg.org/guix/guix.git")
