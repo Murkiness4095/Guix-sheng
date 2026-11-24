@@ -198,7 +198,6 @@ The tty image keeps a text getty from %base-services."
   "Return an <operating-system>.  DESKTOP: tty, kde, gnome, niri."
   (let* ((desktop-service
           (case desktop
-            ((niri) (list (service power-profiles-daemon-service-type)))
             ((kde) (list (service plasma-desktop-service-type)))
             ((gnome) (list (service gnome-desktop-service-type)))
             (else '())))
@@ -319,6 +318,9 @@ The tty image keeps a text getty from %base-services."
               (sheng-internal-storage)
               (sheng-keyboard-auth-service))
         desktop-service
+        (if (memq desktop '(niri kde gnome))
+            (list (service power-profiles-daemon-service-type))
+            '())
         (if (eq? desktop 'niri)
             (list (extra-special-file
                    "/etc/xdg/pcmanfm-qt/default/settings.conf"
