@@ -118,7 +118,7 @@ Niri 的自动登录与 greeter 入口统一通过 `dbus-run-session` 启动；�
 | virtual-keyboard | pinned Guix SDDM 服务默认使用 X11 greeter，不能直接套用 NixOS KWin compositor 字段；改为 Qt6 virtualkeyboard 插件封装及 InputMethod 配置 | 适配实现，登录界面待验收 |
 | extlinux/image | 现有 Guix 世代菜单、闭包注册和 ext4 提取 | 旧 TTY 有 CI/实机记录，本次未构建 |
 | desktop | 原生 Guix KDE/GNOME 服务，niri 自有用户 D-Bus、音频、托盘和 Xwayland 接线 | 不安装个人主题或壁纸 |
-| 电源档位 | 参考 nixos-sheng 固定 nixpkgs 的 GNOME/Plasma 默认服务，在 Guix 的 niri、KDE 和 GNOME 镜像启用 power-profiles-daemon。sheng 另将省电档接到 CPU 大核频率上限，保留 schedutil | 实机验证省电为 2.3424 GHz、均衡恢复 2.9568 GHz。实际耗电差异及服务开机待验证 |
+| 电源档位 | 参考 nixos-sheng 固定 nixpkgs 的 GNOME/Plasma 默认服务，在 Guix 的 niri、KDE 和 GNOME 镜像启用 power-profiles-daemon | Snapdragon 驱动支持的档位及实际调频效果待实机验证 |
 | tmpfs-root / preservation | NixOS 可选持久化布局尚未提供 Guix 对应开关 | 明确未对齐，普通 ext4 root 不依赖该特性 |
 | nix-bootstrap | Nix daemon 的初始化属于 NixOS 专属机制 | Guix 使用镜像 store DB 注册及 Guix daemon |
 
