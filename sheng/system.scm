@@ -7,6 +7,7 @@
   #:use-module (gnu services dbus)
   #:use-module (gnu services ssh)
   #:use-module (gnu services networking)
+  #:use-module ((gnu services pm) #:select (power-profiles-daemon-service-type))
   #:use-module (gnu services sddm)
   #:use-module (gnu services sound)
   #:use-module (gnu services xorg)
@@ -197,6 +198,7 @@ The tty image keeps a text getty from %base-services."
   "Return an <operating-system>.  DESKTOP: tty, kde, gnome, niri."
   (let* ((desktop-service
           (case desktop
+            ((niri) (list (service power-profiles-daemon-service-type)))
             ((kde) (list (service plasma-desktop-service-type)))
             ((gnome) (list (service gnome-desktop-service-type)))
             (else '())))
