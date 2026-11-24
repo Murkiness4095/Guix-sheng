@@ -113,10 +113,21 @@
    #~(begin
        (setenv "PATH" (string-append #$(file-append dbus "/bin")
                                     ":" (or (getenv "PATH") "")))
-       (execl #$(file-append dbus "/bin/dbus-run-session")
-              "dbus-run-session" "--"
-              #$(file-append niri "/bin/niri")
-              "-c" "/etc/sheng/niri-noctalia.kdl"))))
+       (let* ((home (getenv "HOME"))
+              (config-home (or (getenv "XDG_CONFIG_HOME")
+                               (and home (string-append home "/.config"))))
+              (config (and config-home
+                           (string-append config-home "/niri/config.kdl")))
+              (use-home? (and (equal? (getenv "SHENG_NIRI_USE_HOME_CONFIG") "1")
+                              config (file-exists? config)))
+              (dbus-run #$(file-append dbus "/bin/dbus-run-session"))
+              (niri-bin #$(file-append niri "/bin/niri")))
+         (if use-home?
+             (execl dbus-run "dbus-run-session" "--" niri-bin "-c" config
+                    "--" "/etc/sheng/niri-startup" "--home")
+             (execl dbus-run "dbus-run-session" "--" niri-bin
+                    "-c" "/etc/sheng/niri-noctalia.kdl"))))))
+
 
 (define (sheng-greetd-config desktop auto-login? username)
   (greetd-configuration
@@ -184,7 +195,9 @@ The tty image keeps a text getty from %base-services."
                       "niri-noctalia.kdl"
                       "include \""
                       (file-append niri-default-config "/share/niri/default-config.kdl")
-                      "\"\noutput \"DSI-1\" { mode \"3048x2032@120\"; }\nspawn-at-startup \""
+                      "\"\noutput \"DSI-1\" { mode \"3048x2032@120\"; }\n"
+                      "spawn-at-startup \"/etc/sheng/niri-startup\"\n"))
+                    (extra-special-file "/etc/sheng/niri-startup"
                       (program-file
                        "sheng-niri-startup"
                        #~(begin
@@ -201,16 +214,16 @@ The tty image keeps a text getty from %base-services."
                                (wait (- attempts 1))))
                            (spawn #$(file-append pipewire "/bin/pipewire-pulse"))
                            (spawn #$(file-append wireplumber "/bin/wireplumber"))
-                           (spawn #$(file-append noctalia "/bin/noctalia"))
-                           (spawn #$(file-append fcitx5 "/bin/fcitx5"))
+                           (unless (member "--home" (cdr (command-line)))
+                             (spawn #$(file-append noctalia "/bin/noctalia"))
+                             (spawn #$(file-append fcitx5 "/bin/fcitx5")))
                            #$(if vendor-services?
                                  #~(begin
                                      (spawn #$(file-append sheng-pen-status "/bin/xiaomi-pen-status"))
                                      (spawn #$(file-append sheng-keyboard-helper
                                                           "/libexec/xiaomi-sheng-keyboard-helper")
                                             "--micmute"))
-                                 #~#t)))
-                      "\"\n")))
+                                 #~#t)))))
               '()))
          (browser (if (eq? desktop 'tty) '() (list librewolf))))
     (operating-system
