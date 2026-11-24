@@ -2,6 +2,7 @@
 
 ## 当前状态
 
+- 实机发现开机后充电器已在线，但 MiPPS 监视器未收到认证请求。手动触发后确认 `pd_verifed=1`、`real_type=PD_PPS`，适配器报告上限 90 W。电池 98% 时实测输入约 8 W。监视器增加开机在线检查，带充电器冷启动及低电量功率待复验。
 - 对齐 nixos-sheng `2be57fe` 的 U-Boot 主菜单。镜像初始化、系统重配和闭包切换生成 `/boot/sheng-bootmenu.env`，Extlinux 使用 `PROMPT 0`。已用三个系统条目演练旧配置修复。CI 产物和实机按键启动待验证。
 - [#44065603032](https://github.com/Murkiness4095/Guix-sheng/actions/runs/44065603032) 已实机启动并自动登录 TTY。手动登录仍待验收。
 - [#45212805755](https://github.com/Murkiness4095/Guix-sheng/actions/runs/45212805755) 已产出单系统 niri 镜像和闭包。实机已从闭包启动第 2 世代，标准切换脚本遇到引导模块查找问题，当次通过手动更新 extlinux 完成。

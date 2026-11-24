@@ -41,17 +41,23 @@
      (start #~(make-forkexec-constructor
                (list #$(program-file
                         "sheng-mipps-monitor"
-                        #~(let loop ((previous #f))
+                        #~(let loop ((previous #f) (startup? #t))
                             (let* ((request "/run/sheng-mipps-request")
+                                   (online "/sys/class/power_supply/qcom-battmgr-usb/online")
                                    (current (and (file-exists? request)
                                                  (stat:mtime (stat request)))))
-                              (unless (equal? current previous)
+                              (when (or (not (equal? current previous))
+                                        (and startup?
+                                             (file-exists? online)
+                                             (call-with-input-file online
+                                               (lambda (port)
+                                                 (eqv? (read-char port) #\1)))))
                                 (system* #$(file-append util-linux "/bin/flock")
                                          "-n" "-E" "0" "/run/xiaomi-mipps-auth.lock"
                                          #$(file-append sheng-mipps-auth "/libexec/xiaomi-mipps-auth")
                                          "--timeout" "4"))
                               (sleep 1)
-                              (loop current)))))))
+                              (loop current #f)))))))
      (stop #~(make-kill-destructor))
      (respawn? #t)))))
 
