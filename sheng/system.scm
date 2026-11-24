@@ -56,6 +56,7 @@
   #:use-module (services grow-root)
   #:use-module (services keyboard-auth)
   #:use-module (services sensors)
+  #:use-module (services power-profile)
   #:use-module (services serial-console)
   #:use-module (services thp)
   #:export (sheng-os))
@@ -319,7 +320,8 @@ The tty image keeps a text getty from %base-services."
               (sheng-keyboard-auth-service))
         desktop-service
         (if (memq desktop '(niri kde gnome))
-            (list (service power-profiles-daemon-service-type))
+            (list (service power-profiles-daemon-service-type)
+                  (sheng-power-profile-service))
             '())
         (if (eq? desktop 'niri)
             (list (extra-special-file
